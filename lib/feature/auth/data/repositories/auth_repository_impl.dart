@@ -1,0 +1,74 @@
+import 'package:dartz/dartz.dart';
+import 'package:afiete/core/error/failure.dart';
+import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
+import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
+
+class AuthRepositoryImpl implements AuthRepository {
+  final AuthRemoteDataSource remoteDataSource;
+
+  const AuthRepositoryImpl({required this.remoteDataSource});
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> login(
+    String email,
+    String password,
+  ) async {
+    try {
+      final remoteUser = await remoteDataSource.login(email, password);
+      return Right(remoteUser.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> deleteAccount(
+    String email,
+    String password,
+  ) async {
+    try {
+      final remoteUser = await remoteDataSource.deleteAccount(email, password);
+      return Right(remoteUser.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> logout(
+    String email,
+    String password,
+  ) async {
+    try {
+      final remoteUser = await remoteDataSource.logout(email, password);
+      return Right(remoteUser.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> signup(
+    String name,
+    String email,
+    String password,
+  ) async {
+    try {
+      final remoteUser = await remoteDataSource.signup(name, email, password);
+      return Right(remoteUser.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> googleSignIn() async {
+    try {
+      final remoteUser = await remoteDataSource.googleSignIn();
+      return Right(remoteUser.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+}
