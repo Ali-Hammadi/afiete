@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       create: (_) => sl<AuthCubit>(),
       child: Scaffold(
         backgroundColor: AppColors.primarybackgroundColor,
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthLoaded) {
@@ -161,7 +161,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 18,
                               width: 18,
                             ),
-
                             const SizedBox(width: 10),
                             Text(
                               'Continue with Google',
@@ -171,9 +170,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-
-                        onPressed: () =>
-                            context.read<AuthCubit>().googleSignIn(),
+                        onPressed: () {
+                          context.read<AuthCubit>().googleSignIn();
+                        },
                       ),
                       const SizedBox(height: 30),
                       Row(
