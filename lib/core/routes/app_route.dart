@@ -1,5 +1,6 @@
 import 'package:afiete/feature/auth/presentation/views/auth_info_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/verify_account_screen.dart';
+import 'package:afiete/feature/home/presentation/screens/doctor_info.dart';
 import 'package:afiete/feature/home/presentation/screens/global_home_screen.dart';
 import 'package:afiete/feature/splash/presentation/views/splash_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/signup_screen.dart';
@@ -26,6 +27,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const VerifyAccountScreen());
       case MyRoutes.authInfoScreens:
         return MaterialPageRoute(builder: (_) => const AuthInfoScreen());
+      case MyRoutes.doctorInfoScreen:
+        return MaterialPageRoute(builder: (_) => const DoctorInfo());
 
       default:
         return MaterialPageRoute(
@@ -53,4 +56,5 @@ class MyRoutes {
   static const String authInfoScreens = "/authInfoScreens";
   // Home Screens
   static const String homeScreen = "/homeScreens";
+  static const String doctorInfoScreen = "/doctorInfoScreen";
 }
