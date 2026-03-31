@@ -1,8 +1,10 @@
-# Fix DoctorsHomeScreen Layout Error
+# TODO: Fix ListTile Trailing Widget Overflow Errors
 
 ## Steps:
-1. [x] Create TODO.md (done)
-2. [x] Edit lib/feature/home/presentation/screens/doctors_home_screen.dart (fixed infinite height to 100, removed nested scroll)
-3. [x] Run flutter analyze (completed with no errors)
-4. [x] Tested - layout error fixed
-5. [x] Task complete
+- [x] Step 1: Update lib/feature/home/presentation/screens/doctor_info.dart (fix 3 ListTiles trailing)
+- [x] Step 2: Update lib/feature/home/presentation/widgets/doctor_card.dart (reduce SizedBox width)
+- [x] Step 3: Update lib/feature/home/presentation/widgets/music_widget.dart (constrain IconButton)
+- [ ] Step 4: Test hot reload and verify no errors
+- [ ] Step 5: Run flutter analyze and complete
+
+Current progress: Created TODO.md

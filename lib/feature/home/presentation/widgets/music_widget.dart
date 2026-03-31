@@ -34,9 +34,12 @@ class MusicWidget extends StatelessWidget {
                   color: AppColors.primarytextColor,
                 ),
               ),
-              trailing: IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.play_arrow),
+              trailing: SizedBox(
+                width: 56,
+                child: IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.play_arrow),
+                ),
               ),
             ),
           ],

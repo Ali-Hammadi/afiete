@@ -1,7 +1,7 @@
-import 'package:afiete/core/assets/icon_image_links.dart';
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/psychology_specialties.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/feature/home/presentation/widgets/doctor_card.dart';
 import 'package:flutter/material.dart';
 
 class DoctorsHomeScreen extends StatefulWidget {
@@ -44,6 +44,7 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppStyles.padding,
+                vertical: AppStyles.padding / 2,
               ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -193,35 +194,10 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(AppStyles.padding),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.primaryFillColor,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(AppStyles.borderRadius),
-                  ),
-                ),
-                height: 200,
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(ImageLinks.man1),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Divider(),
-                    Text("data"),
-                  ],
-                ),
-              ),
-            ),
+            DoctorCard(),
+            DoctorCard(),
+            DoctorCard(),
+            DoctorCard(),
           ],
         ),
       ),

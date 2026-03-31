@@ -1,6 +1,7 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/feature/home/presentation/widgets/doctor_profile_image.dart';
 import 'package:flutter/material.dart';
 
 class TopDoctorsWidget extends StatelessWidget {
@@ -38,6 +39,7 @@ class TopDoctorCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppStyles.padding / 2),
       child: Container(
+        padding: EdgeInsets.all(AppStyles.padding / 2),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.primaryColor),
           color: Colors.white,
@@ -47,7 +49,7 @@ class TopDoctorCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Image.asset(ImageLinks.man1),
+            DoctorProfileImage(height: 90),
             Text("Dr. John Doe"),
             Text("Psychiatrist"),
           ],
