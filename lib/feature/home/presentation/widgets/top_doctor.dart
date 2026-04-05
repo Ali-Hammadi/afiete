@@ -1,4 +1,3 @@
-import 'package:afiete/core/assets/icon_image_links.dart';
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/home/presentation/widgets/doctor_profile_image.dart';
@@ -19,7 +18,6 @@ class TopDoctorsWidget extends StatelessWidget {
             TopDoctorCard(),
             TopDoctorCard(),
             TopDoctorCard(),
-
             TopDoctorCard(),
             TopDoctorCard(),
             TopDoctorCard(),

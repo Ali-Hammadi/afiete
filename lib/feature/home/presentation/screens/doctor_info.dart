@@ -2,11 +2,22 @@ import 'package:afiete/core/assets/icon_image_links.dart';
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/widget/custom_button.dart';
+import 'package:afiete/core/widget/error_custom_button.dart';
+import 'package:afiete/feature/home/presentation/widgets/custom_container.dart';
+import 'package:afiete/feature/home/presentation/widgets/doctor_review_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-class DoctorInfo extends StatelessWidget {
+class DoctorInfo extends StatefulWidget {
   const DoctorInfo({super.key});
+
+  @override
+  State<DoctorInfo> createState() => _DoctorInfoState();
+}
+
+class _DoctorInfoState extends State<DoctorInfo> {
+  bool _isFirstReviewExpanded = false;
+  bool _isSecondReviewExpanded = false;
+  bool _isThirdReviewExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -173,100 +184,70 @@ class DoctorInfo extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Reviews", style: AppStyles.headingSmall),
-                  Divider(),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: AssetImage(ImageLinks.man1),
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          title: Text("Fadi"),
-                          subtitle: Text("Excellent doctor!"),
-                          trailing: SizedBox(
-                            width: 56,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star, color: Colors.amber),
-                                Text(
-                                  "4.8",
-                                  style: AppStyles.bodySmall.copyWith(
-                                    color: AppColors.primarytextColor,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      Text("Reviews", style: AppStyles.headingSmall),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "See all",
+                          style: AppStyles.bodySmall.copyWith(
+                            color: AppColors.primaryColor,
                           ),
                         ),
                       ),
                     ],
                   ),
                   Divider(),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: AssetImage(ImageLinks.man1),
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          title: Text("Samer"),
-                          subtitle: Text("Excellent doctor!"),
-                          trailing: SizedBox(
-                            width: 56,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star, color: Colors.amber),
-                                Text(
-                                  "4.9",
-                                  style: AppStyles.bodySmall.copyWith(
-                                    color: AppColors.primarytextColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  DoctorReviewItem(
+                    avatarAsset: ImageLinks.man1,
+                    reviewerName: "Fadi",
+                    reviewTime: "Yesterday",
+                    rating: "4.8",
+                    review:
+                        "Dr. John Doe is an exceptional doctor who provided me with excellent care and support throughout my treatment. He was always attentive to my needs and concerns, and his expertise and professionalism were evident in every interaction. I highly recommend Dr. John Doe to anyone seeking top-notch medical care.",
+                    isExpanded: _isFirstReviewExpanded,
+                    onToggle: () {
+                      setState(() {
+                        _isFirstReviewExpanded = !_isFirstReviewExpanded;
+                      });
+                    },
                   ),
                   Divider(),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: AssetImage(ImageLinks.woman2),
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          title: Text("Maya"),
-                          subtitle: Text("Excellent doctor!"),
-                          trailing: SizedBox(
-                            width: 56,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star, color: Colors.amber),
-                                Text(
-                                  "4.8",
-                                  style: AppStyles.bodySmall.copyWith(
-                                    color: AppColors.primarytextColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  DoctorReviewItem(
+                    avatarAsset: ImageLinks.man1,
+                    reviewerName: "Samer",
+                    reviewTime: "Last month",
+                    rating: "4.9",
+                    review:
+                        "this is a very long review that should be truncated to fit in the available space. The doctor was very professional and attentive to my needs. I highly recommend him to anyone looking for a great healthcare provider.",
+                    isExpanded: _isSecondReviewExpanded,
+                    onToggle: () {
+                      setState(() {
+                        _isSecondReviewExpanded = !_isSecondReviewExpanded;
+                      });
+                    },
+                  ),
+                  Divider(),
+                  DoctorReviewItem(
+                    avatarAsset: ImageLinks.woman2,
+                    reviewerName: "Maya",
+                    reviewTime: "Last week",
+                    rating: "4.8",
+                    review:
+                        "this is a very long review that should be truncated to fit in the available space. The doctor was very professional and attentive to my needs. I highly recommend him to anyone looking for a great healthcare provider.",
+                    isExpanded: _isThirdReviewExpanded,
+                    onToggle: () {
+                      setState(() {
+                        _isThirdReviewExpanded = !_isThirdReviewExpanded;
+                      });
+                    },
                   ),
                 ],
               ),
             ),
+            SizedBox(height: 20),
             CustomButton(
               widget: Text(
                 "Book a session now",
@@ -274,32 +255,16 @@ class DoctorInfo extends StatelessWidget {
               ),
               onPressed: () {},
             ),
-            SizedBox(height: 30),
-            CustomButton(widget: Text("data"), onPressed: () {}),
+            SizedBox(height: 20),
+            ErrorCustomButton(
+              widget: Text(
+                "Report Doctor",
+                style: AppStyles.bodyMedium.copyWith(color: Colors.white),
+              ),
+              onPressed: () {},
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CustomContainer extends StatelessWidget {
-  const CustomContainer({super.key, required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppStyles.padding / 2),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.primaryFillColor,
-          borderRadius: BorderRadius.all(
-            Radius.circular(AppStyles.borderRadius),
-          ),
-        ),
-        padding: const EdgeInsets.all(AppStyles.padding),
-        child: child,
       ),
     );
   }
