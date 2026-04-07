@@ -1,6 +1,6 @@
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
-import 'package:afiete/feature/home/presentation/widgets/doctor_profile_image.dart';
+import 'package:afiete/feature/doctors/presentation/widgets/doctor_profile_image.dart';
 import 'package:flutter/material.dart';
 
 class TopDoctorsWidget extends StatelessWidget {
