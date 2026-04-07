@@ -1,7 +1,7 @@
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
-import 'package:afiete/feature/booking_assiments/data/datasources/appointments_mock_datasource.dart';
+import 'package:afiete/feature/booking_assiments/data/datasources/appointments_remote_datasource.dart';
 import 'package:afiete/feature/booking_assiments/data/repositories/appointments_repository_impl.dart';
 import 'package:afiete/feature/booking_assiments/domain/repositories/appointments_repository.dart';
 import 'package:afiete/feature/booking_assiments/domain/usecase/create_appointment_usecase.dart';
@@ -12,7 +12,7 @@ import 'package:afiete/feature/doctors/data/repositories/doctors_repository_impl
 import 'package:afiete/feature/doctors/domain/repositories/doctors_repository.dart';
 import 'package:afiete/feature/doctors/domain/usecase/get_doctors_usecase.dart';
 import 'package:afiete/feature/doctors/presentation/cubits/doctors_cubit.dart';
-import 'package:afiete/feature/sessions/data/datasources/sessions_mock_datasource.dart';
+import 'package:afiete/feature/sessions/data/datasources/sessions_remote_datasource.dart';
 import 'package:afiete/feature/sessions/data/repositories/sessions_repository_impl.dart';
 import 'package:afiete/feature/sessions/domain/repositories/sessions_repository.dart';
 import 'package:afiete/feature/sessions/domain/usecase/add_review_usecase.dart';
@@ -70,14 +70,14 @@ Future<void> init() async {
   );
 
   // Booking assignments data sources
-  sl.registerLazySingleton<AppointmentsMockDataSource>(
-    () => AppointmentsMockDataSourceImpl(),
+  sl.registerLazySingleton<AppointmentsRemoteDataSource>(
+    () => AppointmentsRemoteDataSourceImpl(),
   );
 
   // Booking assignments repositories
   sl.registerLazySingleton<AppointmentsRepository>(
     () => AppointmentsRepositoryImpl(
-      dataSource: sl<AppointmentsMockDataSource>(),
+      dataSource: sl<AppointmentsRemoteDataSource>(),
     ),
   );
 
@@ -94,17 +94,18 @@ Future<void> init() async {
     () => AppointmentsCubit(
       sl<GetAppointmentsUseCase>(),
       sl<CreateAppointmentUseCase>(),
+      sl<GetAllDoctorsUseCase>(),
     ),
   );
 
   // Sessions data sources
-  sl.registerLazySingleton<SessionsMockDataSource>(
-    () => SessionsMockDataSourceImpl(),
+  sl.registerLazySingleton<SessionsRemoteDataSource>(
+    () => SessionsRemoteDataSourceImpl(),
   );
 
   // Sessions repositories
   sl.registerLazySingleton<SessionsRepository>(
-    () => SessionsRepositoryImpl(dataSource: sl<SessionsMockDataSource>()),
+    () => SessionsRepositoryImpl(dataSource: sl<SessionsRemoteDataSource>()),
   );
 
   // Sessions use cases
@@ -138,7 +139,8 @@ Future<void> init() async {
 
   // Doctors repositories
   sl.registerLazySingleton<DoctorsRepository>(
-    () => DoctorsRepositoryImpl(remoteDataSource: sl<DoctorsRemoteDataSource>()),
+    () =>
+        DoctorsRepositoryImpl(remoteDataSource: sl<DoctorsRemoteDataSource>()),
   );
 
   // Doctors use cases
