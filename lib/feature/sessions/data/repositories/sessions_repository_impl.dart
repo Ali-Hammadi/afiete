@@ -1,14 +1,14 @@
 import 'dart:core';
 
 import 'package:afiete/core/error/failure.dart';
-import 'package:afiete/feature/sessions/data/datasources/sessions_mock_datasource.dart';
+import 'package:afiete/feature/sessions/data/datasources/sessions_remote_datasource.dart';
 import 'package:afiete/feature/sessions/domain/entities/review_entity.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
 import 'package:afiete/feature/sessions/domain/repositories/sessions_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class SessionsRepositoryImpl implements SessionsRepository {
-  final SessionsMockDataSource dataSource;
+  final SessionsRemoteDataSource dataSource;
 
   const SessionsRepositoryImpl({required this.dataSource});
 
