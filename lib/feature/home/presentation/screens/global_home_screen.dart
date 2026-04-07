@@ -44,7 +44,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_alt_outlined),
-            label: "People",
+            label: "Doctors",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.date_range_outlined),
