@@ -15,11 +15,20 @@ class DoctorsHomeScreen extends StatefulWidget {
 
 class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
   String? selectedSpecialty;
+  String searchQuery = '';
+  late TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
+    _searchController = TextEditingController();
     context.read<DoctorsCubit>().loadAllDoctors();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _selectSpecialty(String? specialty) {
@@ -34,29 +43,60 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
     }
   }
 
+  List<dynamic> _filterDoctors(List<dynamic> doctors) {
+    if (searchQuery.isEmpty) {
+      return doctors;
+    }
+
+    final query = searchQuery.toLowerCase();
+    return doctors.where((doctor) {
+      final name = doctor.name.toLowerCase();
+      final specialization = doctor.specialization.toLowerCase();
+      return name.contains(query) || specialization.contains(query);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
               padding: const EdgeInsets.all(AppStyles.padding),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                height: 40,
-                width: double.infinity * 0.8,
-                decoration: BoxDecoration(
-                  color: AppColors.unselectedFieldColor,
-                  borderRadius: BorderRadius.circular(AppStyles.borderRadius),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.search),
-                    Text("Search experts or specialist"),
-                  ],
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search experts or specialist',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              searchQuery = '';
+                            });
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: AppColors.unselectedFieldColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppStyles.borderRadius),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppStyles.padding,
+                    vertical: AppStyles.padding / 2,
+                  ),
                 ),
               ),
             ),
@@ -71,7 +111,7 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
                 child: Row(children: [..._buildSpecialtyChips()]),
               ),
             ),
-            Expanded(
+            Flexible(
               child: BlocBuilder<DoctorsCubit, DoctorsState>(
                 builder: (context, state) {
                   if (state is DoctorsLoading) {
@@ -83,14 +123,22 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
                   }
 
                   if (state is DoctorsLoaded) {
-                    if (state.doctors.isEmpty) {
-                      return const Center(child: Text('No doctors found.'));
+                    final filteredDoctors = _filterDoctors(state.doctors);
+
+                    if (filteredDoctors.isEmpty) {
+                      return Center(
+                        child: Text(
+                          searchQuery.isNotEmpty
+                              ? 'No doctors match your search.'
+                              : 'No doctors found.',
+                        ),
+                      );
                     }
 
                     return ListView.builder(
-                      itemCount: state.doctors.length,
+                      itemCount: filteredDoctors.length,
                       itemBuilder: (context, index) {
-                        return DoctorCard(doctor: state.doctors[index]);
+                        return DoctorCard(doctor: filteredDoctors[index]);
                       },
                     );
                   }
