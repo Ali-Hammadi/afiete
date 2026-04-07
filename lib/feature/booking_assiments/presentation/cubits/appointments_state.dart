@@ -17,11 +17,12 @@ class AppointmentsLoading extends AppointmentsState {
 
 class AppointmentsLoaded extends AppointmentsState {
   final List<AppointmentEntity> appointments;
+  final List<DoctorEntity>? doctors;
 
-  const AppointmentsLoaded(this.appointments);
+  const AppointmentsLoaded(this.appointments, {this.doctors = const []});
 
   @override
-  List<Object> get props => [appointments];
+  List<Object> get props => [appointments, doctors ?? const <DoctorEntity>[]];
 }
 
 class AppointmentsError extends AppointmentsState {

@@ -8,11 +8,15 @@ import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class AppointmentCard extends StatelessWidget {
+class CustomAppointmentCard extends StatelessWidget {
   final AppointmentEntity appointment;
   final DoctorEntity? doctor;
 
-  const AppointmentCard({super.key, required this.appointment, this.doctor});
+  const CustomAppointmentCard({
+    super.key,
+    required this.appointment,
+    this.doctor,
+  });
 
   @override
   Widget build(BuildContext context) {

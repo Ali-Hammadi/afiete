@@ -3,6 +3,8 @@ import 'package:afiete/feature/booking_assiments/domain/entities/appointment_ent
 import 'package:afiete/feature/booking_assiments/domain/usecase/create_appointment_usecase.dart';
 import 'package:afiete/feature/booking_assiments/domain/usecase/get_appointments_usecase.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
+import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
+import 'package:afiete/feature/doctors/domain/usecase/get_doctors_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,18 +13,39 @@ part 'appointments_state.dart';
 class AppointmentsCubit extends Cubit<AppointmentsState> {
   final GetAppointmentsUseCase getAppointmentsUseCase;
   final CreateAppointmentUseCase createAppointmentDraftUseCase;
+  final GetAllDoctorsUseCase? getAllDoctorsUseCase;
 
   AppointmentsCubit(
     this.getAppointmentsUseCase,
     this.createAppointmentDraftUseCase,
+    this.getAllDoctorsUseCase,
   ) : super(const AppointmentsInitial());
 
   Future<void> loadAppointments() async {
     emit(const AppointmentsLoading());
-    final result = await getAppointmentsUseCase(NoParams());
-    result.fold(
-      (failure) => emit(AppointmentsError(failure.errorMessage)),
-      (appointments) => emit(AppointmentsLoaded(appointments)),
+    final appointmentsResult = await getAppointmentsUseCase(NoParams());
+    final doctorsUseCase = getAllDoctorsUseCase;
+
+    final appointments = appointmentsResult.fold<List<AppointmentEntity>?>((
+      failure,
+    ) {
+      emit(AppointmentsError(failure.errorMessage));
+      return null;
+    }, (appointments) => appointments);
+
+    if (appointments == null) {
+      return;
+    }
+
+    if (doctorsUseCase == null) {
+      emit(AppointmentsLoaded(appointments, doctors: const []));
+      return;
+    }
+
+    final doctorsResult = await doctorsUseCase(NoParams());
+    doctorsResult.fold(
+      (_) => emit(AppointmentsLoaded(appointments, doctors: const [])),
+      (doctors) => emit(AppointmentsLoaded(appointments, doctors: doctors)),
     );
   }
 
@@ -54,9 +77,9 @@ class AppointmentsCubit extends Cubit<AppointmentsState> {
       if (currentState is AppointmentsLoaded) {
         final updated = [created, ...currentState.appointments]
           ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
-        emit(AppointmentsLoaded(updated));
+        emit(AppointmentsLoaded(updated, doctors: currentState.doctors));
       } else {
-        emit(AppointmentsLoaded([created]));
+        emit(AppointmentsLoaded([created], doctors: const []));
       }
     });
   }

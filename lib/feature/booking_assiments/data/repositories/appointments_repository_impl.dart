@@ -1,12 +1,12 @@
 import 'package:afiete/core/error/failure.dart';
-import 'package:afiete/feature/booking_assiments/data/datasources/appointments_mock_datasource.dart';
+import 'package:afiete/feature/booking_assiments/data/datasources/appointments_remote_datasource.dart';
 import 'package:afiete/feature/booking_assiments/domain/entities/appointment_entity.dart';
 import 'package:afiete/feature/booking_assiments/domain/repositories/appointments_repository.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
 import 'package:dartz/dartz.dart';
 
 class AppointmentsRepositoryImpl implements AppointmentsRepository {
-  final AppointmentsMockDataSource dataSource;
+  final AppointmentsRemoteDataSource dataSource;
 
   const AppointmentsRepositoryImpl({required this.dataSource});
 

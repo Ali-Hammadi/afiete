@@ -2,6 +2,7 @@ import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/widgets/appointment_card.dart';
+import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -87,8 +88,6 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             ),
           ),
 
-          const SizedBox(height: 10),
-
           const SizedBox(height: 8),
           Expanded(
             child: BlocBuilder<AppointmentsCubit, AppointmentsState>(
@@ -130,8 +129,20 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                     child: ListView.builder(
                       itemCount: filteredAppointments.length,
                       itemBuilder: (context, index) {
-                        return AppointmentCard(
-                          appointment: filteredAppointments[index],
+                        final appointment = filteredAppointments[index];
+                        final doctors = state.doctors ?? const <DoctorEntity>[];
+                        DoctorEntity? matchedDoctor;
+
+                        for (final doctor in doctors) {
+                          if (doctor.id == appointment.doctorId) {
+                            matchedDoctor = doctor;
+                            break;
+                          }
+                        }
+
+                        return CustomAppointmentCard(
+                          doctor: matchedDoctor,
+                          appointment: appointment,
                         );
                       },
                     ),
