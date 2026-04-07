@@ -1,0 +1,52 @@
+import 'package:afiete/core/error/failure.dart';
+import 'package:afiete/feature/booking_assiments/data/datasources/appointments_mock_datasource.dart';
+import 'package:afiete/feature/booking_assiments/domain/entities/appointment_entity.dart';
+import 'package:afiete/feature/booking_assiments/domain/repositories/appointments_repository.dart';
+import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
+import 'package:dartz/dartz.dart';
+
+class AppointmentsRepositoryImpl implements AppointmentsRepository {
+  final AppointmentsMockDataSource dataSource;
+
+  const AppointmentsRepositoryImpl({required this.dataSource});
+
+  @override
+  Future<Either<Failure, List<AppointmentEntity>>> getAppointments() async {
+    try {
+      final result = await dataSource.getAppointments();
+      return Right<Failure, List<AppointmentEntity>>(result);
+    } catch (_) {
+      return Left<Failure, List<AppointmentEntity>>(
+        ServerFailure('Unable to load appointments right now.'),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, AppointmentEntity>> createAppointment({
+    required String doctorName,
+    required DateTime scheduledAt,
+    required int durationSlots,
+    required ConsultationFee consultationFee,
+    required String sessionType,
+    required String doctorId,
+    required String patientId,
+  }) async {
+    try {
+      final result = await dataSource.createAppointment(
+        doctorId: doctorId,
+        patientId: patientId,
+        doctorName: doctorName,
+        scheduledAt: scheduledAt,
+        durationSlots: durationSlots,
+        consultationFee: consultationFee,
+        sessionType: sessionType,
+      );
+      return Right<Failure, AppointmentEntity>(result);
+    } catch (_) {
+      return Left<Failure, AppointmentEntity>(
+        ServerFailure('Could not create booking draft. Please try again.'),
+      );
+    }
+  }
+}
