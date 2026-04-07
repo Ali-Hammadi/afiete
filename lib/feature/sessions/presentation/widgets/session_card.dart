@@ -1,0 +1,157 @@
+import 'package:afiete/core/constants/app_colors.dart';
+import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
+import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class SessionCard extends StatelessWidget {
+  final SessionEntity session;
+  final VoidCallback? onAddReview;
+  final VoidCallback? onBookAgain;
+  final VoidCallback? onReschedule;
+  final VoidCallback? onJoinSession;
+  final VoidCallback? onCancel;
+
+  const SessionCard({
+    super.key,
+    required this.session,
+    this.onAddReview,
+    this.onBookAgain,
+    this.onReschedule,
+    this.onJoinSession,
+    this.onCancel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dateText = DateFormat('MMM dd, yyyy').format(session.scheduledAt);
+    final isPast = !session.isUpcoming;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                  child: const Icon(
+                    Icons.person,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(session.doctorName, style: AppStyles.headingSmall),
+                      Text(
+                        session.doctorSpecialization,
+                        style: AppStyles.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _InfoRow(icon: Icons.calendar_today, text: dateText),
+            const SizedBox(height: 8),
+            _InfoRow(icon: Icons.access_time, text: session.timeRange),
+            const SizedBox(height: 8),
+            SessionType.displayWithIcon(
+              session.sessionType,
+              textStyle: AppStyles.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            _buildActionButtons(isPast),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(bool isPast) {
+    if (isPast) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: onAddReview,
+              child: const Text('Add Review'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: FilledButton(
+              onPressed: onBookAgain,
+              child: const Text('Book Again'),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onReschedule,
+                  child: const Text('Reschedule'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton(
+                  onPressed: onJoinSession,
+                  child: const Text('Join Session'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.errorColor,
+              ),
+              onPressed: onCancel,
+              child: const Text('Cancel'),
+            ),
+          ),
+        ],
+      );
+    }
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _InfoRow({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.primaryColor),
+        const SizedBox(width: 8),
+        Text(text, style: AppStyles.bodyMedium),
+      ],
+    );
+  }
+}
