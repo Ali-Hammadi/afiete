@@ -24,13 +24,15 @@ abstract class SessionsRemoteDataSource {
 }
 
 class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
-  static const String _baseUrl = 'https://api.example.com/api/sessions/';
-  late final Dio _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  static const String _modulePath = '/api/sessions';
+  final Dio _dio;
+
+  SessionsRemoteDataSourceImpl({required Dio dio}) : _dio = dio;
 
   @override
   Future<List<SessionModel>> getUpcomingSessions() async {
     try {
-      final response = await _dio.get('/upcoming');
+      final response = await _dio.get('$_modulePath/upcoming');
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['sessions'] ?? [];
         return data
@@ -49,7 +51,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/upcoming'),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -59,7 +61,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
   @override
   Future<List<SessionModel>> getPastSessions() async {
     try {
-      final response = await _dio.get('/past');
+      final response = await _dio.get('$_modulePath/past');
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['sessions'] ?? [];
         return data
@@ -78,7 +80,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/past'),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -88,7 +90,10 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
   @override
   Future<SessionModel> joinSession(String sessionId) async {
     try {
-      final response = await _dio.post('/join', data: {'sessionId': sessionId});
+      final response = await _dio.post(
+        '$_modulePath/join',
+        data: {'sessionId': sessionId},
+      );
       if (response.statusCode == 200) {
         return SessionModel.fromJson(response.data as Map<String, dynamic>);
       }
@@ -101,7 +106,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/join'),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -112,7 +117,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
   Future<void> cancelSession(String sessionId) async {
     try {
       final response = await _dio.post(
-        '/cancel',
+        '$_modulePath/cancel',
         data: {'sessionId': sessionId},
       );
       if (response.statusCode != 200) {
@@ -126,7 +131,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/cancel'),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -140,7 +145,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '/reschedule',
+        '$_modulePath/reschedule',
         data: {
           'sessionId': sessionId,
           'newScheduledAt': newScheduledAt.toIso8601String(),
@@ -158,7 +163,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/reschedule'),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -173,7 +178,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '/review',
+        '$_modulePath/review',
         data: {'sessionId': sessionId, 'rating': rating, 'comment': comment},
       );
       if (response.statusCode == 201) {
@@ -188,7 +193,7 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/review'),
         error: e,
         type: DioExceptionType.unknown,
       );
