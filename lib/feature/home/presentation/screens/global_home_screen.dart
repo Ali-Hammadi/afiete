@@ -6,6 +6,7 @@ import 'package:afiete/feature/doctors/presentation/cubits/doctors_cubit.dart';
 import 'package:afiete/feature/doctors/presentation/screens/doctors_home_screen.dart';
 import 'package:afiete/feature/home/presentation/screens/first_home_screen.dart';
 import 'package:afiete/feature/home/presentation/widgets/custom_app_bar.dart';
+import 'package:afiete/feature/settings/presentation/screens/settings_screen.dart';
 import 'package:afiete/feature/doctors/presentation/widgets/custom_find_doctors_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -69,7 +70,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         return AppBar(title: const Text('Appointments'), centerTitle: true);
       case 3:
       default:
-        return AppBar(title: const Text('Profile'), centerTitle: true);
+        return AppBar(title: const Text('Settings'), centerTitle: true);
     }
   }
 
@@ -89,7 +90,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         );
       case 3:
       default:
-        return const Center(child: Text('Profile module is coming soon.'));
+        return const SettingsScreen();
     }
   }
 }
