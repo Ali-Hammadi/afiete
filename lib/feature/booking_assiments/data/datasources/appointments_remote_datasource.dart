@@ -17,13 +17,15 @@ abstract class AppointmentsRemoteDataSource {
 }
 
 class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
-  static const String _baseUrl = 'https://api.example.com/api/appointments/';
-  late final Dio _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  static const String _modulePath = '/api/appointments';
+  final Dio _dio;
+
+  AppointmentsRemoteDataSourceImpl({required Dio dio}) : _dio = dio;
 
   @override
   Future<List<AppointmentModel>> getAppointments() async {
     try {
-      final response = await _dio.get('/list');
+      final response = await _dio.get('$_modulePath/list');
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['appointments'] ?? [];
         return data
@@ -41,7 +43,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/list'),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -60,7 +62,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '/create',
+        '$_modulePath/create',
         data: {
           'doctorId': doctorId,
           'patientId': patientId,
@@ -88,7 +90,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: _baseUrl),
+        requestOptions: RequestOptions(path: '$_modulePath/create'),
         error: e,
         type: DioExceptionType.unknown,
       );
