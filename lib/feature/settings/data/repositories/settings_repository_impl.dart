@@ -3,6 +3,7 @@ import 'package:afiete/feature/settings/data/data_source/settings_remote_data_so
 import 'package:afiete/feature/settings/domin/entities/medical_profile_entity.dart';
 import 'package:afiete/feature/settings/domin/repositories/settings_repository.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   final SettingsRemoteDataSource remoteDataSource;
@@ -16,6 +17,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
     try {
       final result = await remoteDataSource.getMedicalProfile(userId);
       return Right(result.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -34,6 +37,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
         details: details,
       );
       return Right(result);
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

@@ -1,5 +1,6 @@
 import 'package:afiete/feature/booking_assiments/data/models/appointment_model.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
+import 'package:afiete/core/network/api_endpoints.dart';
 import 'package:dio/dio.dart';
 
 abstract class AppointmentsRemoteDataSource {
@@ -17,7 +18,6 @@ abstract class AppointmentsRemoteDataSource {
 }
 
 class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
-  static const String _modulePath = '/api/appointments';
   final Dio _dio;
 
   AppointmentsRemoteDataSourceImpl({required Dio dio}) : _dio = dio;
@@ -25,7 +25,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
   @override
   Future<List<AppointmentModel>> getAppointments() async {
     try {
-      final response = await _dio.get('$_modulePath/list');
+      final response = await _dio.get(ApiEndpoints.appointmentsList);
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['appointments'] ?? [];
         return data
@@ -43,7 +43,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/list'),
+        requestOptions: RequestOptions(path: ApiEndpoints.appointmentsList),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -62,7 +62,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '$_modulePath/create',
+        ApiEndpoints.appointmentsCreate,
         data: {
           'doctorId': doctorId,
           'patientId': patientId,
@@ -90,7 +90,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/create'),
+        requestOptions: RequestOptions(path: ApiEndpoints.appointmentsCreate),
         error: e,
         type: DioExceptionType.unknown,
       );

@@ -4,6 +4,7 @@ import 'package:afiete/feature/booking_assiments/domain/entities/appointment_ent
 import 'package:afiete/feature/booking_assiments/domain/repositories/appointments_repository.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 class AppointmentsRepositoryImpl implements AppointmentsRepository {
   final AppointmentsRemoteDataSource dataSource;
@@ -15,6 +16,10 @@ class AppointmentsRepositoryImpl implements AppointmentsRepository {
     try {
       final result = await dataSource.getAppointments();
       return Right<Failure, List<AppointmentEntity>>(result);
+    } on DioException catch (e) {
+      return Left<Failure, List<AppointmentEntity>>(
+        ServerFailure.fromDioError(e),
+      );
     } catch (_) {
       return Left<Failure, List<AppointmentEntity>>(
         ServerFailure('Unable to load appointments right now.'),
@@ -43,6 +48,8 @@ class AppointmentsRepositoryImpl implements AppointmentsRepository {
         sessionType: sessionType,
       );
       return Right<Failure, AppointmentEntity>(result);
+    } on DioException catch (e) {
+      return Left<Failure, AppointmentEntity>(ServerFailure.fromDioError(e));
     } catch (_) {
       return Left<Failure, AppointmentEntity>(
         ServerFailure('Could not create booking draft. Please try again.'),

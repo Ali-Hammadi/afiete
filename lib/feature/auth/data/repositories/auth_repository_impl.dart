@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:afiete/core/error/failure.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
@@ -17,6 +18,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final remoteUser = await remoteDataSource.login(email, password);
       return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -30,6 +33,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final remoteUser = await remoteDataSource.deleteAccount(email, password);
       return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -43,6 +48,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final remoteUser = await remoteDataSource.logout(email, password);
       return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -57,6 +64,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final remoteUser = await remoteDataSource.signup(name, email, password);
       return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -67,6 +76,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final remoteUser = await remoteDataSource.googleSignIn();
       return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

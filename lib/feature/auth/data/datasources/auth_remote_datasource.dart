@@ -1,4 +1,6 @@
 import '../models/user_model.dart';
+import 'package:afiete/core/network/api_endpoints.dart';
+import 'package:afiete/core/network/token_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -11,8 +13,6 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  static const String _modulePath = '/api/auth';
-
   final Dio _dio;
   late final GoogleSignIn _googleSignIn;
 
@@ -24,11 +24,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> login(String email, String password) async {
     try {
       final response = await _dio.post(
-        '$_modulePath/login',
+        ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user'] ?? response.data);
+        final user = _resolveUserFromAuthResponse(response.data);
+        if (user.token.isNotEmpty) {
+          await TokenStorage.saveToken(user.token);
+        }
+        return user;
       } else {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -40,7 +44,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/login'),
+        requestOptions: RequestOptions(path: ApiEndpoints.login),
         error: e.toString(),
       );
     }
@@ -50,11 +54,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> signup(String name, String email, String password) async {
     try {
       final response = await _dio.post(
-        '$_modulePath/signup',
+        ApiEndpoints.signup,
         data: {'name': name, 'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data);
+        final user = _resolveUserFromAuthResponse(response.data);
+        if (user.token.isNotEmpty) {
+          await TokenStorage.saveToken(user.token);
+        }
+        return user;
       } else {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -66,7 +74,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/signup'),
+        requestOptions: RequestOptions(path: ApiEndpoints.signup),
         error: e.toString(),
       );
     }
@@ -76,10 +84,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> logout(String email, String password) async {
     try {
       final response = await _dio.post(
-        '$_modulePath/logout',
+        ApiEndpoints.logout,
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
+        await TokenStorage.clearToken();
         return UserModel(
           id: email,
           name: 'Logged Out',
@@ -98,7 +107,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/logout'),
+        requestOptions: RequestOptions(path: ApiEndpoints.logout),
         error: e.toString(),
       );
     }
@@ -108,10 +117,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> deleteAccount(String email, String password) async {
     try {
       final response = await _dio.post(
-        '$_modulePath/delete-account',
+        ApiEndpoints.deleteAccount,
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
+        await TokenStorage.clearToken();
         return UserModel(
           id: email,
           name: 'Account Deleted',
@@ -130,7 +140,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/delete-account'),
+        requestOptions: RequestOptions(path: ApiEndpoints.deleteAccount),
         error: e.toString(),
       );
     }
@@ -145,11 +155,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       final auth = await account.authentication;
       final response = await _dio.post(
-        '$_modulePath/google-login',
+        ApiEndpoints.googleLogin,
         data: {'id_token': auth.idToken},
       );
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user'] ?? response.data);
+        final user = _resolveUserFromAuthResponse(response.data);
+        if (user.token.isNotEmpty) {
+          await TokenStorage.saveToken(user.token);
+        }
+        return user;
       } else {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -161,9 +175,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/google-login'),
+        requestOptions: RequestOptions(path: ApiEndpoints.googleLogin),
         error: e.toString(),
       );
     }
+  }
+
+  UserModel _resolveUserFromAuthResponse(dynamic responseData) {
+    final dataMap = responseData as Map<String, dynamic>;
+    final userJson =
+        (dataMap['user'] as Map<String, dynamic>?) ??
+        Map<String, dynamic>.from(dataMap);
+
+    if ((userJson['token'] == null || '${userJson['token']}'.isEmpty) &&
+        dataMap['token'] != null) {
+      userJson['token'] = dataMap['token'];
+    }
+
+    return UserModel.fromJson(userJson);
   }
 }

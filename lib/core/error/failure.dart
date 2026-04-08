@@ -10,6 +10,11 @@ class ServerFailure extends Failure {
   ServerFailure(super.errorMessage);
 
   factory ServerFailure.fromDioError(DioException dioError) {
+    final cleanError = dioError.error?.toString();
+    if (cleanError != null && cleanError.isNotEmpty) {
+      return ServerFailure(cleanError);
+    }
+
     switch (dioError.type) {
       case DioExceptionType.connectionTimeout:
         return ServerFailure('Connection timed out');

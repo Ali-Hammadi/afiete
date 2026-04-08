@@ -1,4 +1,5 @@
 import 'package:afiete/feature/settings/data/models/medical_profile_model.dart';
+import 'package:afiete/core/network/api_endpoints.dart';
 import 'package:dio/dio.dart';
 
 abstract class SettingsRemoteDataSource {
@@ -12,8 +13,6 @@ abstract class SettingsRemoteDataSource {
 }
 
 class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
-  static const String _modulePath = '/api/settings';
-
   final Dio _dio;
 
   SettingsRemoteDataSourceImpl({required Dio dio}) : _dio = dio;
@@ -22,7 +21,7 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
   Future<MedicalProfileModel> getMedicalProfile(String userId) async {
     try {
       final response = await _dio.get(
-        '$_modulePath/medical-profile',
+        ApiEndpoints.settingsMedicalProfile,
         queryParameters: {'userId': userId},
       );
       if (response.statusCode == 200) {
@@ -39,7 +38,9 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/medical-profile'),
+        requestOptions: RequestOptions(
+          path: ApiEndpoints.settingsMedicalProfile,
+        ),
         error: e.toString(),
       );
     }
@@ -53,7 +54,7 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '$_modulePath/reports',
+        ApiEndpoints.settingsReports,
         data: {'userId': userId, 'reason': reason, 'details': details},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -69,7 +70,7 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_modulePath/reports'),
+        requestOptions: RequestOptions(path: ApiEndpoints.settingsReports),
         error: e.toString(),
       );
     }
