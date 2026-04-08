@@ -11,20 +11,20 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  static const String _baseUrl = 'https://api.example.com/api/auth/';
+  static const String _modulePath = '/api/auth';
 
-  late final Dio _dio;
+  final Dio _dio;
   late final GoogleSignIn _googleSignIn;
 
-  AuthRemoteDataSourceImpl()
-    : _dio = Dio(BaseOptions(baseUrl: _baseUrl)),
+  AuthRemoteDataSourceImpl({required Dio dio})
+    : _dio = dio,
       _googleSignIn = GoogleSignIn();
 
   @override
   Future<UserModel> login(String email, String password) async {
     try {
       final response = await _dio.post(
-        '/login',
+        '$_modulePath/login',
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
@@ -40,7 +40,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_baseUrl/login'),
+        requestOptions: RequestOptions(path: '$_modulePath/login'),
         error: e.toString(),
       );
     }
@@ -50,7 +50,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> signup(String name, String email, String password) async {
     try {
       final response = await _dio.post(
-        '/signup',
+        '$_modulePath/signup',
         data: {'name': name, 'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
@@ -66,7 +66,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_baseUrl/signup'),
+        requestOptions: RequestOptions(path: '$_modulePath/signup'),
         error: e.toString(),
       );
     }
@@ -76,7 +76,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> logout(String email, String password) async {
     try {
       final response = await _dio.post(
-        '/logout',
+        '$_modulePath/logout',
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
@@ -98,7 +98,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_baseUrl/logout'),
+        requestOptions: RequestOptions(path: '$_modulePath/logout'),
         error: e.toString(),
       );
     }
@@ -108,7 +108,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> deleteAccount(String email, String password) async {
     try {
       final response = await _dio.post(
-        '/delete-account',
+        '$_modulePath/delete-account',
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
@@ -130,7 +130,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_baseUrl/delete-account'),
+        requestOptions: RequestOptions(path: '$_modulePath/delete-account'),
         error: e.toString(),
       );
     }
@@ -145,7 +145,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       final auth = await account.authentication;
       final response = await _dio.post(
-        '/google-login',
+        '$_modulePath/google-login',
         data: {'id_token': auth.idToken},
       );
       if (response.statusCode == 200) {
@@ -161,7 +161,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: '$_baseUrl/google-login'),
+        requestOptions: RequestOptions(path: '$_modulePath/google-login'),
         error: e.toString(),
       );
     }

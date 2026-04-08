@@ -76,4 +76,31 @@ class AuthCubit extends Cubit<AuthState> {
       (user) => emit(AuthLoaded(user)),
     );
   }
+
+  void updateProfileInfo({
+    required DateTime birthDate,
+    required String gender,
+    String? phoneNumber,
+  }) {
+    final currentState = state;
+    if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
+      return;
+    }
+
+    final existingUser = currentState is AuthLoaded
+        ? currentState.user
+        : (currentState as AuthProfileUpdated).user;
+    final age = DateTime.now().difference(birthDate).inDays ~/ 365;
+
+    emit(
+      AuthProfileUpdated(
+        existingUser.copyWith(
+          birthDate: birthDate,
+          age: age,
+          gender: gender,
+          phoneNumber: phoneNumber,
+        ),
+      ),
+    );
+  }
 }

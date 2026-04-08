@@ -1,3 +1,4 @@
+import 'package:afiete/core/network/dio_factory.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
@@ -20,6 +21,12 @@ import 'package:afiete/feature/sessions/domain/usecase/cancel_session_usecase.da
 import 'package:afiete/feature/sessions/domain/usecase/get_past_sessions_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/get_upcoming_sessions_usecase.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
+import 'package:afiete/feature/settings/data/data_source/settings_remote_data_source.dart';
+import 'package:afiete/feature/settings/data/repositories/settings_repository_impl.dart';
+import 'package:afiete/feature/settings/domin/repositories/settings_repository.dart';
+import 'package:afiete/feature/settings/domin/usecase/get_medical_profile_usecase.dart';
+import 'package:afiete/feature/settings/domin/usecase/submit_report_issue_usecase.dart';
+import 'package:afiete/feature/settings/presentation/cubits/settings_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:afiete/feature/auth/data/repositories/auth_repository_impl.dart';
@@ -27,13 +34,17 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:afiete/feature/auth/domain/usecase/login_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/signup_usecase.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
+import 'package:dio/dio.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  // Core network
+  sl.registerLazySingleton<Dio>(() => DioFactory.create());
+
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(),
+    () => AuthRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
   // Repositories
@@ -71,7 +82,7 @@ Future<void> init() async {
 
   // Booking assignments data sources
   sl.registerLazySingleton<AppointmentsRemoteDataSource>(
-    () => AppointmentsRemoteDataSourceImpl(),
+    () => AppointmentsRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
   // Booking assignments repositories
@@ -100,7 +111,7 @@ Future<void> init() async {
 
   // Sessions data sources
   sl.registerLazySingleton<SessionsRemoteDataSource>(
-    () => SessionsRemoteDataSourceImpl(),
+    () => SessionsRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
   // Sessions repositories
@@ -134,7 +145,7 @@ Future<void> init() async {
 
   // Doctors data sources
   sl.registerLazySingleton<DoctorsRemoteDataSource>(
-    () => DoctorsRemoteDataSourceImpl(),
+    () => DoctorsRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
   // Doctors repositories
@@ -160,6 +171,33 @@ Future<void> init() async {
       sl<GetAllDoctorsUseCase>(),
       sl<GetDoctorsBySpecialtyUseCase>(),
       sl<GetDoctorByIdUseCase>(),
+    ),
+  );
+  // Settings data sources
+  sl.registerLazySingleton<SettingsRemoteDataSource>(
+    () => SettingsRemoteDataSourceImpl(dio: sl<Dio>()),
+  );
+
+  // Settings repositories
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(
+      remoteDataSource: sl<SettingsRemoteDataSource>(),
+    ),
+  );
+
+  // Settings use cases
+  sl.registerLazySingleton<GetMedicalProfileUseCase>(
+    () => GetMedicalProfileUseCase(sl<SettingsRepository>()),
+  );
+  sl.registerLazySingleton<SubmitReportIssueUseCase>(
+    () => SubmitReportIssueUseCase(sl<SettingsRepository>()),
+  );
+
+  // Settings cubit
+  sl.registerFactory<SettingsCubit>(
+    () => SettingsCubit(
+      sl<GetMedicalProfileUseCase>(),
+      sl<SubmitReportIssueUseCase>(),
     ),
   );
 }

@@ -2,6 +2,10 @@ import 'package:afiete/feature/auth/presentation/views/auth_info_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/verify_account_screen.dart';
 import 'package:afiete/feature/doctors/presentation/screens/doctor_info.dart';
 import 'package:afiete/feature/home/presentation/screens/global_home_screen.dart';
+import 'package:afiete/feature/settings/presentation/screens/medical_profile_screen.dart';
+import 'package:afiete/feature/settings/presentation/screens/profile_info_screen.dart';
+import 'package:afiete/feature/settings/presentation/screens/report_issue_screen.dart';
+import 'package:afiete/feature/settings/presentation/screens/settings_screen.dart';
 import 'package:afiete/feature/sessions/presentation/screens/my_sessions_screen.dart';
 import 'package:afiete/feature/splash/presentation/views/splash_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/signup_screen.dart';
@@ -32,6 +36,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const DoctorInfo());
       case MyRoutes.mySessionsScreen:
         return MaterialPageRoute(builder: (_) => const MySessionsScreen());
+      case MyRoutes.settingsScreen:
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
+      case MyRoutes.medicalProfileScreen:
+        return MaterialPageRoute(builder: (_) => const MedicalProfileScreen());
+      case MyRoutes.profileInfoScreen:
+        return MaterialPageRoute(builder: (_) => const ProfileInfoScreen());
+      case MyRoutes.reportIssueScreen:
+        return MaterialPageRoute(builder: (_) => const ReportIssueScreen());
 
       default:
         return MaterialPageRoute(
@@ -62,4 +74,8 @@ class MyRoutes {
   static const String mySessionsScreen = "/mySessionsScreen";
   static const String homeScreen = "/homeScreens";
   static const String doctorInfoScreen = "/doctorInfoScreen";
+  static const String settingsScreen = "/settingsScreen";
+  static const String medicalProfileScreen = "/medicalProfileScreen";
+  static const String profileInfoScreen = "/profileInfoScreen";
+  static const String reportIssueScreen = "/reportIssueScreen";
 }

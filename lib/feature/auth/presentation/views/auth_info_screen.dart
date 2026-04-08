@@ -4,7 +4,9 @@ import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/auth/presentation/widgets/custom_text_form_field.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../cubits/auth_cubit.dart';
 
 class AuthInfoScreen extends StatefulWidget {
   const AuthInfoScreen({super.key});
@@ -133,6 +135,19 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                   ),
                 ),
                 onPressed: () {
+                  if (selectedDate == null || selectedGender == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter your birthdate and gender.'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  context.read<AuthCubit>().updateProfileInfo(
+                    birthDate: selectedDate!,
+                    gender: selectedGender!,
+                  );
                   Navigator.pushReplacementNamed(
                     context,
                     MyRoutes.verifyAccountScreen,

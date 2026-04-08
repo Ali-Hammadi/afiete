@@ -24,6 +24,15 @@ class AuthLoaded extends AuthState {
   List<Object> get props => [user];
 }
 
+class AuthProfileUpdated extends AuthState {
+  final UserAuthEntity user;
+
+  const AuthProfileUpdated(this.user);
+
+  @override
+  List<Object> get props => [user];
+}
+
 class AuthError extends AuthState {
   final String message;
 
