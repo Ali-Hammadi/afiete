@@ -65,9 +65,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
 
                     if (state is PastSessionsLoaded) {
                       if (state.sessions.isEmpty) {
-                        return const Center(
-                          child: Text('No past sessions'),
-                        );
+                        return const Center(child: Text('No past sessions'));
                       }
                       return _buildSessionsList(state.sessions, isPast: true);
                     }
@@ -101,9 +99,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: _selectedTab == 0
-                      ? Colors.white
-                      : Colors.transparent,
+                  color: _selectedTab == 0 ? Colors.white : Colors.transparent,
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Text(
@@ -130,9 +126,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: _selectedTab == 1
-                      ? Colors.white
-                      : Colors.transparent,
+                  color: _selectedTab == 1 ? Colors.white : Colors.transparent,
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Text(
@@ -171,7 +165,8 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
           },
           onBookAgain: () => _showSnackBar('Booking feature coming soon'),
           onReschedule: () => _showSnackBar('Reschedule feature coming soon'),
-          onJoinSession: () => _showSnackBar('Join session feature coming soon'),
+          onJoinSession: () =>
+              _showSnackBar('Join session feature coming soon'),
           onCancel: () => _confirmCancel(context, session.id),
         );
       },
@@ -203,8 +198,8 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

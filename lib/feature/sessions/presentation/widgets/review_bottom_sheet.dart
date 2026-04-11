@@ -104,10 +104,7 @@ class _StarRating extends StatelessWidget {
   final int rating;
   final Function(int) onRatingChanged;
 
-  const _StarRating({
-    required this.rating,
-    required this.onRatingChanged,
-  });
+  const _StarRating({required this.rating, required this.onRatingChanged});
 
   @override
   Widget build(BuildContext context) {
