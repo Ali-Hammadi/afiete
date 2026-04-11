@@ -1,5 +1,6 @@
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:flutter/material.dart';
 
 class AssignmentWidget extends StatelessWidget {
@@ -28,7 +29,9 @@ class AssignmentWidget extends StatelessWidget {
             overflow: TextOverflow.visible,
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, MyRoutes.assignmentTestScreen);
+            },
             child: Container(
               padding: EdgeInsets.all(3),
               decoration: BoxDecoration(
@@ -38,7 +41,7 @@ class AssignmentWidget extends StatelessWidget {
                 ),
               ),
               child: Text(
-                " Take the assignment ",
+                "Take an assignment",
                 style: AppStyles.bodyMedium.copyWith(
                   color: AppColors.secondaryColor,
                 ),
