@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:afiete/core/network/token_storage.dart';
 
 abstract class DioFactory {
-  static const String baseUrl = 'https://api.example.com';
+  static const String baseUrl = 'http://127.0.0.1:8000/';
 
   static Dio create() {
     final dio = Dio(

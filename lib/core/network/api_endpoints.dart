@@ -4,6 +4,7 @@ abstract class ApiEndpoints {
   static const String appointments = '/api/appointments';
   static const String sessions = '/api/sessions';
   static const String settings = '/api/settings';
+  static const String assignments = '/api/assignments';
 
   static const String login = '$auth/login';
   static const String signup = '$auth/signup';
@@ -26,4 +27,7 @@ abstract class ApiEndpoints {
 
   static const String settingsMedicalProfile = '$settings/medical-profile';
   static const String settingsReports = '$settings/reports';
+
+  static const String assignmentQuestions = '$assignments/questions';
+  static const String assignmentSubmit = '$assignments/submit';
 }

@@ -1,4 +1,10 @@
 import 'package:afiete/core/network/dio_factory.dart';
+import 'package:afiete/feature/assignments/data/datasources/assignments_remote_datasource.dart';
+import 'package:afiete/feature/assignments/data/repositories/assignments_repository_impl.dart';
+import 'package:afiete/feature/assignments/domain/repositories/assignments_repository.dart';
+import 'package:afiete/feature/assignments/domain/usecase/get_assignment_questions_usecase.dart';
+import 'package:afiete/feature/assignments/domain/usecase/submit_assignment_usecase.dart';
+import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
@@ -163,6 +169,36 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<GetDoctorByIdUseCase>(
     () => GetDoctorByIdUseCase(sl<DoctorsRepository>()),
+  );
+
+  // Assignments data sources
+  sl.registerLazySingleton<AssignmentsRemoteDataSource>(
+    () => AssignmentsRemoteDataSourceImpl(dio: sl<Dio>()),
+  );
+
+  // Assignments repositories
+  sl.registerLazySingleton<AssignmentsRepository>(
+    () => AssignmentsRepositoryImpl(
+      remoteDataSource: sl<AssignmentsRemoteDataSource>(),
+    ),
+  );
+
+  // Assignments use cases
+  sl.registerLazySingleton<GetAssignmentQuestionsUseCase>(
+    () => GetAssignmentQuestionsUseCase(sl<AssignmentsRepository>()),
+  );
+  sl.registerLazySingleton<SubmitAssignmentUseCase>(
+    () => SubmitAssignmentUseCase(sl<AssignmentsRepository>()),
+  );
+
+  // Assignments cubit
+  sl.registerFactory<AssignmentsCubit>(
+    () => AssignmentsCubit(
+      sl<GetAssignmentQuestionsUseCase>(),
+      sl<SubmitAssignmentUseCase>(),
+      sl<GetAllDoctorsUseCase>(),
+      sl<GetDoctorsBySpecialtyUseCase>(),
+    ),
   );
 
   // Doctors cubits

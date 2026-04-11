@@ -1,3 +1,6 @@
+import 'package:afiete/core/di/injection_container.dart';
+import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
+import 'package:afiete/feature/assignments/presentation/screens/assignment_test_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/auth_info_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/verify_account_screen.dart';
 import 'package:afiete/feature/doctors/presentation/screens/doctor_info.dart';
@@ -12,6 +15,7 @@ import 'package:afiete/feature/auth/presentation/views/signup_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/login_screen.dart';
 import 'package:afiete/feature/splash/presentation/views/welcome_screens.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AppRouter {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
@@ -44,6 +48,13 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProfileInfoScreen());
       case MyRoutes.reportIssueScreen:
         return MaterialPageRoute(builder: (_) => const ReportIssueScreen());
+      case MyRoutes.assignmentTestScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<AssignmentsCubit>(
+            create: (_) => sl<AssignmentsCubit>()..loadQuestions(),
+            child: const AssignmentTestScreen(),
+          ),
+        );
 
       default:
         return MaterialPageRoute(
@@ -78,4 +89,5 @@ class MyRoutes {
   static const String medicalProfileScreen = "/medicalProfileScreen";
   static const String profileInfoScreen = "/profileInfoScreen";
   static const String reportIssueScreen = "/reportIssueScreen";
+  static const String assignmentTestScreen = "/assignmentTestScreen";
 }
