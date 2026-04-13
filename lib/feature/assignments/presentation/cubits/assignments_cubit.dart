@@ -68,7 +68,7 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
     if (currentAnswer == null || currentAnswer.trim().isEmpty) {
       emit(
         currentState.copyWith(
-          validationError: 'يرجى اختيار إجابة قبل المتابعة',
+          validationError: 'Please choose an answer before continuing.',
         ),
       );
       return;
@@ -114,7 +114,7 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
     if (currentState.selectedAnswers.length != currentState.questions.length) {
       emit(
         currentState.copyWith(
-          validationError: 'يرجى الإجابة على جميع الاسئلة قبل الارسال',
+          validationError: 'Please answer all questions before submitting.',
         ),
       );
       return;
