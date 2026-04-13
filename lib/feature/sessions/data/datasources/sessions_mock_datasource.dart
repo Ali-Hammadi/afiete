@@ -1,28 +1,8 @@
 import 'package:afiete/feature/sessions/data/models/review_model.dart';
+import 'package:afiete/feature/sessions/data/datasources/sessions_remote_datasource.dart';
 import 'package:afiete/feature/sessions/data/models/session_model.dart';
 
-abstract class SessionsMockDataSource {
-  Future<List<SessionModel>> getUpcomingSessions();
-
-  Future<List<SessionModel>> getPastSessions();
-
-  Future<SessionModel> joinSession(String sessionId);
-
-  Future<void> cancelSession(String sessionId);
-
-  Future<SessionModel> rescheduleSession({
-    required String sessionId,
-    required DateTime newScheduledAt,
-  });
-
-  Future<ReviewModel> addReview({
-    required String sessionId,
-    required int rating,
-    required String comment,
-  });
-}
-
-class SessionsMockDataSourceImpl implements SessionsMockDataSource {
+class SessionsMockDataSourceImpl implements SessionsRemoteDataSource {
   final List<SessionModel> _upcomingSessions = [
     SessionModel(
       id: 'session_1',
