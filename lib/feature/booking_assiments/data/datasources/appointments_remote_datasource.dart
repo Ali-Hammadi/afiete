@@ -27,7 +27,22 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
     try {
       final response = await _dio.get(ApiEndpoints.appointmentsList);
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['appointments'] ?? [];
+        final body = response.data;
+        List<dynamic> data = const [];
+
+        if (body is List) {
+          data = body;
+        } else if (body is Map<String, dynamic>) {
+          final dynamic fromAppointments = body['appointments'];
+          final dynamic fromData = body['data'];
+
+          if (fromAppointments is List) {
+            data = fromAppointments;
+          } else if (fromData is List) {
+            data = fromData;
+          }
+        }
+
         return data
             .map(
               (apt) => AppointmentModel.fromJson(apt as Map<String, dynamic>),
@@ -79,7 +94,14 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
       );
 
       if (response.statusCode == 201) {
-        return AppointmentModel.fromJson(response.data as Map<String, dynamic>);
+        final body = response.data;
+        if (body is Map<String, dynamic>) {
+          final nested = body['appointment'];
+          if (nested is Map<String, dynamic>) {
+            return AppointmentModel.fromJson(nested);
+          }
+          return AppointmentModel.fromJson(body);
+        }
       }
       throw DioException(
         requestOptions: response.requestOptions,

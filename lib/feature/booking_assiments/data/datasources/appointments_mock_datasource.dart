@@ -1,21 +1,8 @@
 import 'package:afiete/feature/booking_assiments/data/models/appointment_model.dart';
+import 'package:afiete/feature/booking_assiments/data/datasources/appointments_remote_datasource.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
 
-abstract class AppointmentsMockDataSource {
-  Future<List<AppointmentModel>> getAppointments();
-
-  Future<AppointmentModel> createAppointment({
-    required String doctorId,
-    required String patientId,
-    required String doctorName,
-    required DateTime scheduledAt,
-    required int durationSlots,
-    required ConsultationFee consultationFee,
-    required String sessionType,
-  });
-}
-
-class AppointmentsMockDataSourceImpl implements AppointmentsMockDataSource {
+class AppointmentsMockDataSourceImpl implements AppointmentsRemoteDataSource {
   final List<AppointmentModel> _appointments = [
     AppointmentModel(
       id: 'apt_1',
