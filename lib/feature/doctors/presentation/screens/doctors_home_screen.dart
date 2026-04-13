@@ -59,96 +59,92 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppStyles.padding),
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search experts or specialist',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {
-                              searchQuery = '';
-                            });
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: AppColors.unselectedFieldColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppStyles.borderRadius),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppStyles.padding,
-                    vertical: AppStyles.padding / 2,
-                  ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppStyles.padding),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search experts or specialist',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            searchQuery = '';
+                          });
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: AppColors.unselectedFieldColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppStyles.borderRadius),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppStyles.padding,
+                  vertical: AppStyles.padding / 2,
                 ),
               ),
             ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppStyles.padding,
-                vertical: AppStyles.padding / 2,
-              ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(children: [..._buildSpecialtyChips()]),
-              ),
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppStyles.padding,
+              vertical: AppStyles.padding / 2,
             ),
-            Flexible(
-              child: BlocBuilder<DoctorsCubit, DoctorsState>(
-                builder: (context, state) {
-                  if (state is DoctorsLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [..._buildSpecialtyChips()]),
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<DoctorsCubit, DoctorsState>(
+              builder: (context, state) {
+                if (state is DoctorsLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                  if (state is DoctorsError) {
-                    return Center(child: Text(state.message));
-                  }
+                if (state is DoctorsError) {
+                  return Center(child: Text(state.message));
+                }
 
-                  if (state is DoctorsLoaded) {
-                    final filteredDoctors = _filterDoctors(state.doctors);
+                if (state is DoctorsLoaded) {
+                  final filteredDoctors = _filterDoctors(state.doctors);
 
-                    if (filteredDoctors.isEmpty) {
-                      return Center(
-                        child: Text(
-                          searchQuery.isNotEmpty
-                              ? 'No doctors match your search.'
-                              : 'No doctors found.',
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      itemCount: filteredDoctors.length,
-                      itemBuilder: (context, index) {
-                        return DoctorCard(doctor: filteredDoctors[index]);
-                      },
+                  if (filteredDoctors.isEmpty) {
+                    return Center(
+                      child: Text(
+                        searchQuery.isNotEmpty
+                            ? 'No doctors match your search.'
+                            : 'No doctors found.',
+                      ),
                     );
                   }
 
-                  return const SizedBox.shrink();
-                },
-              ),
+                  return ListView.builder(
+                    itemCount: filteredDoctors.length,
+                    itemBuilder: (context, index) {
+                      return DoctorCard(doctor: filteredDoctors[index]);
+                    },
+                  );
+                }
+
+                return const SizedBox.shrink();
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

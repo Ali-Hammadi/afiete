@@ -105,7 +105,11 @@ class DoctorCard extends StatelessWidget {
                 style: AppStyles.bodyMedium.copyWith(color: Colors.white),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, MyRoutes.doctorInfoScreen);
+                Navigator.pushNamed(
+                  context,
+                  MyRoutes.doctorInfoScreen,
+                  arguments: doctor,
+                );
               },
             ),
             SizedBox(height: 10),

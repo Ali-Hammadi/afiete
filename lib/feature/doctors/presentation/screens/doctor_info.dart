@@ -1,14 +1,18 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/core/widget/error_custom_button.dart';
+import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:afiete/feature/home/presentation/widgets/custom_container.dart';
 import 'package:afiete/feature/doctors/presentation/widgets/doctor_review_item.dart';
 import 'package:flutter/material.dart';
 
 class DoctorInfo extends StatefulWidget {
-  const DoctorInfo({super.key});
+  final DoctorEntity? doctor;
+
+  const DoctorInfo({super.key, this.doctor});
 
   @override
   State<DoctorInfo> createState() => _DoctorInfoState();
@@ -21,10 +25,18 @@ class _DoctorInfoState extends State<DoctorInfo> {
 
   @override
   Widget build(BuildContext context) {
+    final doctor = widget.doctor;
+    final doctorName = doctor?.name ?? 'Dr. John Doe';
+    final doctorSpecialization = doctor?.specialization ?? 'Specialist';
+    final doctorDescription =
+        doctor?.description.isNotEmpty == true
+            ? doctor!.description
+            : 'Doctor profile details are not available right now.';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Dr. John Doe",
+          doctorName,
           style: AppStyles.headingMedium.copyWith(
             color: AppColors.primarytextColor,
           ),
@@ -49,7 +61,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: AppStyles.padding),
               child: Text(
-                "Dr. John Doe",
+                doctorName,
                 style: AppStyles.headingMedium.copyWith(
                   color: AppColors.primarytextColor,
                 ),
@@ -68,7 +80,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                           children: [
                             Icon(Icons.star, color: Colors.amber),
                             Text(
-                              "4.9",
+                              (doctor?.ratingValue ?? 4.9).toStringAsFixed(1),
                               style: AppStyles.bodySmall.copyWith(
                                 color: AppColors.primarytextColor,
                               ),
@@ -83,7 +95,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("+ 5 years"),
+                        Text(doctor?.experience ?? '+ 5 years'),
                         Text("Experience", style: AppStyles.bodySmall),
                       ],
                     ),
@@ -109,7 +121,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                   SizedBox(
                     width: double.infinity,
                     child: Text(
-                      "Dr. John Doe is a highly skilled and compassionate physician with over 5 years of experience in the medical field. He has a proven track record of providing exceptional care to his patients, earning him a stellar reputation in the community. Dr. Doe is known for his dedication to staying up-to-date with the latest medical advancements and his commitment to delivering personalized treatment plans that cater to the unique needs of each patient.",
+                      doctorDescription,
                       style: AppStyles.bodyMedium.copyWith(
                         color: AppColors.primarytextColor,
                       ),
@@ -128,7 +140,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Anxiety",
+                        doctorSpecialization,
                         style: AppStyles.bodySmall.copyWith(
                           color: AppColors.primarytextColor,
                         ),
@@ -253,7 +265,22 @@ class _DoctorInfoState extends State<DoctorInfo> {
                 "Book a session now",
                 style: AppStyles.headingSmall.copyWith(color: Colors.white),
               ),
-              onPressed: () {},
+              onPressed: () {
+                if (doctor == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Doctor data not loaded yet.'),
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.pushNamed(
+                  context,
+                  MyRoutes.bookSessionScreen,
+                  arguments: doctor,
+                );
+              },
             ),
             SizedBox(height: 20),
             ErrorCustomButton(

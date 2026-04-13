@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 
 class DoctorModel extends Equatable {
@@ -13,6 +14,9 @@ class DoctorModel extends Equatable {
   final double ratingValue;
   final DateTime createdAt;
   final List<DateTime> availableTimes;
+  final List<int> availableDurations;
+  final List<String> availableSessionTypes;
+  final ConsultationFee consultationFee;
 
   const DoctorModel({
     required this.id,
@@ -26,6 +30,9 @@ class DoctorModel extends Equatable {
     required this.ratingValue,
     required this.createdAt,
     required this.availableTimes,
+    required this.availableDurations,
+    required this.availableSessionTypes,
+    required this.consultationFee,
   });
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
@@ -48,6 +55,28 @@ class DoctorModel extends Equatable {
                   .map((e) => DateTime.parse(e as String)),
             )
           : [],
+      availableDurations: json['availableDurations'] != null
+          ? List<int>.from(
+              (json['availableDurations'] as List).map(
+                (e) => e is int ? e : int.tryParse(e.toString()) ?? 1,
+              ),
+            )
+          : const [1, 2],
+      availableSessionTypes: json['availableSessionTypes'] != null
+          ? List<String>.from(
+              (json['availableSessionTypes'] as List).map((e) => '$e'),
+            )
+          : const ['video_call', 'voice_call', 'text_chat'],
+      consultationFee: json['consultationFee'] is Map<String, dynamic>
+          ? ConsultationFee(
+              textChat: ((json['consultationFee']['textChat'] as num?) ?? 10)
+                  .toDouble(),
+              videoCall: ((json['consultationFee']['videoCall'] as num?) ?? 20)
+                  .toDouble(),
+              voiceCall: ((json['consultationFee']['voiceCall'] as num?) ?? 15)
+                  .toDouble(),
+            )
+          : const ConsultationFee(textChat: 10, videoCall: 20, voiceCall: 15),
     );
   }
 
@@ -63,6 +92,13 @@ class DoctorModel extends Equatable {
         'ratingValue': ratingValue,
         'createdAt': createdAt.toIso8601String(),
         'availableTimes': availableTimes.map((e) => e.toIso8601String()).toList(),
+        'availableDurations': availableDurations,
+        'availableSessionTypes': availableSessionTypes,
+        'consultationFee': {
+          'textChat': consultationFee.textChat,
+          'videoCall': consultationFee.videoCall,
+          'voiceCall': consultationFee.voiceCall,
+        },
       };
 
   DoctorEntity toEntity() => DoctorEntity(
@@ -77,6 +113,9 @@ class DoctorModel extends Equatable {
         ratingValue: ratingValue,
         createdAt: createdAt,
         availableTimes: availableTimes,
+        availableDurations: availableDurations,
+        availableSessionTypes: availableSessionTypes,
+        consultationFee: consultationFee,
       );
 
   @override
@@ -92,5 +131,8 @@ class DoctorModel extends Equatable {
         ratingValue,
         createdAt,
         availableTimes,
+        availableDurations,
+        availableSessionTypes,
+        consultationFee,
       ];
 }
