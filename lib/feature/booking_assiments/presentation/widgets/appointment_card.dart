@@ -4,6 +4,7 @@ import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
 import 'package:afiete/feature/booking_assiments/domain/entities/appointment_entity.dart';
+import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -96,7 +97,7 @@ class CustomAppointmentCard extends StatelessWidget {
                       "Join Session",
                       style: AppStyles.bodySmall.copyWith(color: Colors.white),
                     ),
-                    onPressed: () {},
+                    onPressed: () => _handleJoinSession(context),
                   ),
                   CustomButton(
                     widget: Text(
@@ -113,6 +114,14 @@ class CustomAppointmentCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _handleJoinSession(BuildContext context) {
+    ChatSessionNavigator.openFromAppointment(
+      context,
+      appointment,
+      doctorName: doctor?.name ?? appointment.doctorName,
     );
   }
 }
