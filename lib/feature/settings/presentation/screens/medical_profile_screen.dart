@@ -54,6 +54,7 @@ class MedicalProfileScreen extends StatelessWidget {
                   _SectionCard(
                     icon: Icons.medication_outlined,
                     title: 'Prescriptions',
+                    footerAction: 'View All Prescriptions',
                     child: Column(
                       children: profile.prescriptions
                           .map(
@@ -64,12 +65,12 @@ class MedicalProfileScreen extends StatelessWidget {
                           )
                           .toList(),
                     ),
-                    footerAction: 'View All Prescriptions',
                   ),
                   const SizedBox(height: 20),
                   _SectionCard(
                     icon: Icons.note_alt_outlined,
                     title: 'Notes',
+                    footerAction: 'View All Notes',
                     child: Column(
                       children: [
                         ...profile.notes.map(
@@ -80,7 +81,6 @@ class MedicalProfileScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    footerAction: 'View All Notes',
                   ),
                 ],
               ),

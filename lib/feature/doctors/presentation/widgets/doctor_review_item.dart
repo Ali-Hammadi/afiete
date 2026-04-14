@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class DoctorReviewItem extends StatelessWidget {
   const DoctorReviewItem({
+    super.key,
     required this.avatarAsset,
     required this.reviewerName,
     required this.reviewTime,

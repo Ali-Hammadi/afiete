@@ -1,5 +1,7 @@
 import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
+import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
 import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:afiete/feature/sessions/presentation/widgets/review_bottom_sheet.dart';
@@ -85,7 +87,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: AppColors.primaryFillColor.withOpacity(0.3),
+        color: AppColors.primaryFillColor,
       ),
       padding: const EdgeInsets.all(4),
       child: Row(
@@ -149,7 +151,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     );
   }
 
-  Widget _buildSessionsList(dynamic sessions, {required bool isPast}) {
+  Widget _buildSessionsList(List<SessionEntity> sessions, {required bool isPast}) {
     return ListView.builder(
       itemCount: sessions.length,
       itemBuilder: (context, index) {
@@ -165,11 +167,18 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
           },
           onBookAgain: () => _showSnackBar('Booking feature coming soon'),
           onReschedule: () => _showSnackBar('Reschedule feature coming soon'),
-          onJoinSession: () =>
-              _showSnackBar('Join session feature coming soon'),
+          onJoinSession: () => _handleJoinSession(session),
           onCancel: () => _confirmCancel(context, session.id),
         );
       },
+    );
+  }
+
+  void _handleJoinSession(SessionEntity session) {
+    ChatSessionNavigator.openFromSession(
+      context,
+      session,
+      patientId: 'current_patient',
     );
   }
 

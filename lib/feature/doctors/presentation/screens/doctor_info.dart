@@ -28,10 +28,9 @@ class _DoctorInfoState extends State<DoctorInfo> {
     final doctor = widget.doctor;
     final doctorName = doctor?.name ?? 'Dr. John Doe';
     final doctorSpecialization = doctor?.specialization ?? 'Specialist';
-    final doctorDescription =
-        doctor?.description.isNotEmpty == true
-            ? doctor!.description
-            : 'Doctor profile details are not available right now.';
+    final doctorDescription = doctor?.description.isNotEmpty == true
+        ? doctor!.description
+        : 'Doctor profile details are not available right now.';
 
     return Scaffold(
       appBar: AppBar(
@@ -266,14 +265,14 @@ class _DoctorInfoState extends State<DoctorInfo> {
                 style: AppStyles.headingSmall.copyWith(color: Colors.white),
               ),
               onPressed: () {
-                if (doctor == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Doctor data not loaded yet.'),
-                    ),
-                  );
-                  return;
-                }
+                // if (doctor == null) {
+                //   ScaffoldMessenger.of(context).showSnackBar(
+                //     const SnackBar(
+                //       content: Text('Doctor data not loaded yet.'),
+                //     ),
+                //   );
+                //   return;
+                // }
 
                 Navigator.pushNamed(
                   context,

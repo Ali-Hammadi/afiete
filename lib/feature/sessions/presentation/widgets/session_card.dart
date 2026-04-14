@@ -41,7 +41,7 @@ class SessionCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                  backgroundColor: AppColors.primaryColor,
                   child: const Icon(
                     Icons.person,
                     color: AppColors.primaryColor,

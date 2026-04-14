@@ -73,7 +73,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: AppColors.primaryFillColor.withOpacity(0.5),
+                fillColor: AppColors.primaryFillColor,
               ),
             ),
             const SizedBox(height: 20),

@@ -2,7 +2,7 @@ import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/settings/domin/entity/setting_entity.dart';
-import 'package:afiete/feature/settings/presentation/widget/info_row.dart';
+import 'package:afiete/feature/settings/presentation/widgets/info_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,24 +22,24 @@ class ProfileInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
     final user = authState is AuthLoaded
-      ? authState.user
-      : authState is AuthProfileUpdated
-      ? authState.user
-      : null;
+        ? authState.user
+        : authState is AuthProfileUpdated
+        ? authState.user
+        : null;
 
     final displayName = user?.name.isNotEmpty == true
-      ? user!.name
-      : _profile.fullName;
+        ? user!.name
+        : _profile.fullName;
     final displayId = user?.id.isNotEmpty == true ? user!.id : _profile.userId;
     final displayEmail = user?.email.isNotEmpty == true
-      ? user!.email
-      : _profile.email;
+        ? user!.email
+        : _profile.email;
     final displayPhone = user?.phoneNumber?.isNotEmpty == true
-      ? user!.phoneNumber!
-      : _profile.phoneNumber;
+        ? user!.phoneNumber!
+        : _profile.phoneNumber;
     final displayGender = user?.gender?.isNotEmpty == true
-      ? user!.gender!
-      : _profile.gender;
+        ? user!.gender!
+        : _profile.gender;
     final displayAge = user?.age ?? _profile.age;
 
     return Scaffold(

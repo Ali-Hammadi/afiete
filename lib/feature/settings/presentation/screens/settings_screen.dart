@@ -4,6 +4,8 @@ import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/settings/domin/entity/setting_entity.dart';
+import 'package:afiete/feature/settings/presentation/widgets/language_option.dart';
+import 'package:afiete/feature/settings/presentation/widgets/setting_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -39,7 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _buildHeader(context),
               const SizedBox(height: 20),
-              _SettingTile(
+              SettingTile(
                 icon: Icons.medical_services_outlined,
                 title: 'Medical Profile',
                 subtitle: 'Notes | Prescriptions',
@@ -48,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 12),
-              _SettingTile(
+              SettingTile(
                 icon: Icons.language,
                 title: 'Language',
                 trailing: Container(
@@ -70,7 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => _showLanguageSheet(context),
               ),
               const SizedBox(height: 12),
-              _SettingTile(
+              SettingTile(
                 icon: Icons.support_agent,
                 title: 'Support',
                 subtitle: '24/7 Support',
@@ -78,12 +80,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _showInfoSnackBar('Support center is coming soon.'),
               ),
               const SizedBox(height: 12),
-              _SettingTile(
+              SettingTile(
                 icon: Icons.dark_mode_outlined,
                 title: 'Theme',
                 trailing: Switch(
                   value: isDarkMode,
-                  activeColor: AppColors.primaryColor,
+                  activeThumbColor: AppColors.primaryColor,
                   onChanged: (value) {
                     setState(() {
                       isDarkMode = value;
@@ -92,20 +94,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              _SettingTile(
+              SettingTile(
                 icon: Icons.privacy_tip_outlined,
                 title: 'Terms & Privacy',
                 onTap: () =>
                     _showInfoSnackBar('Terms & privacy page is coming soon.'),
               ),
               const SizedBox(height: 12),
-              _SettingTile(
+              SettingTile(
                 icon: Icons.mail_outline,
                 title: 'Contact us',
                 onTap: () => _showInfoSnackBar('Contact page is coming soon.'),
               ),
               const SizedBox(height: 12),
-              _SettingTile(
+              SettingTile(
                 icon: Icons.report_problem_outlined,
                 title: 'Reports',
                 onTap: () {
@@ -166,6 +168,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showLanguageSheet(BuildContext context) {
+    String tempLanguage = selectedLanguage;
+
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.whiteColor,
@@ -173,37 +177,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(AppStyles.padding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Select language', style: AppStyles.headingMedium),
-              const SizedBox(height: 12),
-              _LanguageTile(
-                value: 'English',
-                groupValue: selectedLanguage,
-                onChanged: (value) {
-                  setState(() {
-                    selectedLanguage = value;
-                  });
-                  Navigator.pop(context);
-                },
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(AppStyles.padding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Select language', style: AppStyles.headingMedium),
+                  const SizedBox(height: 12),
+                  RadioGroup<String>(
+                    onChanged: (value) {
+                      if (value != null) {
+                        setModalState(() {
+                          tempLanguage = value;
+                        });
+                      }
+                    },
+                    child: Column(
+                      children: [
+                        LanguageOption(value: 'English'),
+                        LanguageOption(value: 'Arabic'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Cancel', style: AppStyles.bodyMedium),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedLanguage = tempLanguage;
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Select',
+                          style: AppStyles.bodyMedium.copyWith(
+                            color: AppColors.whiteColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
               ),
-              _LanguageTile(
-                value: 'Arabic',
-                groupValue: selectedLanguage,
-                onChanged: (value) {
-                  setState(() {
-                    selectedLanguage = value;
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -240,96 +268,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ? user.gender!
           : _profile.gender,
       age: user.age ?? _profile.age,
-    );
-  }
-}
-
-class _SettingTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final Widget? trailing;
-  final VoidCallback? onTap;
-
-  const _SettingTile({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    this.trailing,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppStyles.borderRadius - 4),
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppStyles.borderRadius - 4),
-          border: Border.all(
-            color: AppColors.unselectedFieldColor.withValues(alpha: 0.4),
-          ),
-          color: AppColors.whiteColor,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.unselectedIconColor, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: AppStyles.bodyMedium),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(subtitle!, style: AppStyles.bodySmall),
-                  ],
-                ],
-              ),
-            ),
-            trailing ??
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: AppColors.unselectedIconColor,
-                ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LanguageTile extends StatelessWidget {
-  final String value;
-  final String groupValue;
-  final ValueChanged<String> onChanged;
-
-  const _LanguageTile({
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(value, style: AppStyles.bodyMedium),
-      trailing: Radio<String>(
-        value: value,
-        groupValue: groupValue,
-        activeColor: AppColors.primaryColor,
-        onChanged: (v) {
-          if (v != null) {
-            onChanged(v);
-          }
-        },
-      ),
-      onTap: () => onChanged(value),
     );
   }
 }
