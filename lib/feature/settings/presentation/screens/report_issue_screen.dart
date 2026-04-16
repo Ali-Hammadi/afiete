@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -32,6 +31,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final authState = context.read<AuthCubit>().state;
     final userId = authState is AuthLoaded
         ? authState.user.id
@@ -47,7 +49,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: AppColors.primaryColor,
+                backgroundColor: colorScheme.primary,
               ),
             );
             Navigator.pop(context);
@@ -55,15 +57,15 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: AppColors.errorColor,
+                backgroundColor: colorScheme.error,
               ),
             );
           }
         },
         child: Scaffold(
-          backgroundColor: AppColors.primarybackgroundColor,
+          backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: AppColors.primarybackgroundColor,
+            backgroundColor: theme.scaffoldBackgroundColor,
             elevation: 0,
             title: const Text('Report Issue', style: AppStyles.headingMedium),
           ),
@@ -72,62 +74,78 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryFillColor.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: AppColors.primaryColor,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Your report is confidential and helps us maintain a safe environment.',
-                          style: AppStyles.bodyMedium,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer.withValues(
+                              alpha: 0.45,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.warning_amber_rounded,
+                                color: colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Your report is confidential and helps us maintain a safe environment.',
+                                  style: AppStyles.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 24),
+                        Text('Select Reason', style: AppStyles.headingMedium),
+                        const SizedBox(height: 12),
+                        ...reasons.map(_buildReasonTile),
+                        const SizedBox(height: 18),
+                        Text(
+                          'Additional Details',
+                          style: AppStyles.headingMedium,
+                        ),
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: detailsController,
+                          maxLines: 6,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: theme.cardColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: colorScheme.outline,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: colorScheme.outline,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                Text('Select Reason', style: AppStyles.headingMedium),
                 const SizedBox(height: 12),
-                ...reasons.map(_buildReasonTile),
-                const SizedBox(height: 18),
-                Text('Additional Details', style: AppStyles.headingMedium),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: detailsController,
-                  maxLines: 6,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.whiteColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: AppColors.unselectedFieldColor,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: AppColors.unselectedFieldColor,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.primaryColor),
-                    ),
-                  ),
-                ),
-                const Spacer(),
                 BlocBuilder<SettingsCubit, SettingsState>(
                   builder: (context, state) {
                     final isLoading = state is SettingsSubmittingReport;
@@ -153,20 +171,20 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                               );
                             },
                       widget: isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                                  colorScheme.onPrimary,
                                 ),
                               ),
                             )
                           : Text(
                               'Submit Report',
                               style: AppStyles.headingSmall.copyWith(
-                                color: AppColors.whiteColor,
+                                color: colorScheme.onPrimary,
                               ),
                             ),
                     );
@@ -195,12 +213,12 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
           decoration: BoxDecoration(
-            color: AppColors.whiteColor,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
-                  ? AppColors.primaryColor
-                  : AppColors.unselectedFieldColor,
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.outline,
             ),
           ),
           child: Row(
@@ -213,8 +231,8 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isSelected
-                        ? AppColors.primaryColor
-                        : AppColors.unselectedFieldColor,
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outline,
                     width: 2,
                   ),
                 ),
@@ -223,9 +241,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                         child: Container(
                           width: 10,
                           height: 10,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primaryColor,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       )
