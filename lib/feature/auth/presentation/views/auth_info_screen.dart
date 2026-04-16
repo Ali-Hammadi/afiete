@@ -44,6 +44,12 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final authState = context.watch<AuthCubit>().state;
+    final currentName = authState is AuthLoaded
+        ? authState.user.name
+        : authState is AuthProfileUpdated
+        ? authState.user.name
+        : '';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -135,7 +141,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (selectedDate == null || selectedGender == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -147,10 +153,14 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                     return;
                   }
 
-                  context.read<AuthCubit>().updateProfileInfo(
-                    birthDate: selectedDate!,
-                    gender: selectedGender!,
-                  );
+                  final saved = await context
+                      .read<AuthCubit>()
+                      .updateProfileInfo(
+                        name: currentName,
+                        birthDate: selectedDate!,
+                        gender: selectedGender!,
+                      );
+                  if (!context.mounted || !saved) return;
                   Navigator.pushReplacementNamed(
                     context,
                     MyRoutes.verifyAccountScreen,

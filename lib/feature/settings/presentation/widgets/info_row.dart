@@ -5,12 +5,14 @@ class CustomInfoRow extends StatelessWidget {
   final IconData icon;
   final String leftText;
   final String rightActionText;
+  final VoidCallback? onActionPressed;
 
   const CustomInfoRow({
     super.key,
     required this.icon,
     required this.leftText,
     required this.rightActionText,
+    this.onActionPressed,
   });
 
   @override
@@ -23,7 +25,7 @@ class CustomInfoRow extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: Text(leftText, style: AppStyles.bodyMedium)),
         TextButton(
-          onPressed: () {},
+          onPressed: onActionPressed,
           child: Text(
             rightActionText,
             style: AppStyles.bodySmall.copyWith(color: colorScheme.primary),

@@ -15,4 +15,22 @@ abstract class AuthRepository {
     String password,
   );
   Future<Either<Failure, UserAuthEntity>> googleSignIn();
+  Future<Either<Failure, UserAuthEntity>> updateProfileInfo({
+    required String userId,
+    required String name,
+    required DateTime birthDate,
+    required String gender,
+    required String phoneNumber,
+  });
+
+  Future<Either<Failure, String>> requestEmailChangeOtp({
+    required String userId,
+    required String newEmail,
+  });
+
+  Future<Either<Failure, UserAuthEntity>> confirmEmailChange({
+    required String userId,
+    required String newEmail,
+    required String otp,
+  });
 }

@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:flutter/material.dart';
 
 class PrivacyScreen extends StatelessWidget {
@@ -14,7 +15,10 @@ class PrivacyScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text('Privacy & Terms', style: AppStyles.headingMedium),
+        title: const Text(
+          SettingsStrings.privacyTermsTitle,
+          style: AppStyles.headingMedium,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppStyles.padding),
@@ -22,7 +26,7 @@ class PrivacyScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSection(
-              title: 'Privacy Policy',
+              title: SettingsStrings.privacyPolicyTitle,
               content:
                   'We are committed to protecting your privacy and ensuring you have a positive experience on our platform. This privacy policy explains how we collect, use, and protect your personal information.\n\n'
                   'Data Collection:\n'
@@ -44,7 +48,7 @@ class PrivacyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             _buildSection(
-              title: 'Terms of Service',
+              title: SettingsStrings.termsOfServiceTitle,
               content:
                   'By using our platform, you agree to these terms and conditions. Please read them carefully.\n\n'
                   'Acceptable Use:\n'
@@ -70,7 +74,7 @@ class PrivacyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             _buildSection(
-              title: 'Cookie Policy',
+              title: SettingsStrings.cookiePolicyTitle,
               content:
                   'We use cookies to enhance your experience on our platform.\n\n'
                   'Types of Cookies:\n'
@@ -100,8 +104,7 @@ class PrivacyScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Last updated: April 2026\n\n'
-                      'For questions about our privacy practices or terms, please contact us.',
+                      '${SettingsStrings.privacyLastUpdated}\n\n${SettingsStrings.privacyContactHint}',
                       style: AppStyles.bodySmall.copyWith(
                         color: colorScheme.onSurface,
                       ),

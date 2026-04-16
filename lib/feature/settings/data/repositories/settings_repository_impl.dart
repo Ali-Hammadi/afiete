@@ -25,6 +25,52 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
+  Future<Either<Failure, MedicalProfileEntity>> updateMedicalNote({
+    required String userId,
+    required String noteTitle,
+    required String previousUpdatedAt,
+    required String newTitle,
+    required String newContent,
+  }) async {
+    try {
+      final result = await remoteDataSource.updateMedicalNote(
+        userId: userId,
+        noteTitle: noteTitle,
+        previousUpdatedAt: previousUpdatedAt,
+        newTitle: newTitle,
+        newContent: newContent,
+      );
+      return Right(result.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> shareMedicalNoteWithDoctor({
+    required String userId,
+    required String noteTitle,
+    required String noteContent,
+    required String doctorId,
+  }) async {
+    try {
+      final result = await remoteDataSource.shareMedicalNoteWithDoctor(
+        userId: userId,
+        noteTitle: noteTitle,
+        noteContent: noteContent,
+        doctorId: doctorId,
+      );
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, String>> submitReportIssue({
     required String userId,
     required String reason,

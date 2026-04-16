@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,10 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text('Contact Us', style: AppStyles.headingMedium),
+        title: const Text(
+          SettingsStrings.contactScreenTitle,
+          style: AppStyles.headingMedium,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppStyles.padding),
@@ -41,12 +45,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Get in Touch',
-              style: AppStyles.headingMedium.copyWith(fontSize: 24),
+              SettingsStrings.getInTouchTitle,
+              style: AppStyles.headingMedium.copyWith(
+                fontSize: AppStyles.veryBigFontSize,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
-              'We\'d love to hear from you. Send us a message and we\'ll respond as soon as possible.',
+              SettingsStrings.getInTouchSubtitle,
               style: AppStyles.bodyMedium.copyWith(
                 color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
@@ -54,55 +60,58 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             const SizedBox(height: 32),
             _buildContactCard(
               icon: Icons.email_outlined,
-              title: 'Email',
+              title: SettingsStrings.emailTitle,
               subtitle: 'support@afiete.com',
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 16),
             _buildContactCard(
               icon: Icons.phone_outlined,
-              title: 'Phone',
+              title: SettingsStrings.phoneTitle,
               subtitle: '+1 (555) 123-4567',
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 16),
             _buildContactCard(
               icon: Icons.location_on_outlined,
-              title: 'Office',
+              title: SettingsStrings.officeTitle,
               subtitle: '123 Healthcare Street\nMedical City, MC 12345',
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 16),
             _buildContactCard(
               icon: Icons.schedule_outlined,
-              title: 'Hours',
+              title: SettingsStrings.hoursTitle,
               subtitle:
                   'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 3:00 PM\nSunday: Closed',
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 40),
-            Text('Send us a Message', style: AppStyles.headingSmall),
+            Text(
+              SettingsStrings.sendMessageSectionTitle,
+              style: AppStyles.headingSmall,
+            ),
             const SizedBox(height: 16),
             _buildTextField(
               controller: nameController,
-              label: 'Full Name',
-              hint: 'Enter your full name',
+              label: SettingsStrings.fullNameLabel,
+              hint: SettingsStrings.fullNameHint,
               icon: Icons.person_outline,
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 16),
             _buildTextField(
               controller: emailController,
-              label: 'Email Address',
-              hint: 'your.email@example.com',
+              label: SettingsStrings.emailAddressLabel,
+              hint: SettingsStrings.emailAddressHint,
               icon: Icons.email_outlined,
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 16),
             _buildTextField(
               controller: messageController,
-              label: 'Message',
-              hint: 'Tell us how we can help...',
+              label: SettingsStrings.messageLabel,
+              hint: SettingsStrings.messageHint,
               icon: Icons.message_outlined,
               colorScheme: colorScheme,
               maxLines: 5,
@@ -122,7 +131,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                       ),
                     )
                   : Text(
-                      'Send Message',
+                      SettingsStrings.sendMessageButton,
                       style: AppStyles.headingSmall.copyWith(
                         color: colorScheme.onPrimary,
                       ),
@@ -231,14 +240,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         emailController.text.isEmpty ||
         messageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        const SnackBar(content: Text(SettingsStrings.fillAllFieldsError)),
       );
       return;
     }
 
     if (!emailController.text.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address')),
+        const SnackBar(content: Text(SettingsStrings.invalidEmailError)),
       );
       return;
     }
@@ -256,7 +265,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Message sent successfully!'),
+            content: const Text(SettingsStrings.messageSentSuccess),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );

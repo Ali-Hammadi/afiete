@@ -82,4 +82,66 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> updateProfileInfo({
+    required String userId,
+    required String name,
+    required DateTime birthDate,
+    required String gender,
+    required String phoneNumber,
+  }) async {
+    try {
+      final remoteUser = await remoteDataSource.updateProfileInfo(
+        userId: userId,
+        name: name,
+        birthDate: birthDate,
+        gender: gender,
+        phoneNumber: phoneNumber,
+      );
+      return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> requestEmailChangeOtp({
+    required String userId,
+    required String newEmail,
+  }) async {
+    try {
+      final result = await remoteDataSource.requestEmailChangeOtp(
+        userId: userId,
+        newEmail: newEmail,
+      );
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> confirmEmailChange({
+    required String userId,
+    required String newEmail,
+    required String otp,
+  }) async {
+    try {
+      final remoteUser = await remoteDataSource.confirmEmailChange(
+        userId: userId,
+        newEmail: newEmail,
+        otp: otp,
+      );
+      return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

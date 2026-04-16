@@ -12,6 +12,9 @@ abstract class ApiEndpoints {
   static const String logout = '$auth/logout';
   static const String deleteAccount = '$auth/delete-account';
   static const String googleLogin = '$auth/google-login';
+  static const String updateProfile = '$auth/update-profile';
+  static const String requestEmailChangeOtp = '$auth/request-email-change-otp';
+  static const String confirmEmailChange = '$auth/confirm-email-change';
 
   static const String allDoctors = doctors;
   static String doctorById(String id) => '$doctors/$id';

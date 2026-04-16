@@ -23,6 +23,31 @@ class UserModel extends Equatable {
     this.gender,
     this.phoneNumber,
   });
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? password,
+    String? token,
+    DateTime? birthDate,
+    int? age,
+    String? gender,
+    String? phoneNumber,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      token: token ?? this.token,
+      birthDate: birthDate ?? this.birthDate,
+      age: age ?? this.age,
+      gender: gender ?? this.gender,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+    );
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
     id: json['id'] ?? '',
     name: json['name'] ?? '',
@@ -32,7 +57,9 @@ class UserModel extends Equatable {
     birthDate: json['birthDate'] != null
         ? DateTime.tryParse(json['birthDate'].toString())
         : null,
-    age: json['age'] is int ? json['age'] as int : int.tryParse('${json['age'] ?? ''}'),
+    age: json['age'] is int
+        ? json['age'] as int
+        : int.tryParse('${json['age'] ?? ''}'),
     gender: json['gender']?.toString(),
     phoneNumber: json['phoneNumber']?.toString(),
   );

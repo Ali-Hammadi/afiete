@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/theme/theme_cubit.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
@@ -17,7 +18,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String selectedLanguage = 'English';
+  String selectedLanguage = SettingsStrings.english;
 
   static const UserSettingsProfileEntity _profile = UserSettingsProfileEntity(
     fullName: 'ALi Hammadi',
@@ -33,6 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isDarkMode = context.select<ThemeCubit, bool>(
       (themeCubit) => themeCubit.state == ThemeMode.dark,
     );
+    final authState = context.watch<AuthCubit>().state;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -44,12 +46,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
+              _buildHeader(context, authState),
               const SizedBox(height: 20),
               CustomSettingTile(
                 icon: Icons.medical_services_outlined,
-                title: 'Medical Profile',
-                subtitle: 'Prescriptions | Medicine | Notes',
+                title: SettingsStrings.medicalProfileTitle,
+                subtitle: SettingsStrings.medicalProfileSubtitle,
                 onTap: () {
                   Navigator.pushNamed(context, MyRoutes.medicalProfileScreen);
                 },
@@ -57,7 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               CustomSettingTile(
                 icon: Icons.language,
-                title: 'Language',
+                title: SettingsStrings.languageTitle,
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -79,15 +81,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               CustomSettingTile(
                 icon: Icons.support_agent,
-                title: 'Support',
-                subtitle: '24/7 Support',
+                title: SettingsStrings.supportTitle,
+                subtitle: SettingsStrings.supportSubtitle,
                 onTap: () =>
-                    _showInfoSnackBar('Support center is coming soon.'),
+                    _showInfoSnackBar(SettingsStrings.supportComingSoon),
               ),
               const SizedBox(height: 12),
               CustomSettingTile(
                 icon: Icons.dark_mode_outlined,
-                title: 'Theme',
+                title: SettingsStrings.themeTitle,
                 trailing: Switch(
                   value: isDarkMode,
                   onChanged: (value) =>
@@ -97,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               CustomSettingTile(
                 icon: Icons.privacy_tip_outlined,
-                title: 'Terms & Privacy',
+                title: SettingsStrings.termsPrivacyTitle,
                 onTap: () {
                   Navigator.pushNamed(context, MyRoutes.privacyScreen);
                 },
@@ -105,7 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               CustomSettingTile(
                 icon: Icons.mail_outline,
-                title: 'Contact us',
+                title: SettingsStrings.contactUsTitle,
                 onTap: () {
                   Navigator.pushNamed(context, MyRoutes.contactUsScreen);
                 },
@@ -113,7 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               CustomSettingTile(
                 icon: Icons.report_problem_outlined,
-                title: 'Reports',
+                title: SettingsStrings.reportsTitle,
                 onTap: () {
                   Navigator.pushNamed(context, MyRoutes.reportIssueScreen);
                 },
@@ -125,8 +127,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final profile = _resolveProfile(context);
+  Widget _buildHeader(BuildContext context, AuthState authState) {
+    final profile = _resolveProfile(authState);
     final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
@@ -187,7 +189,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Select language', style: AppStyles.headingMedium),
+                  Text(
+                    SettingsStrings.selectLanguageTitle,
+                    style: AppStyles.headingMedium,
+                  ),
                   const SizedBox(height: 12),
                   RadioGroup<String>(
                     onChanged: (value) {
@@ -199,8 +204,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                     child: Column(
                       children: [
-                        CustomLanguageOption(value: 'English'),
-                        CustomLanguageOption(value: 'Arabic'),
+                        CustomLanguageOption(value: SettingsStrings.english),
+                        CustomLanguageOption(value: SettingsStrings.arabic),
                       ],
                     ),
                   ),
@@ -210,7 +215,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text('Cancel', style: AppStyles.bodyMedium),
+                        child: Text(
+                          SettingsStrings.cancel,
+                          style: AppStyles.bodyMedium,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
@@ -221,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Navigator.pop(context);
                         },
                         child: Text(
-                          'Select',
+                          SettingsStrings.select,
                           style: AppStyles.bodyMedium.copyWith(
                             color: colorScheme.onPrimary,
                           ),
@@ -245,8 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  UserSettingsProfileEntity _resolveProfile(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+  UserSettingsProfileEntity _resolveProfile(AuthState authState) {
     UserAuthEntity? user;
 
     if (authState is AuthLoaded) {

@@ -188,7 +188,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.star, color: colorScheme.primary),
+                    Icon(Icons.star, color: Colors.amber),
                     Text(
                       (doctor?.ratingValue ?? 4.9).toStringAsFixed(1),
                       style: AppStyles.bodySmall,

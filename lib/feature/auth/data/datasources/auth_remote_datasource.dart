@@ -10,6 +10,24 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> logout(String email, String password);
   Future<UserModel> deleteAccount(String email, String password);
   Future<UserModel> googleSignIn();
+  Future<UserModel> updateProfileInfo({
+    required String userId,
+    required String name,
+    required DateTime birthDate,
+    required String gender,
+    required String phoneNumber,
+  });
+
+  Future<String> requestEmailChangeOtp({
+    required String userId,
+    required String newEmail,
+  });
+
+  Future<UserModel> confirmEmailChange({
+    required String userId,
+    required String newEmail,
+    required String otp,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -176,6 +194,110 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       throw DioException(
         requestOptions: RequestOptions(path: ApiEndpoints.googleLogin),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<UserModel> updateProfileInfo({
+    required String userId,
+    required String name,
+    required DateTime birthDate,
+    required String gender,
+    required String phoneNumber,
+  }) async {
+    try {
+      final response = await _dio.put(
+        ApiEndpoints.updateProfile,
+        data: {
+          'userId': userId,
+          'name': name,
+          'birthDate': birthDate.toIso8601String().split('T').first,
+          'gender': gender,
+          'phoneNumber': phoneNumber,
+        },
+      );
+      if (response.statusCode == 200) {
+        final user = _resolveUserFromAuthResponse(response.data);
+        if (user.token.isNotEmpty) {
+          await TokenStorage.saveToken(user.token);
+        }
+        return user;
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Profile update failed',
+      );
+    } on DioException {
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.updateProfile),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<String> requestEmailChangeOtp({
+    required String userId,
+    required String newEmail,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.requestEmailChangeOtp,
+        data: {'userId': userId, 'newEmail': newEmail},
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data['message']?.toString() ?? 'OTP sent successfully.';
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Failed to request email OTP',
+      );
+    } on DioException {
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(
+          path: ApiEndpoints.requestEmailChangeOtp,
+        ),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<UserModel> confirmEmailChange({
+    required String userId,
+    required String newEmail,
+    required String otp,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.confirmEmailChange,
+        data: {'userId': userId, 'newEmail': newEmail, 'otp': otp},
+      );
+      if (response.statusCode == 200) {
+        final user = _resolveUserFromAuthResponse(response.data);
+        if (user.token.isNotEmpty) {
+          await TokenStorage.saveToken(user.token);
+        }
+        return user;
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Email confirmation failed',
+      );
+    } on DioException {
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.confirmEmailChange),
         error: e.toString(),
       );
     }

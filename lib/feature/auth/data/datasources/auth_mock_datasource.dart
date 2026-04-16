@@ -9,6 +9,8 @@ class AuthMockDataSourceImpl implements AuthRemoteDataSource {
     password: '123456',
     token: 'mock-token-123',
   );
+  String? _pendingEmailOtp;
+  String? _pendingEmailAddress;
 
   @override
   Future<UserModel> login(String email, String password) async {
@@ -70,6 +72,57 @@ class AuthMockDataSourceImpl implements AuthRemoteDataSource {
       password: '',
       token: 'mock-google-token',
     );
+    return _currentUser;
+  }
+
+  @override
+  Future<UserModel> updateProfileInfo({
+    required String userId,
+    required String name,
+    required DateTime birthDate,
+    required String gender,
+    required String phoneNumber,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 220));
+    final age = DateTime.now().difference(birthDate).inDays ~/ 365;
+    _currentUser = _currentUser.copyWith(
+      id: userId.isNotEmpty ? userId : _currentUser.id,
+      name: name.isNotEmpty ? name : _currentUser.name,
+      birthDate: birthDate,
+      age: age,
+      gender: gender,
+      phoneNumber: phoneNumber,
+    );
+    return _currentUser;
+  }
+
+  @override
+  Future<String> requestEmailChangeOtp({
+    required String userId,
+    required String newEmail,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    _pendingEmailAddress = newEmail;
+    _pendingEmailOtp = '1234';
+    return 'Verification code sent to $newEmail (mock OTP: 1234)';
+  }
+
+  @override
+  Future<UserModel> confirmEmailChange({
+    required String userId,
+    required String newEmail,
+    required String otp,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 220));
+    if (_pendingEmailAddress != newEmail || _pendingEmailOtp != otp) {
+      throw Exception('Invalid OTP');
+    }
+    _currentUser = _currentUser.copyWith(
+      id: userId.isNotEmpty ? userId : _currentUser.id,
+      email: newEmail,
+    );
+    _pendingEmailOtp = null;
+    _pendingEmailAddress = null;
     return _currentUser;
   }
 }

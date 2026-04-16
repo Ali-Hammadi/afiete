@@ -8,8 +8,11 @@ import 'package:afiete/feature/assignments/domain/usecase/submit_assignment_usec
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_mock_datasource.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/update_profile_info_usecase.dart';
 import 'package:afiete/feature/booking_assiments/data/datasources/appointments_mock_datasource.dart';
 import 'package:afiete/feature/booking_assiments/data/datasources/appointments_remote_datasource.dart';
 import 'package:afiete/feature/booking_assiments/data/repositories/appointments_repository_impl.dart';
@@ -50,7 +53,9 @@ import 'package:afiete/feature/settings/data/data_source/settings_mock_data_sour
 import 'package:afiete/feature/settings/data/repositories/settings_repository_impl.dart';
 import 'package:afiete/feature/settings/domin/repositories/settings_repository.dart';
 import 'package:afiete/feature/settings/domin/usecase/get_medical_profile_usecase.dart';
+import 'package:afiete/feature/settings/domin/usecase/share_medical_note_with_doctor_usecase.dart';
 import 'package:afiete/feature/settings/domin/usecase/submit_report_issue_usecase.dart';
+import 'package:afiete/feature/settings/domin/usecase/update_medical_note_usecase.dart';
 import 'package:afiete/feature/settings/presentation/cubits/settings_cubit.dart';
 import 'package:afiete/feature/video/data/datasources/video_mock_datasource.dart';
 import 'package:afiete/feature/video/data/datasources/video_remote_datasource.dart';
@@ -117,6 +122,15 @@ Future<void> init() async {
   sl.registerLazySingleton<GoogleSignInUseCase>(
     () => GoogleSignInUseCase(sl<AuthRepository>()),
   );
+  sl.registerLazySingleton<UpdateProfileInfoUseCase>(
+    () => UpdateProfileInfoUseCase(sl<AuthRepository>()),
+  );
+  sl.registerLazySingleton<RequestEmailChangeOtpUseCase>(
+    () => RequestEmailChangeOtpUseCase(sl<AuthRepository>()),
+  );
+  sl.registerLazySingleton<ConfirmEmailChangeUseCase>(
+    () => ConfirmEmailChangeUseCase(sl<AuthRepository>()),
+  );
 
   // Cubits
   sl.registerFactory<AuthCubit>(
@@ -126,6 +140,9 @@ Future<void> init() async {
       sl<LogoutUseCase>(),
       sl<DeleteAccountUseCase>(),
       sl<GoogleSignInUseCase>(),
+      sl<UpdateProfileInfoUseCase>(),
+      sl<RequestEmailChangeOtpUseCase>(),
+      sl<ConfirmEmailChangeUseCase>(),
     ),
   );
 
@@ -372,12 +389,20 @@ Future<void> init() async {
   sl.registerLazySingleton<SubmitReportIssueUseCase>(
     () => SubmitReportIssueUseCase(sl<SettingsRepository>()),
   );
+  sl.registerLazySingleton<UpdateMedicalNoteUseCase>(
+    () => UpdateMedicalNoteUseCase(sl<SettingsRepository>()),
+  );
+  sl.registerLazySingleton<ShareMedicalNoteWithDoctorUseCase>(
+    () => ShareMedicalNoteWithDoctorUseCase(sl<SettingsRepository>()),
+  );
 
   // Settings cubit
   sl.registerFactory<SettingsCubit>(
     () => SettingsCubit(
       sl<GetMedicalProfileUseCase>(),
       sl<SubmitReportIssueUseCase>(),
+      sl<UpdateMedicalNoteUseCase>(),
+      sl<ShareMedicalNoteWithDoctorUseCase>(),
     ),
   );
 
