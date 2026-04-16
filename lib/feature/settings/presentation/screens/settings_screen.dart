@@ -1,6 +1,6 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
+import 'package:afiete/core/theme/theme_cubit.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/settings/domin/entity/setting_entity.dart';
@@ -17,7 +17,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool isDarkMode = false;
   String selectedLanguage = 'English';
 
   static const UserSettingsProfileEntity _profile = UserSettingsProfileEntity(
@@ -31,8 +30,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.select<ThemeCubit, bool>(
+      (themeCubit) => themeCubit.state == ThemeMode.dark,
+    );
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.primarybackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppStyles.padding),
@@ -41,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _buildHeader(context),
               const SizedBox(height: 20),
-              SettingTile(
+              CustomSettingTile(
                 icon: Icons.medical_services_outlined,
                 title: 'Medical Profile',
                 subtitle: 'Notes | Prescriptions',
@@ -50,7 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 12),
-              SettingTile(
+              CustomSettingTile(
                 icon: Icons.language,
                 title: 'Language',
                 trailing: Container(
@@ -59,20 +64,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.unselectedIconColor,
+                    color: colorScheme.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     selectedLanguage,
                     style: AppStyles.bodySmall.copyWith(
-                      color: AppColors.whiteColor,
+                      color: colorScheme.onPrimary,
                     ),
                   ),
                 ),
                 onTap: () => _showLanguageSheet(context),
               ),
               const SizedBox(height: 12),
-              SettingTile(
+              CustomSettingTile(
                 icon: Icons.support_agent,
                 title: 'Support',
                 subtitle: '24/7 Support',
@@ -80,34 +85,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _showInfoSnackBar('Support center is coming soon.'),
               ),
               const SizedBox(height: 12),
-              SettingTile(
+              CustomSettingTile(
                 icon: Icons.dark_mode_outlined,
                 title: 'Theme',
                 trailing: Switch(
                   value: isDarkMode,
-                  activeThumbColor: AppColors.primaryColor,
-                  onChanged: (value) {
-                    setState(() {
-                      isDarkMode = value;
-                    });
-                  },
+                  onChanged: (value) =>
+                      context.read<ThemeCubit>().toggleTheme(value),
                 ),
               ),
               const SizedBox(height: 12),
-              SettingTile(
+              CustomSettingTile(
                 icon: Icons.privacy_tip_outlined,
                 title: 'Terms & Privacy',
-                onTap: () =>
-                    _showInfoSnackBar('Terms & privacy page is coming soon.'),
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutes.privacyScreen);
+                },
               ),
               const SizedBox(height: 12),
-              SettingTile(
+              CustomSettingTile(
                 icon: Icons.mail_outline,
                 title: 'Contact us',
-                onTap: () => _showInfoSnackBar('Contact page is coming soon.'),
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutes.contactUsScreen);
+                },
               ),
               const SizedBox(height: 12),
-              SettingTile(
+              CustomSettingTile(
                 icon: Icons.report_problem_outlined,
                 title: 'Reports',
                 onTap: () {
@@ -123,6 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final profile = _resolveProfile(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
       onTap: () {
@@ -133,8 +138,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           CircleAvatar(
             radius: 38,
-            backgroundColor: AppColors.unselectedFieldColor,
-            child: Icon(Icons.person, size: 44, color: AppColors.whiteColor),
+            backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
+            child: Icon(Icons.person, size: 44, color: colorScheme.primary),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -150,18 +155,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Icon(
                       Icons.copy_outlined,
                       size: 18,
-                      color: AppColors.primaryColor,
+                      color: colorScheme.primary,
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          Icon(
-            Icons.arrow_forward_ios,
-            size: 16,
-            color: AppColors.unselectedIconColor,
-          ),
+          Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.outline),
         ],
       ),
     );
@@ -169,10 +170,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showLanguageSheet(BuildContext context) {
     String tempLanguage = selectedLanguage;
+    final colorScheme = Theme.of(context).colorScheme;
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.whiteColor,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -197,8 +199,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                     child: Column(
                       children: [
-                        LanguageOption(value: 'English'),
-                        LanguageOption(value: 'Arabic'),
+                        CustomLanguageOption(value: 'English'),
+                        CustomLanguageOption(value: 'Arabic'),
                       ],
                     ),
                   ),
@@ -221,7 +223,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Text(
                           'Select',
                           style: AppStyles.bodyMedium.copyWith(
-                            color: AppColors.whiteColor,
+                            color: colorScheme.onPrimary,
                           ),
                         ),
                       ),
@@ -238,9 +240,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showInfoSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: AppColors.primaryColor),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   UserSettingsProfileEntity _resolveProfile(BuildContext context) {

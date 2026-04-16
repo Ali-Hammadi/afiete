@@ -1,11 +1,10 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class SessionCard extends StatelessWidget {
+class CustomSessionCard extends StatelessWidget {
   final SessionEntity session;
   final VoidCallback? onAddReview;
   final VoidCallback? onBookAgain;
@@ -13,7 +12,7 @@ class SessionCard extends StatelessWidget {
   final VoidCallback? onJoinSession;
   final VoidCallback? onCancel;
 
-  const SessionCard({
+  const CustomSessionCard({
     super.key,
     required this.session,
     this.onAddReview,
@@ -27,6 +26,8 @@ class SessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateText = DateFormat('MMM dd, yyyy').format(session.scheduledAt);
     final isPast = !session.isUpcoming;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 12),
@@ -41,11 +42,8 @@ class SessionCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AppColors.primaryColor,
-                  child: const Icon(
-                    Icons.person,
-                    color: AppColors.primaryColor,
-                  ),
+                  backgroundColor: colorScheme.primaryContainer,
+                  child: Icon(Icons.person, color: colorScheme.primary),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -72,14 +70,16 @@ class SessionCard extends StatelessWidget {
               textStyle: AppStyles.bodyMedium,
             ),
             const SizedBox(height: 16),
-            _buildActionButtons(isPast),
+            _buildActionButtons(context, isPast),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionButtons(bool isPast) {
+  Widget _buildActionButtons(BuildContext context, bool isPast) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     if (isPast) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -126,7 +126,8 @@ class SessionCard extends StatelessWidget {
             width: double.infinity,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.errorColor,
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
               ),
               onPressed: onCancel,
               child: const Text('Cancel'),
@@ -146,9 +147,11 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.primaryColor),
+        Icon(icon, size: 18, color: colorScheme.primary),
         const SizedBox(width: 8),
         Text(text, style: AppStyles.bodyMedium),
       ],

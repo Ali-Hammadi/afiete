@@ -1,15 +1,14 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
-class SettingTile extends StatelessWidget {
+class CustomSettingTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
   final Widget? trailing;
   final VoidCallback? onTap;
 
-  const SettingTile({
+  const CustomSettingTile({
     super.key,
     required this.icon,
     required this.title,
@@ -20,6 +19,8 @@ class SettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return InkWell(
       borderRadius: BorderRadius.circular(AppStyles.borderRadius - 4),
       onTap: onTap,
@@ -29,13 +30,13 @@ class SettingTile extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppStyles.borderRadius - 4),
           border: Border.all(
-            color: AppColors.unselectedFieldColor.withValues(alpha: 0.4),
+            color: colorScheme.outline.withValues(alpha: 0.35),
           ),
-          color: AppColors.whiteColor,
+          color: Theme.of(context).cardColor,
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.unselectedIconColor, size: 24),
+            Icon(icon, color: colorScheme.primary, size: 24),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -53,7 +54,7 @@ class SettingTile extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: AppColors.unselectedIconColor,
+                  color: colorScheme.outline,
                 ),
           ],
         ),
