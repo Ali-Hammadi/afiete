@@ -34,13 +34,13 @@ class _EmailChangeVerificationScreenState
   }
 
   Future<void> _sendOtp() async {
-    final message = await context
-        .read<AuthCubit>()
-        .requestEmailChangeOtp(newEmail: widget.newEmail);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message ?? 'OTP sent.')),
+    final message = await context.read<AuthCubit>().requestEmailChangeOtp(
+      newEmail: widget.newEmail,
     );
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message ?? 'OTP sent.')));
   }
 
   Future<void> _confirmEmailChange() async {
@@ -50,9 +50,9 @@ class _EmailChangeVerificationScreenState
     });
 
     final success = await context.read<AuthCubit>().confirmEmailChange(
-          newEmail: widget.newEmail,
-          otp: _pinController.text,
-        );
+      newEmail: widget.newEmail,
+      otp: _pinController.text,
+    );
 
     if (!mounted) return;
 

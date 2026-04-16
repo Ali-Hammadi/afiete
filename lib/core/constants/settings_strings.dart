@@ -1,7 +1,8 @@
 abstract class SettingsStrings {
   static const String settingsTitle = 'Settings';
   static const String medicalProfileTitle = 'Medical Profile';
-  static const String medicalProfileSubtitle = 'Prescriptions | Medicine | Notes';
+  static const String medicalProfileSubtitle =
+      'Prescriptions | Medicine | Notes';
   static const String languageTitle = 'Language';
   static const String supportTitle = 'Support';
   static const String supportSubtitle = '24/7 Support';
@@ -44,28 +45,28 @@ abstract class SettingsStrings {
   static const String noteUpdatedSuccess = 'Note updated successfully.';
   static const String selectDoctorError = 'Please select a doctor.';
 
-    static const String profileTitle = 'Profile';
-    static const String editProfileTitle = 'Edit Profile';
-    static const String fullNameTitle = 'Full Name';
-    static const String emailTitleProfile = 'Email Address';
-    static const String phoneTitleProfile = 'Phone Number';
-    static const String birthDateTitle = 'Birth Date';
-    static const String genderTitle = 'Gender';
-    static const String passwordTitle = 'Password';
-    static const String saveProfileChanges = 'Save Changes';
-    static const String changeEmailTitle = 'Change Email';
-    static const String addNumberTitle = 'Add Number';
-    static const String deleteAccountTitle = 'Delete Account';
-    static const String profileUpdatedSuccess = 'Profile updated successfully.';
-    static const String emailVerificationRequired =
+  static const String profileTitle = 'Profile';
+  static const String editProfileTitle = 'Edit Profile';
+  static const String fullNameTitle = 'Full Name';
+  static const String emailTitleProfile = 'Email Address';
+  static const String phoneTitleProfile = 'Phone Number';
+  static const String birthDateTitle = 'Birth Date';
+  static const String genderTitle = 'Gender';
+  static const String passwordTitle = 'Password';
+  static const String saveProfileChanges = 'Save Changes';
+  static const String changeEmailTitle = 'Change Email';
+  static const String addNumberTitle = 'Add Number';
+  static const String deleteAccountTitle = 'Delete Account';
+  static const String profileUpdatedSuccess = 'Profile updated successfully.';
+  static const String emailVerificationRequired =
       'Verify the new email before saving it.';
-    static const String updateProfileHint =
+  static const String updateProfileHint =
       'Edit the profile fields below. Email changes will be verified by OTP.';
-    static const String verificationCodeSent = 'Verification code sent.';
-    static const String emailUpdatedSuccess = 'Email updated successfully.';
-    static const String verifyNewEmailTitle = 'Verify New Email';
-    static const String resendCode = 'Resend code';
-    static const String verify = 'Verify';
+  static const String verificationCodeSent = 'Verification code sent.';
+  static const String emailUpdatedSuccess = 'Email updated successfully.';
+  static const String verifyNewEmailTitle = 'Verify New Email';
+  static const String resendCode = 'Resend code';
+  static const String verify = 'Verify';
 
   static const String privacyTermsTitle = 'Privacy & Terms';
   static const String privacyPolicyTitle = 'Privacy Policy';

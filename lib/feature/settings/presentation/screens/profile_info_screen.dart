@@ -75,7 +75,9 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 children: [
                   CircleAvatar(
                     radius: 44,
-                    backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
+                    backgroundColor: colorScheme.primary.withValues(
+                      alpha: 0.18,
+                    ),
                     child: Icon(
                       Icons.person,
                       size: 50,
@@ -216,7 +218,11 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  Icon(Icons.cake_outlined, color: colorScheme.outline, size: 30),
+                  Icon(
+                    Icons.cake_outlined,
+                    color: colorScheme.outline,
+                    size: 30,
+                  ),
                   const SizedBox(width: 8),
                   Text('$displayAge Years old', style: AppStyles.bodyMedium),
                 ],
@@ -318,9 +324,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       ),
       onChanged: (_) => setState(() {}),
     );
@@ -381,18 +385,16 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       }
 
       final saved = await context.read<AuthCubit>().updateProfileInfo(
-            name: name,
-            birthDate: _selectedBirthDate,
-            gender: _selectedGender,
-            phoneNumber: phone,
-          );
+        name: name,
+        birthDate: _selectedBirthDate,
+        gender: _selectedGender,
+        phoneNumber: phone,
+      );
 
       if (!mounted || !saved) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(SettingsStrings.profileUpdatedSuccess),
-        ),
+        const SnackBar(content: Text(SettingsStrings.profileUpdatedSuccess)),
       );
     } finally {
       if (mounted) {

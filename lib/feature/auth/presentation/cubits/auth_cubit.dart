@@ -133,19 +133,13 @@ class AuthCubit extends Cubit<AuthState> {
         : (currentState as AuthProfileUpdated).user;
 
     final result = await requestEmailChangeOtpUseCase(
-      RequestEmailChangeOtpParams(
-        userId: existingUser.id,
-        newEmail: newEmail,
-      ),
+      RequestEmailChangeOtpParams(userId: existingUser.id, newEmail: newEmail),
     );
 
-    return result.fold(
-      (failure) {
-        emit(AuthError(failure.errorMessage));
-        return failure.errorMessage;
-      },
-      (message) => message,
-    );
+    return result.fold((failure) {
+      emit(AuthError(failure.errorMessage));
+      return failure.errorMessage;
+    }, (message) => message);
   }
 
   Future<bool> confirmEmailChange({
