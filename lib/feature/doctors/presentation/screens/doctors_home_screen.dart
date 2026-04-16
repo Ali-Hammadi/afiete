@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/psychology_specialties.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/doctors/presentation/cubits/doctors_cubit.dart';
@@ -58,95 +57,107 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(AppStyles.padding),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  searchQuery = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Search experts or specialist',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {
-                            searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: AppColors.unselectedFieldColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppStyles.borderRadius),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppStyles.padding,
-                  vertical: AppStyles.padding / 2,
-                ),
-              ),
-            ),
-          ),
+          _buildSearchField(theme: theme),
           const Divider(),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppStyles.padding,
-              vertical: AppStyles.padding / 2,
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(children: [..._buildSpecialtyChips()]),
-            ),
-          ),
+          _buildSpecialtyChipsSection(),
           Expanded(
             child: BlocBuilder<DoctorsCubit, DoctorsState>(
-              builder: (context, state) {
-                if (state is DoctorsLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (state is DoctorsError) {
-                  return Center(child: Text(state.message));
-                }
-
-                if (state is DoctorsLoaded) {
-                  final filteredDoctors = _filterDoctors(state.doctors);
-
-                  if (filteredDoctors.isEmpty) {
-                    return Center(
-                      child: Text(
-                        searchQuery.isNotEmpty
-                            ? 'No doctors match your search.'
-                            : 'No doctors found.',
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    itemCount: filteredDoctors.length,
-                    itemBuilder: (context, index) {
-                      return DoctorCard(doctor: filteredDoctors[index]);
-                    },
-                  );
-                }
-
-                return const SizedBox.shrink();
-              },
+              builder: _buildDoctorsState,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildSearchField({required ThemeData theme}) {
+    return Padding(
+      padding: const EdgeInsets.all(AppStyles.padding),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (value) {
+          setState(() {
+            searchQuery = value;
+          });
+        },
+        decoration: InputDecoration(
+          hintText: 'Search experts or specialist',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      searchQuery = '';
+                    });
+                  },
+                )
+              : null,
+          filled: true,
+          fillColor: theme.cardColor,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppStyles.borderRadius),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppStyles.padding,
+            vertical: AppStyles.padding / 2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpecialtyChipsSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppStyles.padding,
+        vertical: AppStyles.padding / 2,
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(children: [..._buildSpecialtyChips()]),
+      ),
+    );
+  }
+
+  Widget _buildDoctorsState(BuildContext context, DoctorsState state) {
+    if (state is DoctorsLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is DoctorsError) {
+      return Center(child: Text(state.message));
+    }
+
+    if (state is DoctorsLoaded) {
+      final filteredDoctors = _filterDoctors(state.doctors);
+
+      if (filteredDoctors.isEmpty) {
+        return Center(
+          child: Text(
+            searchQuery.isNotEmpty
+                ? 'No doctors match your search.'
+                : 'No doctors found.',
+          ),
+        );
+      }
+
+      return ListView.builder(
+        itemCount: filteredDoctors.length,
+        itemBuilder: (context, index) {
+          return CustomDoctorCard(doctor: filteredDoctors[index]);
+        },
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   List<Widget> _buildSpecialtyChips() {
@@ -191,6 +202,8 @@ class SpecialtyChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppStyles.padding * 0.5),
       child: GestureDetector(
@@ -198,15 +211,20 @@ class SpecialtyChip extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.primaryColor, width: 1.5),
+            border: Border.all(color: colorScheme.primary, width: 1.5),
             borderRadius: BorderRadius.all(
               Radius.circular(AppStyles.borderRadius),
             ),
             color: isSelected
-                ? AppColors.primaryColor
-                : AppColors.primaryFillColor,
+                ? colorScheme.primary
+                : colorScheme.primaryContainer.withValues(alpha: 0.35),
           ),
-          child: Text(label),
+          child: Text(
+            label,
+            style: AppStyles.bodyMedium.copyWith(
+              color: isSelected ? colorScheme.onPrimary : null,
+            ),
+          ),
         ),
       ),
     );
