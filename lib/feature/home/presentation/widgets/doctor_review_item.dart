@@ -1,9 +1,8 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
-class DoctorReviewItem extends StatelessWidget {
-  const DoctorReviewItem({
+class CustomDoctorReviewItem extends StatelessWidget {
+  const CustomDoctorReviewItem({
     super.key,
     required this.avatarAsset,
     required this.reviewerName,
@@ -33,10 +32,12 @@ class DoctorReviewItem extends StatelessWidget {
   }
 
   Widget _buildReviewText({
+    required BuildContext context,
     required String review,
     required bool isExpanded,
     required VoidCallback onToggle,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isTruncatable = review.length > _reviewPreviewMaxChars;
     final preview = _truncateAtWord(review, _reviewPreviewMaxChars);
 
@@ -46,23 +47,18 @@ class DoctorReviewItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppStyles.padding / 2),
         child: RichText(
           text: TextSpan(
-            style: AppStyles.bodyMedium.copyWith(
-              color: AppColors.primarytextColor,
-            ),
+            style: AppStyles.bodyMedium,
             children: [
               TextSpan(text: isExpanded || !isTruncatable ? review : preview),
               if (isTruncatable && !isExpanded)
-                TextSpan(
-                  text: '...',
-                  style: AppStyles.bodyMedium.copyWith(color: Colors.black),
-                ),
+                TextSpan(text: '...', style: AppStyles.bodyMedium),
               if (isTruncatable)
                 TextSpan(
                   text: isExpanded
                       ? '\u00A0Read\u00A0less'
                       : '\u00A0Read\u00A0more',
                   style: AppStyles.bodySmall.copyWith(
-                    color: AppColors.primaryColor,
+                    color: colorScheme.primary,
                   ),
                 ),
             ],
@@ -74,6 +70,8 @@ class DoctorReviewItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Row(
@@ -88,13 +86,8 @@ class DoctorReviewItem extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.star, color: Colors.amber),
-                      Text(
-                        rating,
-                        style: AppStyles.bodySmall.copyWith(
-                          color: AppColors.primarytextColor,
-                        ),
-                      ),
+                      Icon(Icons.star, color: colorScheme.primary),
+                      Text(rating, style: AppStyles.bodySmall),
                     ],
                   ),
                 ),
@@ -103,6 +96,7 @@ class DoctorReviewItem extends StatelessWidget {
           ],
         ),
         _buildReviewText(
+          context: context,
           review: review,
           isExpanded: isExpanded,
           onToggle: onToggle,

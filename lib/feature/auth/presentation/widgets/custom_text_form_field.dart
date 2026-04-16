@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +22,8 @@ class CustomTextFormFiled extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
@@ -31,10 +32,10 @@ class CustomTextFormFiled extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: AppStyles.bodyMedium,
-        errorStyle: AppStyles.bodySmall.copyWith(color: AppColors.errorColor),
+        errorStyle: AppStyles.bodySmall.copyWith(color: colorScheme.error),
         suffixIcon: suffixIcon,
-        prefixIcon: Icon(prefixIcon, color: AppColors.primaryColor),
-        fillColor: AppColors.primaryFillColor,
+        prefixIcon: Icon(prefixIcon, color: colorScheme.primary),
+        fillColor: colorScheme.primaryContainer.withValues(alpha: 0.45),
         filled: true,
         contentPadding: EdgeInsets.symmetric(
           horizontal: AppStyles.padding,
@@ -42,25 +43,25 @@ class CustomTextFormFiled extends StatelessWidget {
         ),
 
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.selectedFieldColor),
+          borderSide: BorderSide(color: colorScheme.outline),
           borderRadius: BorderRadius.all(
             Radius.circular(AppStyles.borderRadius),
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
           borderRadius: BorderRadius.all(
             Radius.circular(AppStyles.borderRadius),
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.errorColor),
+          borderSide: BorderSide(color: colorScheme.error),
           borderRadius: BorderRadius.all(
             Radius.circular(AppStyles.borderRadius),
           ),
         ),
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.unselectedFieldColor),
+          borderSide: BorderSide(color: colorScheme.outline),
           borderRadius: BorderRadius.all(
             Radius.circular(AppStyles.borderRadius),
           ),

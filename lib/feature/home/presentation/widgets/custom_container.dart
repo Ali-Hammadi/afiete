@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -8,11 +7,13 @@ class CustomContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppStyles.padding / 2),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.primaryFillColor,
+          color: colorScheme.primaryContainer.withValues(alpha: 0.35),
           borderRadius: BorderRadius.all(
             Radius.circular(AppStyles.borderRadius),
           ),

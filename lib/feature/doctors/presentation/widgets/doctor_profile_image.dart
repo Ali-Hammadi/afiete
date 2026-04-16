@@ -3,11 +3,11 @@ import 'package:afiete/core/constants/styles.dart';
 
 import 'package:flutter/material.dart';
 
-class DoctorProfileImage extends StatelessWidget {
+class CustomDoctorProfileImage extends StatelessWidget {
   final double height;
   final String imagePath;
 
-  const DoctorProfileImage({
+  const CustomDoctorProfileImage({
     super.key,
     required this.height,
     this.imagePath = ImageLinks.man1,

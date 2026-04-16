@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -6,13 +5,17 @@ import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:afiete/feature/doctors/presentation/widgets/doctor_profile_image.dart';
 import 'package:flutter/material.dart';
 
-class DoctorCard extends StatelessWidget {
+class CustomDoctorCard extends StatelessWidget {
   final DoctorEntity doctor;
 
-  const DoctorCard({super.key, required this.doctor});
+  const CustomDoctorCard({super.key, required this.doctor});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final cardBackground = colorScheme.primaryContainer.withValues(alpha: 0.45);
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppStyles.padding,
@@ -20,7 +23,7 @@ class DoctorCard extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.primaryFillColor,
+          color: cardBackground,
           borderRadius: BorderRadius.all(
             Radius.circular(AppStyles.borderRadius),
           ),
@@ -30,7 +33,7 @@ class DoctorCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                DoctorProfileImage(height: 100),
+                CustomDoctorProfileImage(height: 100),
                 Expanded(
                   child: ListTile(
                     title: Text(doctor.name),
@@ -40,12 +43,10 @@ class DoctorCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star, color: Colors.amber),
+                          Icon(Icons.star, color: colorScheme.primary),
                           Text(
                             doctor.ratingValue.toString(),
-                            style: AppStyles.bodySmall.copyWith(
-                              color: AppColors.primarytextColor,
-                            ),
+                            style: AppStyles.bodySmall,
                           ),
                         ],
                       ),
@@ -68,10 +69,7 @@ class DoctorCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                VerticalDivider(
-                  thickness: 1,
-                  color: AppColors.unselectedFieldColor,
-                ),
+                VerticalDivider(thickness: 1, color: colorScheme.outline),
                 Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -102,7 +100,9 @@ class DoctorCard extends StatelessWidget {
             CustomButton(
               widget: Text(
                 "View details",
-                style: AppStyles.bodyMedium.copyWith(color: Colors.white),
+                style: AppStyles.bodyMedium.copyWith(
+                  color: colorScheme.onPrimary,
+                ),
               ),
               onPressed: () {
                 Navigator.pushNamed(

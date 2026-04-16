@@ -36,6 +36,8 @@ class DoctorModel extends Equatable {
   });
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
+    final consultationFee = json['consultationFee'] as Map<String, dynamic>?;
+
     return DoctorModel(
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
@@ -51,8 +53,9 @@ class DoctorModel extends Equatable {
           : DateTime.now(),
       availableTimes: json['availableTimes'] != null
           ? List<DateTime>.from(
-              (json['availableTimes'] as List)
-                  .map((e) => DateTime.parse(e as String)),
+              (json['availableTimes'] as List).map(
+                (e) => DateTime.parse(e as String),
+              ),
             )
           : [],
       availableDurations: json['availableDurations'] != null
@@ -67,72 +70,83 @@ class DoctorModel extends Equatable {
               (json['availableSessionTypes'] as List).map((e) => '$e'),
             )
           : const ['video_call', 'voice_call', 'text_chat'],
-      consultationFee: json['consultationFee'] is Map<String, dynamic>
+      consultationFee: consultationFee != null
           ? ConsultationFee(
-              textChat: ((json['consultationFee']['textChat'] as num?) ?? 10)
-                  .toDouble(),
-              videoCall: ((json['consultationFee']['videoCall'] as num?) ?? 20)
-                  .toDouble(),
-              voiceCall: ((json['consultationFee']['voiceCall'] as num?) ?? 15)
-                  .toDouble(),
+              textChat:
+                  ((consultationFee['textChat'] ?? consultationFee['text_chat'])
+                              as num? ??
+                          10)
+                      .toDouble(),
+              videoCall:
+                  ((consultationFee['videoCall'] ??
+                                  consultationFee['video_call'])
+                              as num? ??
+                          20)
+                      .toDouble(),
+              voiceCall:
+                  ((consultationFee['voiceCall'] ??
+                                  consultationFee['voice_call'])
+                              as num? ??
+                          15)
+                      .toDouble(),
             )
           : const ConsultationFee(textChat: 10, videoCall: 20, voiceCall: 15),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'specialization': specialization,
-        'experience': experience,
-        'rating': rating,
-        'imageUrl': imageUrl,
-        'description': description,
-        'isOnline': isOnline,
-        'ratingValue': ratingValue,
-        'createdAt': createdAt.toIso8601String(),
-        'availableTimes': availableTimes.map((e) => e.toIso8601String()).toList(),
-        'availableDurations': availableDurations,
-        'availableSessionTypes': availableSessionTypes,
-        'consultationFee': {
-          'textChat': consultationFee.textChat,
-          'videoCall': consultationFee.videoCall,
-          'voiceCall': consultationFee.voiceCall,
-        },
-      };
+    'id': id,
+    'name': name,
+    'specialization': specialization,
+    'experience': experience,
+    'rating': rating,
+    'imageUrl': imageUrl,
+    'description': description,
+    'isOnline': isOnline,
+    'ratingValue': ratingValue,
+    'createdAt': createdAt.toIso8601String(),
+    'availableTimes': availableTimes.map((e) => e.toIso8601String()).toList(),
+    'availableDurations': availableDurations,
+    'availableSessionTypes': availableSessionTypes,
+    'consultationFee': {
+      'textChat': consultationFee.textChat,
+      'videoCall': consultationFee.videoCall,
+      'voiceCall': consultationFee.voiceCall,
+    },
+  };
 
   DoctorEntity toEntity() => DoctorEntity(
-        id: id,
-        name: name,
-        specialization: specialization,
-        experience: experience,
-        rating: rating,
-        imageUrl: imageUrl,
-        description: description,
-        isOnline: isOnline,
-        ratingValue: ratingValue,
-        createdAt: createdAt,
-        availableTimes: availableTimes,
-        availableDurations: availableDurations,
-        availableSessionTypes: availableSessionTypes,
-        consultationFee: consultationFee,
-      );
+    id: id,
+    name: name,
+    specialization: specialization,
+    experience: experience,
+    rating: rating,
+    imageUrl: imageUrl,
+    description: description,
+    isOnline: isOnline,
+    ratingValue: ratingValue,
+    createdAt: createdAt,
+    availableTimes: availableTimes,
+    availableDurations: availableDurations,
+    availableSessionTypes: availableSessionTypes,
+    consultationFee: consultationFee,
+  );
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        specialization,
-        experience,
-        rating,
-        imageUrl,
-        description,
-        isOnline,
-        ratingValue,
-        createdAt,
-        availableTimes,
-        availableDurations,
-        availableSessionTypes,
-        consultationFee,
-      ];
+    id,
+    name,
+    specialization,
+    experience,
+    rating,
+    imageUrl,
+    description,
+    isOnline,
+    ratingValue,
+    createdAt,
+    availableTimes,
+    availableDurations,
+    availableSessionTypes,
+    consultationFee,
+  ];
 }
