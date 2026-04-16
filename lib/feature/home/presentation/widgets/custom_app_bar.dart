@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +10,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final String userName = 'Ali'; // Placeholder for authenticated user
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 5.0),
@@ -22,16 +22,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         contentPadding: EdgeInsets.zero,
         title: Text(
           'Welcome $userName',
-          style: AppStyles.headingMedium.copyWith(
-            color: AppColors.primaryColor,
-          ),
+          style: AppStyles.headingMedium.copyWith(color: colorScheme.primary),
         ),
-        subtitle: Text(
-          'Start your journey',
-          style: AppStyles.bodyMedium.copyWith(
-            color: AppColors.primarytextColor,
-          ),
-        ),
+        subtitle: Text('Start your journey', style: AppStyles.bodyMedium),
       ),
     );
   }
