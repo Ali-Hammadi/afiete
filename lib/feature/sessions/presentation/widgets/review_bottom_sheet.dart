@@ -1,19 +1,19 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ReviewBottomSheet extends StatefulWidget {
+class CustomReviewBottomSheet extends StatefulWidget {
   final String sessionId;
 
-  const ReviewBottomSheet({super.key, required this.sessionId});
+  const CustomReviewBottomSheet({super.key, required this.sessionId});
 
   @override
-  State<ReviewBottomSheet> createState() => _ReviewBottomSheetState();
+  State<CustomReviewBottomSheet> createState() =>
+      _CustomReviewBottomSheetState();
 }
 
-class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
+class _CustomReviewBottomSheetState extends State<CustomReviewBottomSheet> {
   int _rating = 0;
   final _commentController = TextEditingController();
 
@@ -25,10 +25,13 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: theme.cardColor,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -43,7 +46,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryFillColor,
+                  color: colorScheme.outline.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -73,7 +76,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: AppColors.primaryFillColor,
+                fillColor: colorScheme.primaryContainer.withValues(alpha: 0.45),
               ),
             ),
             const SizedBox(height: 20),
@@ -108,6 +111,8 @@ class _StarRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -118,7 +123,7 @@ class _StarRating extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Icon(
                 i <= rating ? Icons.star : Icons.star_outline,
-                color: AppColors.primaryColor,
+                color: colorScheme.primary,
                 size: 40,
               ),
             ),

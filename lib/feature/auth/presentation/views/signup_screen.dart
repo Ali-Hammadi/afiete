@@ -1,11 +1,11 @@
-import 'package:afiete/core/assets/icon_image_links.dart';
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
+import 'package:afiete/feature/auth/presentation/widgets/auth_google_button.dart';
+import 'package:afiete/feature/auth/presentation/widgets/auth_header.dart';
+import 'package:afiete/feature/auth/presentation/widgets/auth_switch_prompt.dart';
 import 'package:afiete/feature/auth/presentation/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/auth_cubit.dart';
 
@@ -25,8 +25,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.primarybackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
@@ -50,12 +53,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset(ImageLinks.appIcon),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Create your account',
-                      style: AppStyles.headingLarge,
-                    ),
+                    const CustomAuthHeader(title: 'Create your account'),
                     const SizedBox(height: 20),
                     Form(
                       key: formKey,
@@ -131,20 +129,20 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     CustomButton(
                       widget: state is AuthLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                                  colorScheme.onPrimary,
                                 ),
                               ),
                             )
                           : Text(
                               "Signup",
                               style: AppStyles.bodyMedium.copyWith(
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                               ),
                             ),
                       onPressed: state is AuthLoading
@@ -163,50 +161,18 @@ class _SignupScreenState extends State<SignupScreen> {
                             },
                     ),
                     const SizedBox(height: 20),
-                    CustomButton(
-                      widget: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            SvgImageLinks.googleIcon,
-                            height: 18,
-                            width: 18,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Continue with Google',
-                            style: AppStyles.bodyMedium.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
+                    CustomAuthGoogleButton(
                       onPressed: () {
                         context.read<AuthCubit>().googleSignIn();
                       },
                     ),
                     const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Already have an account?',
-                          style: AppStyles.bodyMedium,
-                        ),
-                        TextButton(
-                          child: Text(
-                            'Login',
-                            style: AppStyles.headingSmall.copyWith(
-                              color: AppColors.primaryColor,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, MyRoutes.login);
-                          },
-                        ),
-                      ],
+                    CustomAuthSwitchPrompt(
+                      promptText: 'Already have an account?',
+                      actionText: 'Login',
+                      onPressed: () {
+                        Navigator.pushNamed(context, MyRoutes.login);
+                      },
                     ),
                   ],
                 ),

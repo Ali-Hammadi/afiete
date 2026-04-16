@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/settings/domin/entity/setting_entity.dart';
@@ -20,6 +19,9 @@ class ProfileInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final authState = context.watch<AuthCubit>().state;
     final user = authState is AuthLoaded
         ? authState.user
@@ -43,9 +45,9 @@ class ProfileInfoScreen extends StatelessWidget {
     final displayAge = user?.age ?? _profile.age;
 
     return Scaffold(
-      backgroundColor: AppColors.primarybackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primarybackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -57,11 +59,11 @@ class ProfileInfoScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 44,
-                  backgroundColor: AppColors.unselectedFieldColor,
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
                   child: Icon(
                     Icons.person,
                     size: 50,
-                    color: AppColors.whiteColor,
+                    color: colorScheme.primary,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -78,7 +80,7 @@ class ProfileInfoScreen extends StatelessWidget {
                           Icon(
                             Icons.copy_outlined,
                             size: 18,
-                            color: AppColors.primaryColor,
+                            color: colorScheme.primary,
                           ),
                         ],
                       ),
@@ -87,28 +89,26 @@ class ProfileInfoScreen extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.edit_square, color: AppColors.primaryColor),
+                  icon: Icon(Icons.edit_square, color: colorScheme.primary),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            Divider(
-              color: AppColors.unselectedIconColor.withValues(alpha: 0.4),
-            ),
+            Divider(color: colorScheme.outline.withValues(alpha: 0.35)),
             const SizedBox(height: 24),
-            InfoRow(
+            CustomInfoRow(
               icon: Icons.call,
               leftText: displayPhone,
               rightActionText: 'Add Number',
             ),
             const SizedBox(height: 20),
-            InfoRow(
+            CustomInfoRow(
               icon: Icons.email,
               leftText: displayEmail,
               rightActionText: 'Change Email',
             ),
             const SizedBox(height: 20),
-            InfoRow(
+            CustomInfoRow(
               icon: Icons.lock,
               leftText: '************',
               rightActionText: 'Change Password',
@@ -116,15 +116,11 @@ class ProfileInfoScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Row(
               children: [
-                Icon(Icons.male, color: AppColors.selectedIconcolor, size: 34),
+                Icon(Icons.male, color: colorScheme.primary, size: 34),
                 const SizedBox(width: 8),
                 Text(displayGender, style: AppStyles.bodyMedium),
                 const SizedBox(width: 30),
-                Icon(
-                  Icons.cake_outlined,
-                  color: AppColors.unselectedIconColor,
-                  size: 30,
-                ),
+                Icon(Icons.cake_outlined, color: colorScheme.outline, size: 30),
                 const SizedBox(width: 8),
                 Text('$displayAge Years old', style: AppStyles.bodyMedium),
               ],
@@ -134,8 +130,8 @@ class ProfileInfoScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.errorColor,
-                  foregroundColor: AppColors.whiteColor,
+                  backgroundColor: colorScheme.error,
+                  foregroundColor: colorScheme.onError,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 28,
                     vertical: 12,
@@ -147,7 +143,7 @@ class ProfileInfoScreen extends StatelessWidget {
                 child: Text(
                   'Delete Account',
                   style: AppStyles.headingSmall.copyWith(
-                    color: AppColors.whiteColor,
+                    color: colorScheme.onError,
                   ),
                 ),
               ),
