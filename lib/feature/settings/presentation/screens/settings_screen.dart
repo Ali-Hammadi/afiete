@@ -49,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               CustomSettingTile(
                 icon: Icons.medical_services_outlined,
                 title: 'Medical Profile',
-                subtitle: 'Notes | Prescriptions',
+                subtitle: 'Prescriptions | Medicine | Notes',
                 onTap: () {
                   Navigator.pushNamed(context, MyRoutes.medicalProfileScreen);
                 },
