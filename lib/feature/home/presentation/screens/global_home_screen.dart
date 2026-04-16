@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/appointments_screen.dart';
@@ -22,6 +21,8 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
   int selectedItemIndex = 0;
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: _appBarForIndex(selectedItemIndex),
       body: _bodyForIndex(selectedItemIndex),
@@ -29,15 +30,15 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         selectedFontSize: 14,
         currentIndex: selectedItemIndex,
         elevation: 0,
-        selectedItemColor: AppColors.primaryColor,
-        unselectedItemColor: AppColors.unselectedIconColor,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.outline,
         onTap: (value) {
           setState(() {
             selectedItemIndex = value;
           });
         },
         iconSize: 28,
-        backgroundColor: AppColors.primaryFillColor,
+        backgroundColor: Theme.of(context).cardColor,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),

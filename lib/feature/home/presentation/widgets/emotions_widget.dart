@@ -1,14 +1,15 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class EmotionsWidget extends StatelessWidget {
-  const EmotionsWidget({super.key});
+class CustomEmotionsWidget extends StatelessWidget {
+  const CustomEmotionsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppStyles.padding,
@@ -19,7 +20,7 @@ class EmotionsWidget extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: AppColors.primaryFillColor,
+              color: colorScheme.primaryContainer.withValues(alpha: 0.45),
               borderRadius: BorderRadius.all(
                 Radius.circular(AppStyles.borderRadius),
               ),
@@ -33,7 +34,7 @@ class EmotionsWidget extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.primaryFillColor,
+              color: colorScheme.primaryContainer.withValues(alpha: 0.45),
               borderRadius: BorderRadius.all(
                 Radius.circular(AppStyles.borderRadius),
               ),
@@ -47,7 +48,7 @@ class EmotionsWidget extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.primaryFillColor,
+              color: colorScheme.primaryContainer.withValues(alpha: 0.45),
               borderRadius: BorderRadius.all(
                 Radius.circular(AppStyles.borderRadius),
               ),
@@ -61,7 +62,7 @@ class EmotionsWidget extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.primaryFillColor,
+              color: colorScheme.primaryContainer.withValues(alpha: 0.45),
               borderRadius: BorderRadius.all(
                 Radius.circular(AppStyles.borderRadius),
               ),

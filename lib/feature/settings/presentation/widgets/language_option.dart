@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class LanguageOption extends StatelessWidget {
+class CustomLanguageOption extends StatelessWidget {
   final String value;
 
-  const LanguageOption({super.key, required this.value});
+  const CustomLanguageOption({super.key, required this.value});
 
   @override
   Widget build(BuildContext context) {

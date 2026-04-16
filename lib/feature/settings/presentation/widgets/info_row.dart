@@ -1,13 +1,12 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
-class InfoRow extends StatelessWidget {
+class CustomInfoRow extends StatelessWidget {
   final IconData icon;
   final String leftText;
   final String rightActionText;
 
-  const InfoRow({
+  const CustomInfoRow({
     super.key,
     required this.icon,
     required this.leftText,
@@ -16,16 +15,18 @@ class InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
-        Icon(icon, size: 28, color: AppColors.unselectedIconColor),
+        Icon(icon, size: 28, color: colorScheme.primary),
         const SizedBox(width: 12),
         Expanded(child: Text(leftText, style: AppStyles.bodyMedium)),
         TextButton(
           onPressed: () {},
           child: Text(
             rightActionText,
-            style: AppStyles.bodySmall.copyWith(color: AppColors.primaryColor),
+            style: AppStyles.bodySmall.copyWith(color: colorScheme.primary),
           ),
         ),
       ],
