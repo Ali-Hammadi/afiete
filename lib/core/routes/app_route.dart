@@ -18,7 +18,9 @@ import 'package:afiete/feature/report/domain/entities/report_entity.dart';
 import 'package:afiete/feature/report/presentation/cubits/report_cubit.dart';
 import 'package:afiete/feature/report/presentation/screens/report_history_screen.dart';
 import 'package:afiete/feature/report/presentation/screens/report_screen.dart';
+import 'package:afiete/feature/settings/presentation/screens/contact_us_screen.dart';
 import 'package:afiete/feature/settings/presentation/screens/medical_profile_screen.dart';
+import 'package:afiete/feature/settings/presentation/screens/privacy_screen.dart';
 import 'package:afiete/feature/settings/presentation/screens/profile_info_screen.dart';
 import 'package:afiete/feature/settings/presentation/screens/report_issue_screen.dart';
 import 'package:afiete/feature/settings/presentation/screens/settings_screen.dart';
@@ -123,6 +125,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProfileInfoScreen());
       case MyRoutes.reportIssueScreen:
         return MaterialPageRoute(builder: (_) => const ReportIssueScreen());
+      case MyRoutes.privacyScreen:
+        return MaterialPageRoute(builder: (_) => const PrivacyScreen());
+      case MyRoutes.contactUsScreen:
+        return MaterialPageRoute(builder: (_) => const ContactUsScreen());
       case MyRoutes.assignmentTestScreen:
         return MaterialPageRoute(
           builder: (_) => BlocProvider<AssignmentsCubit>(
@@ -252,6 +258,8 @@ class MyRoutes {
   static const String medicalProfileScreen = "/medicalProfileScreen";
   static const String profileInfoScreen = "/profileInfoScreen";
   static const String reportIssueScreen = "/reportIssueScreen";
+  static const String privacyScreen = "/privacyScreen";
+  static const String contactUsScreen = "/contactUsScreen";
   static const String assignmentTestScreen = "/assignmentTestScreen";
   static const String assignmentResultScreen = "/assignmentResultScreen";
   // Report Screens

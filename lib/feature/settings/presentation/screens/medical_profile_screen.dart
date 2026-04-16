@@ -324,7 +324,9 @@ class _MedicineTile extends StatelessWidget {
             children: [
               Icon(Icons.medication, color: colorScheme.primary),
               const SizedBox(width: 8),
-              Expanded(child: Text(item.medicine, style: AppStyles.headingSmall)),
+              Expanded(
+                child: Text(item.medicine, style: AppStyles.headingSmall),
+              ),
             ],
           ),
           const SizedBox(height: 8),

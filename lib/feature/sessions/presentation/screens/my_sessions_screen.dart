@@ -1,8 +1,7 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
-import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:afiete/feature/sessions/presentation/widgets/review_bottom_sheet.dart';
 import 'package:afiete/feature/sessions/presentation/widgets/session_card.dart';
@@ -29,6 +28,9 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Sessions'),
@@ -41,39 +43,11 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              _buildTabSelector(),
+              _buildTabSelector(theme: theme, colorScheme: colorScheme),
               const SizedBox(height: 16),
               Expanded(
                 child: BlocBuilder<SessionsCubit, SessionsState>(
-                  builder: (context, state) {
-                    if (state is SessionsLoading || state is SessionsInitial) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (state is SessionsError) {
-                      return Center(
-                        child: Text(state.message, style: AppStyles.bodyMedium),
-                      );
-                    }
-
-                    if (state is UpcomingSessionsLoaded) {
-                      if (state.sessions.isEmpty) {
-                        return const Center(
-                          child: Text('No upcoming sessions'),
-                        );
-                      }
-                      return _buildSessionsList(state.sessions, isPast: false);
-                    }
-
-                    if (state is PastSessionsLoaded) {
-                      if (state.sessions.isEmpty) {
-                        return const Center(child: Text('No past sessions'));
-                      }
-                      return _buildSessionsList(state.sessions, isPast: true);
-                    }
-
-                    return const SizedBox.shrink();
-                  },
+                  builder: _buildStateBody,
                 ),
               ),
             ],
@@ -83,67 +57,110 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     );
   }
 
-  Widget _buildTabSelector() {
+  Widget _buildStateBody(BuildContext context, SessionsState state) {
+    if (state is SessionsLoading || state is SessionsInitial) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is SessionsError) {
+      return Center(child: Text(state.message, style: AppStyles.bodyMedium));
+    }
+
+    if (state is UpcomingSessionsLoaded) {
+      return _buildLoadedState(
+        sessions: state.sessions,
+        emptyMessage: 'No upcoming sessions',
+        isPast: false,
+      );
+    }
+
+    if (state is PastSessionsLoaded) {
+      return _buildLoadedState(
+        sessions: state.sessions,
+        emptyMessage: 'No past sessions',
+        isPast: true,
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildLoadedState({
+    required List<SessionEntity> sessions,
+    required String emptyMessage,
+    required bool isPast,
+  }) {
+    if (sessions.isEmpty) {
+      return Center(child: Text(emptyMessage));
+    }
+
+    return _buildSessionsList(sessions, isPast: isPast);
+  }
+
+  Widget _buildSessionsList(
+    List<SessionEntity> sessions, {
+    required bool isPast,
+  }) {
+    return ListView.builder(
+      itemCount: sessions.length,
+      itemBuilder: (context, index) {
+        final session = sessions[index];
+
+        return CustomSessionCard(
+          session: session,
+          onAddReview: isPast
+              ? () {
+                  showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) =>
+                        CustomReviewBottomSheet(sessionId: session.id),
+                  );
+                }
+              : null,
+          onBookAgain: () => _showSnackBar('Booking feature coming soon'),
+          onReschedule: () => _showSnackBar('Reschedule feature coming soon'),
+          onJoinSession: () => _handleJoinSession(session),
+          onCancel: () => _confirmCancel(context, session.id),
+        );
+      },
+    );
+  }
+
+  Widget _buildTabSelector({
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+  }) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: AppColors.primaryFillColor,
+        color: colorScheme.primaryContainer.withValues(alpha: 0.45),
       ),
       padding: const EdgeInsets.all(4),
       child: Row(
         children: [
           Expanded(
-            child: GestureDetector(
+            child: _buildTabItem(
+              theme: theme,
+              colorScheme: colorScheme,
+              title: 'Upcoming',
+              isSelected: _selectedTab == 0,
               onTap: () {
                 setState(() => _selectedTab = 0);
                 _cubit.loadUpcomingSessions();
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: _selectedTab == 0 ? Colors.white : Colors.transparent,
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'Upcoming',
-                  textAlign: TextAlign.center,
-                  style: AppStyles.bodyMedium.copyWith(
-                    color: _selectedTab == 0
-                        ? AppColors.primaryColor
-                        : AppColors.secondarytextColor,
-                    fontWeight: _selectedTab == 0
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
             ),
           ),
           Expanded(
-            child: GestureDetector(
+            child: _buildTabItem(
+              theme: theme,
+              colorScheme: colorScheme,
+              title: 'Past',
+              isSelected: _selectedTab == 1,
               onTap: () {
                 setState(() => _selectedTab = 1);
                 _cubit.loadPastSessions();
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: _selectedTab == 1 ? Colors.white : Colors.transparent,
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'Past',
-                  textAlign: TextAlign.center,
-                  style: AppStyles.bodyMedium.copyWith(
-                    color: _selectedTab == 1
-                        ? AppColors.primaryColor
-                        : AppColors.secondarytextColor,
-                    fontWeight: _selectedTab == 1
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
             ),
           ),
         ],
@@ -151,26 +168,32 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     );
   }
 
-  Widget _buildSessionsList(List<SessionEntity> sessions, {required bool isPast}) {
-    return ListView.builder(
-      itemCount: sessions.length,
-      itemBuilder: (context, index) {
-        final session = sessions[index];
-        return SessionCard(
-          session: session,
-          onAddReview: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => ReviewBottomSheet(sessionId: session.id),
-            );
-          },
-          onBookAgain: () => _showSnackBar('Booking feature coming soon'),
-          onReschedule: () => _showSnackBar('Reschedule feature coming soon'),
-          onJoinSession: () => _handleJoinSession(session),
-          onCancel: () => _confirmCancel(context, session.id),
-        );
-      },
+  Widget _buildTabItem({
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: isSelected ? theme.cardColor : Colors.transparent,
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: AppStyles.bodyMedium.copyWith(
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.onSurface.withValues(alpha: 0.75),
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 

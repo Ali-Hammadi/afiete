@@ -1,5 +1,4 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -24,8 +23,11 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.primarybackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: null,
       body: SafeArea(
         child: Column(
@@ -44,8 +46,8 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
               controller: _pageController,
               count: 3,
               effect: WormEffect(
-                activeDotColor: AppColors.primaryColor,
-                dotColor: Colors.grey,
+                activeDotColor: colorScheme.primary,
+                dotColor: colorScheme.outline,
                 dotHeight: 8,
                 dotWidth: 8,
               ),
@@ -59,6 +61,8 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
   }
 
   Widget _buildThirdScreen() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -92,7 +96,7 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
         CustomButton(
           widget: Text(
             "Get Started",
-            style: AppStyles.bodyMedium.copyWith(color: Colors.white),
+            style: AppStyles.bodyMedium.copyWith(color: colorScheme.onPrimary),
           ),
           onPressed: () {
             Navigator.pushNamed(context, MyRoutes.signup);
@@ -105,6 +109,8 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
   }
 
   Widget _buildSecondScreen() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -118,7 +124,7 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.unselectedFieldColor,
+                color: colorScheme.primary.withValues(alpha: 0.35),
                 blurRadius: 20,
                 offset: const Offset(0, 5),
               ),
@@ -150,6 +156,8 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
   }
 
   Widget _buildFirstPage() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -163,7 +171,7 @@ class _WelcomeScreensState extends State<WelcomeScreens> {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.unselectedFieldColor,
+                color: colorScheme.primary.withValues(alpha: 0.35),
                 blurRadius: 20,
                 offset: const Offset(0, 5),
               ),
