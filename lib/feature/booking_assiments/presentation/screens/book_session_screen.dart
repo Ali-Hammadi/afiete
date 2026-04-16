@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -184,6 +183,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final canBook = _availableDays.isNotEmpty;
 
     return Scaffold(
@@ -214,12 +214,12 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
             const SizedBox(height: 12),
             CustomButton(
               widget: _isSubmitting
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.2,
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                       ),
                     )
                   : Text(
@@ -227,7 +227,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
                           ? 'Continue to payment'
                           : 'Continue',
                       style: AppStyles.headingSmall.copyWith(
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                       ),
                     ),
               onPressed: (_canContinue && canBook) ? _onContinuePressed : null,
@@ -358,7 +358,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
             Icon(
               Icons.event_busy_outlined,
               size: 44,
-              color: AppColors.secondarytextColor,
+              color: Theme.of(context).colorScheme.outline,
             ),
             const SizedBox(height: 10),
             Text(
@@ -403,23 +403,26 @@ class _OptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return InkWell(
       borderRadius: BorderRadius.circular(AppStyles.borderRadius),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.primaryFillColor,
+          color: colorScheme.primaryContainer.withValues(alpha: 0.35),
           borderRadius: BorderRadius.circular(AppStyles.borderRadius),
           border: Border.all(
-            color: isSelected ? AppColors.primaryColor : Colors.transparent,
+            color: isSelected ? colorScheme.primary : Colors.transparent,
             width: 1.5,
           ),
         ),
         child: Row(
           children: [
             if (leading != null) ...[
-              Icon(leading, color: AppColors.primaryColor),
+              Icon(leading, color: colorScheme.primary),
               const SizedBox(width: 8),
             ],
             Expanded(
@@ -434,7 +437,7 @@ class _OptionCard extends StatelessWidget {
             ),
             Icon(
               Icons.circle,
-              color: isSelected ? AppColors.primaryColor : Colors.white,
+              color: isSelected ? colorScheme.primary : theme.cardColor,
               size: 20,
             ),
           ],
@@ -457,6 +460,8 @@ class _ChipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: onTap,
@@ -464,15 +469,17 @@ class _ChipCard extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryColor
-              : AppColors.primaryFillColor,
+              ? colorScheme.primary
+              : colorScheme.primaryContainer.withValues(alpha: 0.35),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.unselectedFieldColor),
+          border: Border.all(
+            color: colorScheme.outline.withValues(alpha: 0.55),
+          ),
         ),
         child: Text(
           label,
           style: AppStyles.bodyMedium.copyWith(
-            color: isSelected ? Colors.white : AppColors.primarytextColor,
+            color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
           ),
         ),
       ),
