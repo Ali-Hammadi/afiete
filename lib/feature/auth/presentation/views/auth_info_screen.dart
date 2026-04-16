@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/auth/presentation/widgets/custom_text_form_field.dart';
@@ -43,7 +42,11 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: null,
       body: SafeArea(
         child: Padding(
@@ -63,7 +66,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                     "The following information will help us to personalize your experience",
                     textAlign: TextAlign.center,
                     style: AppStyles.bodyLarge.copyWith(
-                      color: AppColors.secondarytextColor,
+                      color: colorScheme.onSurface.withValues(alpha: 0.75),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -87,26 +90,24 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                       labelStyle: AppStyles.bodyMedium,
                       prefixIcon: Icon(
                         Icons.person,
-                        color: AppColors.primaryColor,
+                        color: colorScheme.primary,
                       ),
                       suffixIcon: Icon(
                         Icons.arrow_drop_down,
-                        color: AppColors.primaryColor,
+                        color: colorScheme.primary,
                       ),
-                      fillColor: AppColors.primaryFillColor,
+                      fillColor: colorScheme.primaryContainer.withValues(
+                        alpha: 0.45,
+                      ),
                       filled: true,
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: AppColors.selectedFieldColor,
-                        ),
+                        borderSide: BorderSide(color: colorScheme.outline),
                         borderRadius: BorderRadius.circular(
                           AppStyles.borderRadius,
                         ),
                       ),
                       border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: AppColors.unselectedFieldColor,
-                        ),
+                        borderSide: BorderSide(color: colorScheme.outline),
                         borderRadius: BorderRadius.circular(
                           AppStyles.borderRadius,
                         ),
@@ -126,10 +127,10 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
               ),
               SizedBox(height: 20),
               CustomButton(
-                widget: const Text(
+                widget: Text(
                   'Next',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -138,7 +139,9 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                   if (selectedDate == null || selectedGender == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Please enter your birthdate and gender.'),
+                        content: Text(
+                          'Please enter your birthdate and gender.',
+                        ),
                       ),
                     );
                     return;
