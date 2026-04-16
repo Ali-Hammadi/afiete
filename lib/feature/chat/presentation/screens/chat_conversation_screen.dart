@@ -1,8 +1,8 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/feature/chat/presentation/widgets/chat_message_bubble.dart';
+import 'package:afiete/feature/chat/presentation/widgets/chat_message_item.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class ChatConversationArgs {
   final String sessionId;
@@ -31,34 +31,34 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  late final List<_ChatMessageItem> _messages;
+  late final List<ChatMessageItem> _messages;
 
   @override
   void initState() {
     super.initState();
     final now = DateTime.now();
-    _messages = <_ChatMessageItem>[
-      _ChatMessageItem(
+    _messages = <ChatMessageItem>[
+      ChatMessageItem(
         id: '1',
         text: 'Hello! Are you ready for our therapy session?',
         sentAt: now.subtract(const Duration(minutes: 2)),
         isMine: false,
       ),
-      _ChatMessageItem(
+      ChatMessageItem(
         id: '2',
         text:
             'Hello Doctor, I am ready for our session. I just joined the waiting room.',
         sentAt: now.subtract(const Duration(minutes: 1, seconds: 30)),
         isMine: true,
       ),
-      _ChatMessageItem(
+      ChatMessageItem(
         id: '3',
         text:
             'Great! I will see you in 2 minutes. I am finishing up with another patient.',
         sentAt: now.subtract(const Duration(minutes: 1)),
         isMine: false,
       ),
-      _ChatMessageItem(
+      ChatMessageItem(
         id: '4',
         text: 'Sounds good, thank you.',
         sentAt: now.subtract(const Duration(seconds: 30)),
@@ -82,7 +82,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
 
     setState(() {
       _messages.add(
-        _ChatMessageItem(
+        ChatMessageItem(
           id: DateTime.now().microsecondsSinceEpoch.toString(),
           text: value,
           sentAt: DateTime.now(),
@@ -106,10 +106,13 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.primarybackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primarybackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         titleSpacing: 0,
         title: Row(
@@ -117,16 +120,18 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
             CircleAvatar(
               radius: 20,
               backgroundImage: const AssetImage(ImageLinks.woman1),
-              backgroundColor: AppColors.primaryFillColor,
+              backgroundColor: colorScheme.primaryContainer.withValues(
+                alpha: 0.45,
+              ),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: Container(
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                    color: Colors.green,
+                    color: colorScheme.primary,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.whiteColor, width: 1.5),
+                    border: Border.all(color: theme.cardColor, width: 1.5),
                   ),
                 ),
               ),
@@ -139,7 +144,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                   Text(widget.args.doctorName, style: AppStyles.bodyMedium),
                   Text(
                     'online',
-                    style: AppStyles.bodySmall.copyWith(color: Colors.green),
+                    style: AppStyles.bodySmall.copyWith(
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ],
               ),
@@ -149,11 +156,11 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.videocam, color: AppColors.primaryColor),
+            icon: Icon(Icons.videocam, color: colorScheme.primary),
           ),
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.call, color: AppColors.primaryColor),
+            icon: Icon(Icons.call, color: colorScheme.primary),
           ),
           const SizedBox(width: 4),
         ],
@@ -165,7 +172,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
           CircleAvatar(
             radius: 58,
             backgroundImage: const AssetImage(ImageLinks.woman1),
-            backgroundColor: AppColors.primaryFillColor,
+            backgroundColor: colorScheme.primaryContainer.withValues(
+              alpha: 0.45,
+            ),
           ),
           const SizedBox(height: 10),
           Text(widget.args.doctorName, style: AppStyles.headingMedium),
@@ -190,7 +199,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 }
 
                 final message = _messages[index - 1];
-                return _MessageBubble(message: message);
+                return CustomChatMessageBubble(message: message);
               },
             ),
           ),
@@ -204,7 +213,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primaryFillColor,
+                        color: colorScheme.primaryContainer.withValues(
+                          alpha: 0.45,
+                        ),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: TextField(
@@ -229,14 +240,11 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                     child: Container(
                       width: 48,
                       height: 48,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryColor,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.send,
-                        color: AppColors.whiteColor,
-                      ),
+                      child: Icon(Icons.send, color: colorScheme.onPrimary),
                     ),
                   ),
                 ],
@@ -247,74 +255,4 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
       ),
     );
   }
-}
-
-class _MessageBubble extends StatelessWidget {
-  final _ChatMessageItem message;
-
-  const _MessageBubble({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    final timeText = DateFormat('h:mm a').format(message.sentAt);
-
-    return Align(
-      alignment: message.isMine ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        constraints: const BoxConstraints(maxWidth: 290),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: message.isMine ? AppColors.primaryColor : AppColors.whiteColor,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(20),
-            topRight: const Radius.circular(20),
-            bottomLeft: Radius.circular(message.isMine ? 20 : 4),
-            bottomRight: Radius.circular(message.isMine ? 4 : 20),
-          ),
-          border: message.isMine
-              ? null
-              : Border.all(
-                  color: AppColors.primaryColor.withValues(alpha: 0.4),
-                ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              message.text,
-              style: AppStyles.bodyMedium.copyWith(
-                color: message.isMine
-                    ? AppColors.whiteColor
-                    : AppColors.primarytextColor,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              timeText,
-              style: AppStyles.bodySmall.copyWith(
-                color: message.isMine
-                    ? AppColors.whiteColor.withValues(alpha: 0.85)
-                    : AppColors.secondarytextColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ChatMessageItem {
-  final String id;
-  final String text;
-  final DateTime sentAt;
-  final bool isMine;
-
-  const _ChatMessageItem({
-    required this.id,
-    required this.text,
-    required this.sentAt,
-    required this.isMine,
-  });
 }
