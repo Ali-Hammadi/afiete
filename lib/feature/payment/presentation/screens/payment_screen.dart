@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -17,10 +16,13 @@ class PaymentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.primarybackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primarybackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         title: const Text('Payment', style: AppStyles.headingMedium),
       ),
@@ -63,14 +65,14 @@ class PaymentScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          PaymentSummaryCard(request: request),
+                          CustomPaymentSummaryCard(request: request),
                           const SizedBox(height: 28),
                           Text(
                             'Payment Method',
                             style: AppStyles.headingMedium,
                           ),
                           const SizedBox(height: 12),
-                          PaymentMethodTile(
+                          CustomPaymentMethodTile(
                             title: 'Credit / Debit Card',
                             icon: Icons.credit_card_outlined,
                             selected: selectedMethod == PaymentMethod.card,
@@ -79,7 +81,7 @@ class PaymentScreen extends StatelessWidget {
                                 : () => cubit.selectMethod(PaymentMethod.card),
                           ),
                           const SizedBox(height: 10),
-                          PaymentMethodTile(
+                          CustomPaymentMethodTile(
                             title: 'Apple Pay',
                             icon: Icons.apple,
                             selected: selectedMethod == PaymentMethod.wallet,
@@ -94,7 +96,7 @@ class PaymentScreen extends StatelessWidget {
                             style: AppStyles.headingSmall,
                           ),
                           const SizedBox(height: 8),
-                          PaymentInputField(
+                          CustomPaymentInputField(
                             hint: '0000 0000 0000 0000',
                             prefixIcon: Icons.credit_card,
                           ),
@@ -102,14 +104,14 @@ class PaymentScreen extends StatelessWidget {
                           Row(
                             children: const [
                               Expanded(
-                                child: PaymentInputField(
+                                child: CustomPaymentInputField(
                                   label: 'Expiry Date',
                                   hint: 'MM/YY',
                                 ),
                               ),
                               SizedBox(width: 14),
                               Expanded(
-                                child: PaymentInputField(
+                                child: CustomPaymentInputField(
                                   label: 'CVV',
                                   hint: '123',
                                 ),
@@ -117,7 +119,7 @@ class PaymentScreen extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 14),
-                          const PaymentInputField(
+                          const CustomPaymentInputField(
                             label: 'Cardholder Name',
                             hint: 'Name on card',
                           ),
@@ -131,18 +133,18 @@ class PaymentScreen extends StatelessWidget {
                       width: 180,
                       child: CustomButton(
                         widget: isProcessing
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: colorScheme.onPrimary,
                                 ),
                               )
                             : Text(
                                 'Pay ${_formatAmount(request.amount)} \$',
                                 style: AppStyles.headingSmall.copyWith(
-                                  color: Colors.white,
+                                  color: colorScheme.onPrimary,
                                 ),
                               ),
                         onPressed: isProcessing

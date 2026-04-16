@@ -1,21 +1,23 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/payment/domain/entities/payment_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class PaymentSummaryCard extends StatelessWidget {
+class CustomPaymentSummaryCard extends StatelessWidget {
   final PaymentRequestEntity request;
 
-  const PaymentSummaryCard({super.key, required this.request});
+  const CustomPaymentSummaryCard({super.key, required this.request});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.primaryFillColor,
+        color: colorScheme.primaryContainer.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -35,7 +37,10 @@ class PaymentSummaryCard extends StatelessWidget {
             ).format(request.scheduledAt),
           ),
           const SizedBox(height: 6),
-          Divider(color: Colors.black.withValues(alpha: 0.08), height: 18),
+          Divider(
+            color: colorScheme.outline.withValues(alpha: 0.35),
+            height: 18,
+          ),
           Row(
             children: [
               Text('Total Amount', style: AppStyles.bodyMedium),
@@ -43,7 +48,7 @@ class PaymentSummaryCard extends StatelessWidget {
               Text(
                 '${_formatAmount(request.amount)} \$',
                 style: AppStyles.headingMedium.copyWith(
-                  color: AppColors.secondaryColor,
+                  color: colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -82,13 +87,15 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         Expanded(
           child: Text(
             label,
             style: AppStyles.bodyMedium.copyWith(
-              color: AppColors.secondarytextColor,
+              color: colorScheme.onSurface.withValues(alpha: 0.75),
             ),
           ),
         ),

@@ -1,13 +1,12 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
-class PaymentInputField extends StatelessWidget {
+class CustomPaymentInputField extends StatelessWidget {
   final String? label;
   final String hint;
   final IconData? prefixIcon;
 
-  const PaymentInputField({
+  const CustomPaymentInputField({
     super.key,
     this.label,
     required this.hint,
@@ -16,6 +15,9 @@ class PaymentInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -27,26 +29,29 @@ class PaymentInputField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: AppColors.secondarytextColor)
+                ? Icon(
+                    prefixIcon,
+                    color: colorScheme.onSurface.withValues(alpha: 0.75),
+                  )
                 : null,
             filled: true,
-            fillColor: Colors.white,
+            fillColor: theme.cardColor,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 14,
             ),
             hintStyle: AppStyles.bodyMedium.copyWith(
-              color: AppColors.secondarytextColor,
+              color: colorScheme.onSurface.withValues(alpha: 0.75),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
-                color: Colors.black.withValues(alpha: 0.10),
+                color: colorScheme.outline.withValues(alpha: 0.35),
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
+              borderSide: BorderSide(color: colorScheme.primary),
             ),
           ),
         ),

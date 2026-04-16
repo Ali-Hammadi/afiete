@@ -1,14 +1,13 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
-class PaymentMethodTile extends StatelessWidget {
+class CustomPaymentMethodTile extends StatelessWidget {
   final String title;
   final IconData icon;
   final bool selected;
   final VoidCallback? onTap;
 
-  const PaymentMethodTile({
+  const CustomPaymentMethodTile({
     super.key,
     required this.title,
     required this.icon,
@@ -18,16 +17,21 @@ class PaymentMethodTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.primaryFillColor.withValues(alpha: 0.45),
+          color: colorScheme.primaryContainer.withValues(alpha: 0.45),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? AppColors.primaryColor : Colors.black12,
+            color: selected
+                ? colorScheme.primary
+                : colorScheme.outline.withValues(alpha: 0.35),
             width: selected ? 1.6 : 1,
           ),
         ),
@@ -36,10 +40,10 @@ class PaymentMethodTile extends StatelessWidget {
             Icon(
               Icons.circle,
               size: 20,
-              color: selected ? AppColors.primaryColor : Colors.white,
+              color: selected ? colorScheme.primary : theme.cardColor,
             ),
             const SizedBox(width: 12),
-            Icon(icon, color: AppColors.secondarytextColor),
+            Icon(icon, color: colorScheme.onSurface.withValues(alpha: 0.75)),
             const SizedBox(width: 16),
             Expanded(child: Text(title, style: AppStyles.headingSmall)),
           ],
