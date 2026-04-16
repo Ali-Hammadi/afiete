@@ -1,5 +1,4 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
@@ -21,14 +20,18 @@ class CustomAppointmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final dateText = DateFormat(
       'EEE, dd MMM yyyy - hh:mm a',
     ).format(appointment.scheduledAt);
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
+      color: theme.cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppStyles.borderRadius),
+        side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.25)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppStyles.padding),
@@ -40,7 +43,9 @@ class CustomAppointmentCard extends StatelessWidget {
                 CircleAvatar(
                   backgroundImage: AssetImage(ImageLinks.man1),
                   radius: 30,
-                  backgroundColor: AppColors.primaryFillColor,
+                  backgroundColor: colorScheme.primaryContainer.withValues(
+                    alpha: 0.35,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -64,7 +69,7 @@ class CustomAppointmentCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppStyles.padding),
               decoration: BoxDecoration(
-                color: AppColors.primaryFillColor,
+                color: colorScheme.primaryContainer.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(AppStyles.borderRadius),
               ),
               child: Column(
@@ -95,14 +100,18 @@ class CustomAppointmentCard extends StatelessWidget {
                   CustomButton(
                     widget: Text(
                       "Join Session",
-                      style: AppStyles.bodySmall.copyWith(color: Colors.white),
+                      style: AppStyles.bodySmall.copyWith(
+                        color: colorScheme.onPrimary,
+                      ),
                     ),
                     onPressed: () => _handleJoinSession(context),
                   ),
                   CustomButton(
                     widget: Text(
                       "Reschedule",
-                      style: AppStyles.bodySmall.copyWith(color: Colors.white),
+                      style: AppStyles.bodySmall.copyWith(
+                        color: colorScheme.onPrimary,
+                      ),
                     ),
                     onPressed: () {
                       // Handle cancel action
