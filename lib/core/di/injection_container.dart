@@ -66,6 +66,13 @@ import 'package:afiete/feature/voice/domain/repositories/voice_repository.dart';
 import 'package:afiete/feature/voice/domain/usecase/end_voice_call_usecase.dart';
 import 'package:afiete/feature/voice/domain/usecase/get_voice_calls_usecase.dart';
 import 'package:afiete/feature/voice/domain/usecase/start_voice_call_usecase.dart';
+import 'package:afiete/feature/report/data/datasources/report_remote_datasource.dart';
+import 'package:afiete/feature/report/data/repositories/report_repository_impl.dart';
+import 'package:afiete/feature/report/domain/repositories/report_repository.dart';
+import 'package:afiete/feature/report/domain/usecases/submit_report_usecase.dart';
+import 'package:afiete/feature/report/domain/usecases/get_report_history_usecase.dart';
+import 'package:afiete/feature/report/domain/usecases/get_reports_by_type_usecase.dart';
+import 'package:afiete/feature/report/presentation/cubits/report_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:afiete/feature/auth/data/repositories/auth_repository_impl.dart';
@@ -371,6 +378,36 @@ Future<void> init() async {
     () => SettingsCubit(
       sl<GetMedicalProfileUseCase>(),
       sl<SubmitReportIssueUseCase>(),
+    ),
+  );
+
+  // Report data sources
+  sl.registerLazySingleton<ReportRemoteDataSource>(
+    () => ReportRemoteDataSourceImpl(dio: sl<Dio>()),
+  );
+
+  // Report repositories
+  sl.registerLazySingleton<ReportRepository>(
+    () => ReportRepositoryImpl(remoteDataSource: sl<ReportRemoteDataSource>()),
+  );
+
+  // Report use cases
+  sl.registerLazySingleton<SubmitReportUseCase>(
+    () => SubmitReportUseCase(sl<ReportRepository>()),
+  );
+  sl.registerLazySingleton<GetReportHistoryUseCase>(
+    () => GetReportHistoryUseCase(sl<ReportRepository>()),
+  );
+  sl.registerLazySingleton<GetReportsByTypeUseCase>(
+    () => GetReportsByTypeUseCase(sl<ReportRepository>()),
+  );
+
+  // Report cubit
+  sl.registerFactory<ReportCubit>(
+    () => ReportCubit(
+      submitReportUseCase: sl<SubmitReportUseCase>(),
+      getReportHistoryUseCase: sl<GetReportHistoryUseCase>(),
+      getReportsByTypeUseCase: sl<GetReportsByTypeUseCase>(),
     ),
   );
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/di/injection_container.dart';
 import 'core/routes/app_route.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
 import 'feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'feature/auth/presentation/cubits/auth_cubit.dart';
 import 'feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
@@ -13,16 +15,20 @@ import 'feature/settings/presentation/cubits/settings_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await init();
-  runApp(const MyApp());
+  final themeCubit = await ThemeCubit.create();
+  runApp(MyApp(themeCubit: themeCubit));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeCubit themeCubit;
+
+  const MyApp({super.key, required this.themeCubit});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<ThemeCubit>.value(value: themeCubit),
         BlocProvider<AuthCubit>(create: (_) => sl<AuthCubit>()),
         BlocProvider<AssignmentsCubit>(create: (_) => sl<AssignmentsCubit>()),
         BlocProvider<AppointmentsCubit>(create: (_) => sl<AppointmentsCubit>()),
@@ -31,12 +37,18 @@ class MyApp extends StatelessWidget {
         BlocProvider<SessionsCubit>(create: (_) => sl<SessionsCubit>()),
         BlocProvider<SettingsCubit>(create: (_) => sl<SettingsCubit>()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Afiete',
-
-        initialRoute: MyRoutes.homeScreen,
-        onGenerateRoute: AppRouter.generateRoute,
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Afiete',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeMode,
+            initialRoute: MyRoutes.homeScreen,
+            onGenerateRoute: AppRouter.generateRoute,
+          );
+        },
       ),
     );
   }
