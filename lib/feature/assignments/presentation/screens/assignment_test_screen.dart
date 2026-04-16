@@ -1,4 +1,3 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
@@ -15,10 +14,13 @@ class AssignmentTestScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.primarybackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primarybackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         title: const Text('Assessment', style: AppStyles.headingMedium),
         centerTitle: true,
@@ -34,7 +36,7 @@ class AssignmentTestScreen extends StatelessWidget {
           }
 
           if (state is AssignmentsError) {
-            return AssignmentErrorView(
+            return CustomAssignmentErrorView(
               message: state.message,
               onRetry: () => context.read<AssignmentsCubit>().loadQuestions(),
             );
@@ -63,7 +65,7 @@ class AssignmentTestScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AssignmentProgressHeader(
+                      CustomAssignmentProgressHeader(
                         progress: progress,
                         questionIndex: state.currentQuestionIndex + 1,
                         totalQuestions: state.questions.length,
@@ -77,9 +79,10 @@ class AssignmentTestScreen extends StatelessWidget {
                       Text(
                         'Select the option that best represents your current state of mind.',
                         style: AppStyles.bodyMedium.copyWith(
-                          color: AppColors.primarytextColor.withValues(
-                            alpha: 0.8,
-                          ),
+                          color:
+                              (theme.textTheme.bodyMedium?.color ??
+                                      colorScheme.onSurface)
+                                  .withValues(alpha: 0.8),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -97,7 +100,7 @@ class AssignmentTestScreen extends StatelessWidget {
                         Text(
                           state.validationError!,
                           style: AppStyles.bodySmall.copyWith(
-                            color: AppColors.errorColor,
+                            color: colorScheme.error,
                           ),
                         ),
                       ],
@@ -105,7 +108,7 @@ class AssignmentTestScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              AssignmentBottomActions(
+              CustomAssignmentBottomActions(
                 showBack: state.currentQuestionIndex > 0,
                 isLastQuestion: isLastQuestion,
                 onBack: () =>
@@ -133,7 +136,7 @@ class AssignmentTestScreen extends StatelessWidget {
   }) {
     return options
         .map(
-          (option) => AssignmentOptionTile(
+          (option) => CustomAssignmentOptionTile(
             option: option,
             isSelected: selectedAnswer == option,
             onTap: () => context.read<AssignmentsCubit>().selectAnswer(

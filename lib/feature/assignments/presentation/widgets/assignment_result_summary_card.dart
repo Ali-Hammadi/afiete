@@ -1,23 +1,24 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
 import 'package:flutter/material.dart';
 
-class AssignmentResultSummaryCard extends StatelessWidget {
+class CustomAssignmentResultSummaryCard extends StatelessWidget {
   final AssignmentEntity result;
 
-  const AssignmentResultSummaryCard({super.key, required this.result});
+  const CustomAssignmentResultSummaryCard({super.key, required this.result});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.unselectedFieldColor.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.6)),
       ),
       child: Column(
         children: [
@@ -30,14 +31,14 @@ class AssignmentResultSummaryCard extends StatelessWidget {
                 CircularProgressIndicator(
                   value: (result.score / 100).clamp(0.0, 1.0),
                   strokeWidth: 8,
-                  color: AppColors.primaryColor,
-                  backgroundColor: AppColors.primaryFillColor,
+                  color: colorScheme.primary,
+                  backgroundColor: colorScheme.primaryContainer,
                 ),
                 Center(
                   child: Text(
                     '${result.score}%',
                     style: AppStyles.headingMedium.copyWith(
-                      color: AppColors.primaryColor,
+                      color: colorScheme.primary,
                     ),
                   ),
                 ),

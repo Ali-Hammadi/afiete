@@ -2,11 +2,11 @@ import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:flutter/material.dart';
 
-class AssignmentErrorView extends StatelessWidget {
+class CustomAssignmentErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  const AssignmentErrorView({
+  const CustomAssignmentErrorView({
     super.key,
     required this.message,
     required this.onRetry,
@@ -14,6 +14,8 @@ class AssignmentErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppStyles.padding),
@@ -25,7 +27,9 @@ class AssignmentErrorView extends StatelessWidget {
             CustomButton(
               widget: Text(
                 'Retry',
-                style: AppStyles.bodyMedium.copyWith(color: Colors.white),
+                style: AppStyles.bodyMedium.copyWith(
+                  color: colorScheme.onPrimary,
+                ),
               ),
               onPressed: onRetry,
             ),

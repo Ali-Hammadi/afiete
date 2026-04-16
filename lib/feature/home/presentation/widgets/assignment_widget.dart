@@ -1,18 +1,19 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:flutter/material.dart';
 
-class AssignmentWidget extends StatelessWidget {
-  const AssignmentWidget({super.key});
+class CustomAssignmentWidget extends StatelessWidget {
+  const CustomAssignmentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(AppStyles.padding),
       height: 200,
       decoration: BoxDecoration(
-        color: AppColors.secondaryColor,
+        color: colorScheme.primary,
         borderRadius: BorderRadius.all(Radius.circular(AppStyles.borderRadius)),
       ),
       child: Column(
@@ -20,12 +21,12 @@ class AssignmentWidget extends StatelessWidget {
         children: [
           Text(
             "Not sure where to start ?\n ",
-            style: AppStyles.bodyMedium.copyWith(color: AppColors.whiteColor),
+            style: AppStyles.bodyMedium.copyWith(color: colorScheme.onPrimary),
             textAlign: TextAlign.left,
           ),
           Text(
             "Take a short mental health assignment so we can understand your state and suggest the best doctors for you",
-            style: AppStyles.bodyMedium.copyWith(color: AppColors.whiteColor),
+            style: AppStyles.bodyMedium.copyWith(color: colorScheme.onPrimary),
             overflow: TextOverflow.visible,
           ),
           TextButton(
@@ -35,15 +36,15 @@ class AssignmentWidget extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(3),
               decoration: BoxDecoration(
-                color: AppColors.whiteColor,
+                color: colorScheme.onPrimary,
                 borderRadius: BorderRadius.all(
                   Radius.circular(AppStyles.borderRadius),
                 ),
               ),
               child: Text(
-                "Take an assignment",
+                " Take an assignment ",
                 style: AppStyles.bodyMedium.copyWith(
-                  color: AppColors.secondaryColor,
+                  color: colorScheme.primary,
                 ),
               ),
             ),

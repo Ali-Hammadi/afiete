@@ -14,6 +14,8 @@ class AssignmentResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppStyles.padding),
       child: Column(
@@ -23,7 +25,7 @@ class AssignmentResultScreen extends StatelessWidget {
             child: Text('Assessment Result', style: AppStyles.headingMedium),
           ),
           const SizedBox(height: 14),
-          AssignmentResultSummaryCard(result: state.result),
+          CustomAssignmentResultSummaryCard(result: state.result),
           const SizedBox(height: 14),
           Text('Suggested specialist', style: AppStyles.headingSmall),
           const SizedBox(height: 10),
@@ -36,7 +38,7 @@ class AssignmentResultScreen extends StatelessWidget {
             Column(
               children: state.doctors
                   .take(3)
-                  .map((doctor) => DoctorCard(doctor: doctor))
+                  .map((doctor) => CustomDoctorCard(doctor: doctor))
                   .toList(),
             ),
           const SizedBox(height: 20),
@@ -46,7 +48,9 @@ class AssignmentResultScreen extends StatelessWidget {
                 child: CustomButton(
                   widget: Text(
                     'Home',
-                    style: AppStyles.bodyMedium.copyWith(color: Colors.white),
+                    style: AppStyles.bodyMedium.copyWith(
+                      color: colorScheme.onPrimary,
+                    ),
                   ),
                   onPressed: () {
                     Navigator.pushNamedAndRemoveUntil(
@@ -62,7 +66,9 @@ class AssignmentResultScreen extends StatelessWidget {
                 child: CustomButton(
                   widget: Text(
                     'Specialists',
-                    style: AppStyles.bodyMedium.copyWith(color: Colors.white),
+                    style: AppStyles.bodyMedium.copyWith(
+                      color: colorScheme.onPrimary,
+                    ),
                   ),
                   onPressed: () {
                     Navigator.pushNamedAndRemoveUntil(

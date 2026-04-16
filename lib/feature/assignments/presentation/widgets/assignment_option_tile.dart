@@ -1,13 +1,12 @@
-import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
-class AssignmentOptionTile extends StatelessWidget {
+class CustomAssignmentOptionTile extends StatelessWidget {
   final String option;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const AssignmentOptionTile({
+  const CustomAssignmentOptionTile({
     super.key,
     required this.option,
     required this.isSelected,
@@ -16,6 +15,8 @@ class AssignmentOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
@@ -25,12 +26,12 @@ class AssignmentOptionTile extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFFDDE7E4),
+            color: colorScheme.primaryContainer.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isSelected
-                  ? AppColors.primaryColor
-                  : const Color(0xFFAAC0BC),
+                  ? colorScheme.primary
+                  : colorScheme.outline.withValues(alpha: 0.55),
               width: isSelected ? 1.5 : 1,
             ),
           ),
@@ -38,7 +39,7 @@ class AssignmentOptionTile extends StatelessWidget {
             children: [
               Expanded(child: Text(option, style: AppStyles.headingSmall)),
               if (isSelected)
-                Icon(Icons.check_circle_outline, color: AppColors.primaryColor),
+                Icon(Icons.check_circle_outline, color: colorScheme.primary),
             ],
           ),
         ),
