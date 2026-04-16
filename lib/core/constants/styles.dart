@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 
 abstract class AppStyles {
   // padding and border radius
@@ -16,33 +15,21 @@ abstract class AppStyles {
   static const TextStyle headingLarge = TextStyle(
     fontSize: veryBigFontSize,
     fontWeight: FontWeight.bold,
-    color: AppColors.primarytextColor,
   );
 
   static const TextStyle headingMedium = TextStyle(
     fontSize: bigFontSize,
     fontWeight: FontWeight.w600,
-    color: AppColors.primarytextColor,
   );
 
   static const TextStyle headingSmall = TextStyle(
     fontSize: smallFontSize,
     fontWeight: FontWeight.w600,
-    color: AppColors.primarytextColor,
   );
 
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: mediumFontSize,
-    color: AppColors.primarytextColor,
-  );
+  static const TextStyle bodyLarge = TextStyle(fontSize: mediumFontSize);
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: smallFontSize,
-    color: AppColors.primarytextColor,
-  );
+  static const TextStyle bodyMedium = TextStyle(fontSize: smallFontSize);
 
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 14,
-    color: AppColors.secondarytextColor,
-  );
+  static const TextStyle bodySmall = TextStyle(fontSize: 14);
 }

@@ -14,6 +14,10 @@ import 'package:afiete/feature/home/presentation/screens/first_home_screen.dart'
 import 'package:afiete/feature/home/presentation/screens/global_home_screen.dart';
 import 'package:afiete/feature/payment/domain/entities/payment_entity.dart';
 import 'package:afiete/feature/payment/presentation/screens/payment_screen.dart';
+import 'package:afiete/feature/report/domain/entities/report_entity.dart';
+import 'package:afiete/feature/report/presentation/cubits/report_cubit.dart';
+import 'package:afiete/feature/report/presentation/screens/report_history_screen.dart';
+import 'package:afiete/feature/report/presentation/screens/report_screen.dart';
 import 'package:afiete/feature/settings/presentation/screens/medical_profile_screen.dart';
 import 'package:afiete/feature/settings/presentation/screens/profile_info_screen.dart';
 import 'package:afiete/feature/settings/presentation/screens/report_issue_screen.dart';
@@ -144,6 +148,55 @@ class AppRouter {
           builder: (_) => AssignmentResultScreen(state: args),
         );
 
+      case MyRoutes.reportScreen:
+        final args = settings.arguments;
+        final reportArgs = args is ReportScreenArgs
+            ? args
+            : args is Map<String, dynamic>
+            ? ReportScreenArgs(
+                reportType: args['reportType'] as ReportType,
+                userId: args['userId'] as String,
+                doctorId: args['doctorId'] as String?,
+                doctorName: args['doctorName'] as String?,
+                sessionId: args['sessionId'] as String?,
+              )
+            : null;
+
+        if (reportArgs == null) {
+          return MaterialPageRoute(
+            builder: (context) => Scaffold(
+              appBar: AppBar(),
+              body: const Center(
+                child: Text(
+                  'Report data is required.',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<ReportCubit>(
+            create: (_) => sl<ReportCubit>(),
+            child: ReportScreen(
+              reportType: reportArgs.reportType,
+              userId: reportArgs.userId,
+              doctorId: reportArgs.doctorId,
+              doctorName: reportArgs.doctorName,
+              sessionId: reportArgs.sessionId,
+            ),
+          ),
+        );
+
+      case MyRoutes.reportHistoryScreen:
+        final userId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<ReportCubit>(
+            create: (_) => sl<ReportCubit>(),
+            child: ReportHistoryScreen(userId: userId),
+          ),
+        );
+
       default:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
@@ -157,6 +210,22 @@ class AppRouter {
         );
     }
   }
+}
+
+class ReportScreenArgs {
+  final ReportType reportType;
+  final String userId;
+  final String? doctorId;
+  final String? doctorName;
+  final String? sessionId;
+
+  ReportScreenArgs({
+    required this.reportType,
+    required this.userId,
+    this.doctorId,
+    this.doctorName,
+    this.sessionId,
+  });
 }
 
 class MyRoutes {
@@ -185,4 +254,7 @@ class MyRoutes {
   static const String reportIssueScreen = "/reportIssueScreen";
   static const String assignmentTestScreen = "/assignmentTestScreen";
   static const String assignmentResultScreen = "/assignmentResultScreen";
+  // Report Screens
+  static const String reportScreen = "/reportScreen";
+  static const String reportHistoryScreen = "/reportHistoryScreen";
 }
