@@ -1,31 +1,52 @@
+import 'package:afiete/core/assets/icon_image_links.dart';
 import 'package:afiete/feature/settings/data/data_source/settings_remote_data_source.dart';
 import 'package:afiete/feature/settings/data/models/medical_profile_model.dart';
 
 class SettingsMockDataSourceImpl implements SettingsRemoteDataSource {
-  List<MedicalPrescriptionModel> _prescriptions = const [
+  final List<MedicalPrescriptionModel> _prescriptions = const [
     MedicalPrescriptionModel(
+      prescriptionNumber: 'AF-RX-2026-000001',
       medicine: 'Sertraline',
       dosage: '50mg',
       schedule: 'Once daily after breakfast',
       nextRefill: '2026-05-15',
+      documentType: 'Prescription',
+      doctorName: 'Dr. Sarah Ali',
+      capturedAt: '2026-04-12',
+      imagePath: ImageLinks.prescription,
     ),
     MedicalPrescriptionModel(
+      prescriptionNumber: 'AF-RX-2026-000002',
       medicine: 'Escitalopram',
       dosage: '10mg',
       schedule: 'Once daily in the morning',
       nextRefill: '2026-05-10',
+      documentType: 'Session Report',
+      doctorName: 'Dr. Omar Hassan',
+      capturedAt: '2026-04-14',
+      imagePath: ImageLinks.prescription2,
     ),
     MedicalPrescriptionModel(
+      prescriptionNumber: 'AF-RX-2026-000003',
       medicine: 'Magnesium Glycinate',
       dosage: '200mg',
       schedule: 'At night before sleep',
       nextRefill: '2026-05-18',
+      documentType: 'Prescription',
+      doctorName: 'Dr. Sarah Ali',
+      capturedAt: '2026-04-16',
+      imagePath: ImageLinks.prescription,
     ),
     MedicalPrescriptionModel(
+      prescriptionNumber: 'AF-RX-2026-000004',
       medicine: 'Omega-3',
       dosage: '1000mg',
       schedule: 'Twice daily with meals',
       nextRefill: '2026-05-22',
+      documentType: 'Session Report',
+      doctorName: 'Dr. Omar Hassan',
+      capturedAt: '2026-04-18',
+      imagePath: ImageLinks.prescription2,
     ),
   ];
 

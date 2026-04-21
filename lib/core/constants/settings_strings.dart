@@ -22,13 +22,31 @@ abstract class SettingsStrings {
   static const String medicalTabMedicine = 'Medicine';
   static const String medicalTabNotes = 'Notes';
   static const String noPrescriptions = 'No prescriptions yet.';
+  static const String noPrescriptionImage = 'No prescription image available.';
   static const String noMedicines = 'No medicine records yet.';
   static const String noNotes = 'No notes yet.';
   static const String oral = 'ORAL';
+  static const String prescriptionNumberLabel = 'Prescription No:';
+  static const String prescriptionNameLabel = 'Prescription Name:';
   static const String dosageLabel = 'Dosage:';
   static const String scheduleLabel = 'Schedule:';
   static const String refillLabel = 'Refill:';
   static const String nextRefillLabel = 'Next refill:';
+  static const String doctorLabel = 'Doctor:';
+  static const String capturedAtLabel = 'Captured:';
+  static const String viewDocument = 'View Image';
+  static const String downloadDocument = 'Download Image';
+  static const String shareWithPharmacist = 'Share Image';
+  static const String prescriptionDocument = 'Prescription';
+  static const String sessionReportDocument = 'Session Report';
+  static const String sharedWithPharmacistSuccess =
+      'Prescription image shared successfully.';
+  static const String imageDownloadedSuccess =
+      'Prescription image downloaded successfully.';
+  static const String imageOperationFailed =
+      'Could not complete image operation. Please try again.';
+  static const String noImageToShare =
+      'No image attached to this prescription yet.';
   static const String totalLabel = 'Total:';
   static const String activeMedicinesLabel = 'Active medicines:';
   static const String totalNotesLabel = 'Total notes:';
@@ -67,6 +85,35 @@ abstract class SettingsStrings {
   static const String verifyNewEmailTitle = 'Verify New Email';
   static const String resendCode = 'Resend code';
   static const String verify = 'Verify';
+
+  // Password and Account Management
+  static const String changePasswordTitle = 'Change Password';
+  static const String oldPasswordLabel = 'Old Password';
+  static const String oldPasswordHint = 'Enter your current password';
+  static const String newPasswordLabel = 'New Password';
+  static const String newPasswordHint = 'Enter your new password';
+  static const String confirmPasswordLabel = 'Confirm Password';
+  static const String confirmPasswordHint = 'Confirm your new password';
+  static const String passwordChanged = 'Password changed successfully.';
+  static const String passwordMismatch = 'Passwords do not match.';
+  static const String invalidOldPassword = 'Current password is incorrect.';
+  static const String verifyOldEmailTitle = 'Verify Current Email';
+  static const String verifyOldEmailDesc =
+      'We will send a verification code to your current email address.';
+  static const String newEmailVerificationDesc =
+      'A verification code will be sent to your new email address.';
+  static const String deleteAccountWarning =
+      'Are you sure you want to delete your account? This action cannot be undone.';
+  static const String deleteAccountConfirm =
+      'Type "DELETE" to confirm account deletion.';
+  static const String deleteConfirmationText = 'DELETE';
+  static const String accountDeletedSuccess =
+      'Your account has been deleted successfully.';
+  static const String forgotPasswordTitle = 'Reset Password';
+  static const String forgotPasswordDesc =
+      'Enter your email address and we will send you a code to reset your password.';
+  static const String sendCode = 'Send Code';
+  static const String resetPassword = 'Reset Password';
 
   static const String privacyTermsTitle = 'Privacy & Terms';
   static const String privacyPolicyTitle = 'Privacy Policy';

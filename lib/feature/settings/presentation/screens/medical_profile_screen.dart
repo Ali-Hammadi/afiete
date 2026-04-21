@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
@@ -6,7 +8,11 @@ import 'package:afiete/feature/settings/domin/entities/medical_profile_entity.da
 import 'package:afiete/feature/settings/presentation/cubits/settings_cubit.dart';
 import 'package:afiete/feature/settings/presentation/screens/note_details_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MedicalProfileScreen extends StatelessWidget {
   const MedicalProfileScreen({super.key});
@@ -270,9 +276,22 @@ class _PrescriptionTile extends StatelessWidget {
 
   const _PrescriptionTile({required this.item});
 
+  bool get _hasImage => item.imagePath.trim().isNotEmpty;
+
+  String get _documentLabel {
+    final rawType = item.documentType.trim().toLowerCase();
+    if (rawType == 'session report') {
+      return SettingsStrings.sessionReportDocument;
+    }
+    return SettingsStrings.prescriptionDocument;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final prescriptionNumber = item.prescriptionNumber.trim().isNotEmpty
+        ? item.prescriptionNumber
+        : 'N/A';
 
     return Container(
       width: double.infinity,
@@ -281,46 +300,266 @@ class _PrescriptionTile extends StatelessWidget {
         color: colorScheme.primaryContainer.withValues(alpha: 0.45),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item.medicine, style: AppStyles.headingSmall),
-                const SizedBox(height: 4),
-                Text(
-                  '${item.dosage} • ${item.schedule}',
+          Row(
+            children: [
+              Expanded(
+                child: Text(item.medicine, style: AppStyles.headingSmall),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _documentLabel,
                   style: AppStyles.bodySmall.copyWith(
-                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${SettingsStrings.nextRefillLabel} ${item.nextRefill}',
-                  style: AppStyles.bodySmall,
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '${SettingsStrings.prescriptionNumberLabel} $prescriptionNumber',
+            style: AppStyles.bodySmall.copyWith(fontWeight: FontWeight.w700),
+          ),
+          Text(
+            '${SettingsStrings.prescriptionNameLabel} ${item.medicine}',
+            style: AppStyles.bodySmall,
+          ),
+          if (item.doctorName.trim().isNotEmpty)
+            Text(
+              '${SettingsStrings.doctorLabel} ${item.doctorName}',
+              style: AppStyles.bodySmall,
+            ),
+          if (item.capturedAt.trim().isNotEmpty)
+            Text(
+              '${SettingsStrings.capturedAtLabel} ${item.capturedAt}',
+              style: AppStyles.bodySmall,
+            ),
+          const SizedBox(height: 2),
+          Text(
+            '${SettingsStrings.dosageLabel} ${item.dosage}',
+            style: AppStyles.bodySmall,
+          ),
+          Text(
+            '${SettingsStrings.scheduleLabel} ${item.schedule}',
+            style: AppStyles.bodySmall,
+          ),
+          Text(
+            '${SettingsStrings.nextRefillLabel} ${item.nextRefill}',
+            style: AppStyles.bodySmall,
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: _hasImage
+                  ? Image.asset(
+                      item.imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, error, stackTrace) =>
+                          _buildImageFallback(
+                            colorScheme,
+                            SettingsStrings.noPrescriptionImage,
+                          ),
+                    )
+                  : _buildImageFallback(
+                      colorScheme,
+                      SettingsStrings.noPrescriptionImage,
+                    ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              SettingsStrings.oral,
-              style: AppStyles.bodySmall.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.bold,
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              SizedBox(
+                width: 160,
+                child: OutlinedButton.icon(
+                  onPressed: _hasImage ? () => _openImageViewer(context) : null,
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: const Text(SettingsStrings.viewDocument),
+                ),
               ),
-            ),
+              SizedBox(
+                width: 190,
+                child: OutlinedButton.icon(
+                  onPressed: _hasImage
+                      ? () => _downloadDocument(context)
+                      : null,
+                  icon: const Icon(Icons.download_outlined),
+                  label: const Text(SettingsStrings.downloadDocument),
+                ),
+              ),
+              SizedBox(
+                width: 150,
+                child: FilledButton.icon(
+                  onPressed: () => _shareWithPharmacist(context),
+                  icon: const Icon(Icons.local_pharmacy_outlined),
+                  label: const Text(SettingsStrings.shareWithPharmacist),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildImageFallback(ColorScheme colorScheme, String text) {
+    return Container(
+      color: colorScheme.surfaceContainerHighest,
+      alignment: Alignment.center,
+      child: Text(
+        text,
+        style: AppStyles.bodySmall.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  void _openImageViewer(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return Dialog(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 700, maxHeight: 560),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.medicine,
+                          style: AppStyles.headingSmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: InteractiveViewer(
+                      minScale: 1,
+                      maxScale: 4,
+                      child: Image.asset(item.imagePath, fit: BoxFit.contain),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<File> _saveAssetImageToFile() async {
+    final safeNumber = item.prescriptionNumber
+        .replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_')
+        .trim();
+    final fileName = '${safeNumber.isEmpty ? 'prescription' : safeNumber}.jpg';
+
+    final bytes = await _loadAssetImageBytes();
+    final downloadDir = await getDownloadsDirectory();
+    final baseDir = downloadDir ?? await getApplicationDocumentsDirectory();
+    final destination = File('${baseDir.path}/$fileName');
+
+    await destination.writeAsBytes(
+      bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes),
+      flush: true,
+    );
+
+    return destination;
+  }
+
+  Future<Uint8List> _loadAssetImageBytes() async {
+    final data = await rootBundle.load(item.imagePath);
+    return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  }
+
+  Future<void> _downloadDocument(BuildContext context) async {
+    if (!_hasImage) {
+      _showMessage(context, SettingsStrings.noImageToShare);
+      return;
+    }
+
+    try {
+      final safeNumber = item.prescriptionNumber
+          .replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_')
+          .trim();
+      final imageName =
+          '${safeNumber.isEmpty ? 'prescription' : safeNumber}_${DateTime.now().millisecondsSinceEpoch}';
+      final bytes = await _loadAssetImageBytes();
+      final result = await ImageGallerySaver.saveImage(
+        bytes,
+        quality: 100,
+        name: imageName,
+      );
+      final isSaved =
+          result['isSuccess'] == true ||
+          result['filePath'] != null ||
+          result['status'] == true;
+      if (!context.mounted) return;
+      _showMessage(
+        context,
+        isSaved
+            ? SettingsStrings.imageDownloadedSuccess
+            : SettingsStrings.imageOperationFailed,
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      _showMessage(context, SettingsStrings.imageOperationFailed);
+    }
+  }
+
+  Future<void> _shareWithPharmacist(BuildContext context) async {
+    if (!_hasImage) {
+      _showMessage(context, SettingsStrings.noImageToShare);
+      return;
+    }
+
+    try {
+      final file = await _saveAssetImageToFile();
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text:
+            '${SettingsStrings.prescriptionNameLabel} ${item.medicine}\n${SettingsStrings.prescriptionNumberLabel} ${item.prescriptionNumber}',
+      );
+      if (!context.mounted) return;
+      _showMessage(context, SettingsStrings.sharedWithPharmacistSuccess);
+    } catch (_) {
+      if (!context.mounted) return;
+      _showMessage(context, SettingsStrings.imageOperationFailed);
+    }
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 

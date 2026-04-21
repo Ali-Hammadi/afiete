@@ -123,18 +123,24 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
               style: AppStyles.headingSmall,
             ),
             const SizedBox(height: 10),
-            ...widget.doctors.map(
-              (doctor) => RadioListTile<ShareDoctorOption>(
-                contentPadding: EdgeInsets.zero,
-                value: doctor,
-                groupValue: _selectedDoctor,
-                title: Text(doctor.name),
-                subtitle: Text(doctor.specialization),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedDoctor = value;
-                  });
-                },
+            RadioGroup<ShareDoctorOption>(
+              groupValue: _selectedDoctor,
+              onChanged: (value) {
+                setState(() {
+                  _selectedDoctor = value;
+                });
+              },
+              child: Column(
+                children: [
+                  ...widget.doctors.map(
+                    (doctor) => RadioListTile<ShareDoctorOption>(
+                      contentPadding: EdgeInsets.zero,
+                      value: doctor,
+                      title: Text(doctor.name),
+                      subtitle: Text(doctor.specialization),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 8),

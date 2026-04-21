@@ -11,6 +11,8 @@ abstract class ImageLinks {
   static const String professionalDoctor =
       'assets/images/Professional_doctor.png';
   static const String protectingMental = 'assets/images/Protecting_mental.png';
+  static const String prescription = 'assets/images/prescription.jpg';
+  static const String prescription2 = 'assets/images/prescription2.jpg';
 }
 
 class SvgImageLinks {

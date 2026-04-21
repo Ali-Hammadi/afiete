@@ -1,8 +1,8 @@
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
-import 'package:afiete/feature/settings/presentation/screens/email_change_verification_screen.dart';
 import 'package:afiete/feature/settings/presentation/widgets/info_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +18,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
 
   DateTime _selectedBirthDate = DateTime.now();
   String _selectedGender = 'Male';
@@ -32,7 +31,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     final user = _currentUser;
     _nameController.text = user?.name ?? '';
     _emailController.text = user?.email ?? '';
-    _phoneController.text = user?.phoneNumber ?? '';
     _selectedBirthDate = user?.birthDate ?? DateTime.now();
     _selectedGender = user?.gender ?? 'Male';
     _isInitialized = true;
@@ -42,7 +40,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     super.dispose();
   }
 
@@ -150,19 +147,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              _buildField(
-                controller: _phoneController,
-                label: SettingsStrings.phoneTitleProfile,
-                icon: Icons.call_outlined,
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Phone number is required';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
               InkWell(
                 borderRadius: BorderRadius.circular(14),
                 onTap: () async {
@@ -194,7 +178,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedGender,
+                initialValue: _selectedGender,
                 decoration: InputDecoration(
                   labelText: SettingsStrings.genderTitle,
                   border: OutlineInputBorder(
@@ -253,30 +237,24 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               ),
               const SizedBox(height: 20),
               CustomInfoRow(
-                icon: Icons.call,
-                leftText: _phoneController.text.isNotEmpty
-                    ? _phoneController.text
-                    : '—',
-                rightActionText: SettingsStrings.addNumberTitle,
-              ),
-              const SizedBox(height: 20),
-              CustomInfoRow(
                 icon: Icons.email,
                 leftText: _emailController.text.isNotEmpty
                     ? _emailController.text
                     : '—',
                 rightActionText: SettingsStrings.changeEmailTitle,
+                onActionPressed: _handleChangeEmail,
               ),
               const SizedBox(height: 20),
               CustomInfoRow(
                 icon: Icons.lock,
                 leftText: '************',
-                rightActionText: SettingsStrings.passwordTitle,
+                rightActionText: SettingsStrings.changePasswordTitle,
+                onActionPressed: _handleChangePassword,
               ),
               const SizedBox(height: 24),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _handleDeleteAccount,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.error,
                     foregroundColor: colorScheme.onError,
@@ -335,23 +313,14 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       return;
     }
 
-    final currentUser = _currentUser;
-    final currentEmail = currentUser?.email ?? '';
-    final newEmail = _emailController.text.trim();
     final name = _nameController.text.trim();
-    final phone = _phoneController.text.trim();
-    final emailChanged = currentEmail.isNotEmpty && currentEmail != newEmail;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text(SettingsStrings.editProfileTitle),
-          content: Text(
-            emailChanged
-                ? SettingsStrings.emailVerificationRequired
-                : 'Save these profile changes?',
-          ),
+          content: const Text('Save these profile changes?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
@@ -373,22 +342,11 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     });
 
     try {
-      if (emailChanged) {
-        final verified = await Navigator.of(context).push<bool>(
-          MaterialPageRoute(
-            builder: (_) => EmailChangeVerificationScreen(newEmail: newEmail),
-          ),
-        );
-        if (verified != true || !mounted) {
-          return;
-        }
-      }
-
       final saved = await context.read<AuthCubit>().updateProfileInfo(
         name: name,
         birthDate: _selectedBirthDate,
         gender: _selectedGender,
-        phoneNumber: phone,
+        phoneNumber: '',
       );
 
       if (!mounted || !saved) return;
@@ -403,5 +361,23 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
         });
       }
     }
+  }
+
+  Future<void> _handleChangeEmail() async {
+    await Navigator.pushNamed(context, MyRoutes.emailChangeScreen);
+    if (mounted) {
+      setState(() {
+        final user = _currentUser;
+        _emailController.text = user?.email ?? '';
+      });
+    }
+  }
+
+  Future<void> _handleChangePassword() async {
+    await Navigator.pushNamed(context, MyRoutes.passwordChangeScreen);
+  }
+
+  Future<void> _handleDeleteAccount() async {
+    await Navigator.pushNamed(context, MyRoutes.deleteAccountScreen);
   }
 }

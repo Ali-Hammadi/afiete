@@ -2,36 +2,70 @@ import 'package:afiete/feature/settings/domin/entities/medical_profile_entity.da
 import 'package:equatable/equatable.dart';
 
 class MedicalPrescriptionModel extends Equatable {
+  final String prescriptionNumber;
   final String medicine;
   final String dosage;
   final String schedule;
   final String nextRefill;
+  final String documentType;
+  final String doctorName;
+  final String capturedAt;
+  final String imagePath;
 
   const MedicalPrescriptionModel({
+    this.prescriptionNumber = '',
     required this.medicine,
     required this.dosage,
     required this.schedule,
     required this.nextRefill,
+    this.documentType = '',
+    this.doctorName = '',
+    this.capturedAt = '',
+    this.imagePath = '',
   });
 
   factory MedicalPrescriptionModel.fromJson(Map<String, dynamic> json) {
     return MedicalPrescriptionModel(
+      prescriptionNumber:
+          json['prescriptionNumber'] ??
+          json['prescription_number'] ??
+          json['id'] ??
+          '',
       medicine: json['medicine'] ?? json['name'] ?? '',
       dosage: json['dosage'] ?? json['amount'] ?? '',
       schedule: json['schedule'] ?? json['timing'] ?? '',
       nextRefill: json['nextRefill'] ?? json['next_refill'] ?? '',
+      documentType: json['documentType'] ?? json['document_type'] ?? '',
+      doctorName: json['doctorName'] ?? json['doctor_name'] ?? '',
+      capturedAt: json['capturedAt'] ?? json['captured_at'] ?? '',
+      imagePath: json['imagePath'] ?? json['image_path'] ?? '',
     );
   }
 
   MedicalPrescriptionEntity toEntity() => MedicalPrescriptionEntity(
+    prescriptionNumber: prescriptionNumber,
     medicine: medicine,
     dosage: dosage,
     schedule: schedule,
     nextRefill: nextRefill,
+    documentType: documentType,
+    doctorName: doctorName,
+    capturedAt: capturedAt,
+    imagePath: imagePath,
   );
 
   @override
-  List<Object?> get props => [medicine, dosage, schedule, nextRefill];
+  List<Object?> get props => [
+    prescriptionNumber,
+    medicine,
+    dosage,
+    schedule,
+    nextRefill,
+    documentType,
+    doctorName,
+    capturedAt,
+    imagePath,
+  ];
 }
 
 class MedicalNoteModel extends Equatable {
