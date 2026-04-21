@@ -3,6 +3,10 @@ import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit
 import 'package:afiete/feature/assignments/presentation/screens/assignment_result_screen.dart';
 import 'package:afiete/feature/assignments/presentation/screens/assignment_test_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/auth_info_screen.dart';
+import 'package:afiete/feature/auth/presentation/views/delete_account_screen.dart';
+import 'package:afiete/feature/auth/presentation/views/email_change_screen.dart';
+import 'package:afiete/feature/auth/presentation/views/forgot_password_screen.dart';
+import 'package:afiete/feature/auth/presentation/views/password_change_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/verify_account_screen.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/appointments_screen.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/book_session_screen.dart';
@@ -31,6 +35,7 @@ import 'package:afiete/feature/auth/presentation/views/login_screen.dart';
 import 'package:afiete/feature/splash/presentation/views/welcome_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 
 class AppRouter {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
@@ -53,6 +58,24 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const VerifyAccountScreen());
       case MyRoutes.authInfoScreens:
         return MaterialPageRoute(builder: (_) => const AuthInfoScreen());
+      case MyRoutes.emailChangeScreen:
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: context.read<AuthCubit>(),
+            child: const EmailChangeScreen(),
+          ),
+        );
+      case MyRoutes.passwordChangeScreen:
+        return MaterialPageRoute(builder: (_) => const PasswordChangeScreen());
+      case MyRoutes.deleteAccountScreen:
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: context.read<AuthCubit>(),
+            child: const DeleteAccountScreen(),
+          ),
+        );
+      case MyRoutes.forgotPasswordScreen:
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
       case MyRoutes.doctorInfoScreen:
         final args = settings.arguments;
         return MaterialPageRoute(
@@ -243,6 +266,10 @@ class MyRoutes {
   static const String welcomeScreens = "/welcomeScreens";
   static const String verifyAccountScreen = "/verifyAccountScreen";
   static const String authInfoScreens = "/authInfoScreens";
+  static const String emailChangeScreen = "/emailChangeScreen";
+  static const String passwordChangeScreen = "/passwordChangeScreen";
+  static const String deleteAccountScreen = "/deleteAccountScreen";
+  static const String forgotPasswordScreen = "/forgotPasswordScreen";
   // Home Screens
   // Sessions Screens
   static const String mySessionsScreen = "/mySessionsScreen";
