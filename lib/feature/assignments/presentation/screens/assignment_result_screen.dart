@@ -73,7 +73,7 @@ class AssignmentResultScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
-                      MyRoutes.homeScreen,
+                      MyRoutes.doctorsHomeScreen,
                       (route) => false,
                     );
                   },
