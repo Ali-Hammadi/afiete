@@ -49,19 +49,24 @@ class UserModel extends Equatable {
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: json['id'] ?? '',
-    name: json['name'] ?? '',
-    email: json['email'] ?? '',
-    password: json['password'] ?? '',
-    token: json['token'] ?? '',
-    birthDate: json['birthDate'] != null
-        ? DateTime.tryParse(json['birthDate'].toString())
+    id: (json['id'] ?? json['user_id'] ?? '').toString(),
+    name:
+      (json['name'] ??
+          json['nickname'] ??
+          '${json['first_name'] ?? ''} ${json['last_name'] ?? ''}')
+        .toString()
+        .trim(),
+    email: (json['email'] ?? '').toString(),
+    password: (json['password'] ?? '').toString(),
+    token: (json['token'] ?? json['access'] ?? '').toString(),
+    birthDate: (json['birthDate'] ?? json['birth_date']) != null
+      ? DateTime.tryParse((json['birthDate'] ?? json['birth_date']).toString())
         : null,
     age: json['age'] is int
         ? json['age'] as int
         : int.tryParse('${json['age'] ?? ''}'),
     gender: json['gender']?.toString(),
-    phoneNumber: json['phoneNumber']?.toString(),
+    phoneNumber: (json['phoneNumber'] ?? json['phone'])?.toString(),
   );
 
   UserAuthEntity toEntity() => UserAuthEntity(

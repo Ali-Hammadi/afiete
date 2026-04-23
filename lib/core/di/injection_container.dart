@@ -78,6 +78,11 @@ import 'package:afiete/feature/report/domain/usecases/submit_report_usecase.dart
 import 'package:afiete/feature/report/domain/usecases/get_report_history_usecase.dart';
 import 'package:afiete/feature/report/domain/usecases/get_reports_by_type_usecase.dart';
 import 'package:afiete/feature/report/presentation/cubits/report_cubit.dart';
+import 'package:afiete/feature/articles/data/datasources/articles_mock_datasource.dart';
+import 'package:afiete/feature/articles/data/repositories/articles_repository_impl.dart';
+import 'package:afiete/feature/articles/domain/repositories/articles_repository.dart';
+import 'package:afiete/feature/articles/domain/usecases/articles_usecases.dart';
+import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:afiete/feature/auth/data/repositories/auth_repository_impl.dart';
@@ -89,6 +94,7 @@ import 'package:dio/dio.dart';
 
 final sl = GetIt.instance;
 const bool useMockDataSources = true;
+const bool useMockAuthDataSource = false;
 
 Future<void> init() async {
   // Core network
@@ -96,7 +102,7 @@ Future<void> init() async {
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => useMockDataSources
+    () => useMockAuthDataSource
         ? AuthMockDataSourceImpl()
         : AuthRemoteDataSourceImpl(dio: sl<Dio>()),
   );
@@ -433,6 +439,50 @@ Future<void> init() async {
       submitReportUseCase: sl<SubmitReportUseCase>(),
       getReportHistoryUseCase: sl<GetReportHistoryUseCase>(),
       getReportsByTypeUseCase: sl<GetReportsByTypeUseCase>(),
+    ),
+  );
+
+  // Articles data sources
+  sl.registerLazySingleton<ArticlesRemoteDataSource>(
+    () => ArticlesMockDataSourceImpl(),
+  );
+
+  // Articles repositories
+  sl.registerLazySingleton<ArticlesRepository>(
+    () => ArticlesRepositoryImpl(
+      remoteDataSource: sl<ArticlesRemoteDataSource>(),
+    ),
+  );
+
+  // Articles use cases
+  sl.registerLazySingleton<GetArticlesForHomeUseCase>(
+    () => GetArticlesForHomeUseCase(sl<ArticlesRepository>()),
+  );
+  sl.registerLazySingleton<GetArticlesByDoctorUseCase>(
+    () => GetArticlesByDoctorUseCase(sl<ArticlesRepository>()),
+  );
+  sl.registerLazySingleton<GetAllArticlesUseCase>(
+    () => GetAllArticlesUseCase(sl<ArticlesRepository>()),
+  );
+  sl.registerLazySingleton<GetArticleByIdUseCase>(
+    () => GetArticleByIdUseCase(sl<ArticlesRepository>()),
+  );
+  sl.registerLazySingleton<LikeArticleUseCase>(
+    () => LikeArticleUseCase(sl<ArticlesRepository>()),
+  );
+  sl.registerLazySingleton<DislikeArticleUseCase>(
+    () => DislikeArticleUseCase(sl<ArticlesRepository>()),
+  );
+
+  // Articles cubit
+  sl.registerFactory<ArticlesCubit>(
+    () => ArticlesCubit(
+      getArticlesForHomeUseCase: sl<GetArticlesForHomeUseCase>(),
+      getArticlesByDoctorUseCase: sl<GetArticlesByDoctorUseCase>(),
+      getAllArticlesUseCase: sl<GetAllArticlesUseCase>(),
+      getArticleByIdUseCase: sl<GetArticleByIdUseCase>(),
+      likeArticleUseCase: sl<LikeArticleUseCase>(),
+      dislikeArticleUseCase: sl<DislikeArticleUseCase>(),
     ),
   );
 }

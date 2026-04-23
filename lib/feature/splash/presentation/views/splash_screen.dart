@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:afiete/core/assets/icon_image_links.dart';
-import 'package:afiete/feature/splash/presentation/views/welcome_screens.dart';
+import 'package:afiete/core/network/token_storage.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,6 +16,17 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
+  Future<void> _navigateAfterSplash() async {
+    final token = await TokenStorage.getAccessToken();
+    if (!mounted) return;
+
+    final nextRoute = (token != null && token.isNotEmpty)
+        ? MyRoutes.homeScreen
+        : MyRoutes.login;
+
+    Navigator.pushReplacementNamed(context, nextRoute);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -28,24 +40,12 @@ class _SplashScreenState extends State<SplashScreen>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _controller.forward();
 
-    // After fade-in, wait then fade-out and transition smoothly
+    // After splash animation, continue based on saved auth state.
     Timer(const Duration(seconds: 2), () {
       if (mounted) {
         _controller.reverse().then((_) {
           if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const WelcomeScreens(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                transitionDuration: const Duration(milliseconds: 1500),
-                reverseTransitionDuration: const Duration(milliseconds: 1500),
-              ),
-            );
+            _navigateAfterSplash();
           }
         });
       }

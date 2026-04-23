@@ -1,0 +1,759 @@
+﻿openapi: 3.0.3
+info:
+  title: Afiete Project API
+  version: 1.0.0
+paths:
+  /api/doctors/profile/education/:
+    get:
+      operationId: doctors_profile_education_list
+      tags:
+      - doctors
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DoctorEducation'
+          description: ''
+    post:
+      operationId: doctors_profile_education_create
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorEducation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoctorEducation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoctorEducation'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorEducation'
+          description: ''
+  /api/doctors/profile/education/{id}/:
+    get:
+      operationId: doctors_profile_education_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorEducation'
+          description: ''
+    put:
+      operationId: doctors_profile_education_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorEducation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoctorEducation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoctorEducation'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorEducation'
+          description: ''
+    patch:
+      operationId: doctors_profile_education_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorEducation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorEducation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorEducation'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorEducation'
+          description: ''
+    delete:
+      operationId: doctors_profile_education_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/doctors/profile/update:
+    put:
+      operationId: doctors_profile_update_update
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorProfileSerialzer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoctorProfileSerialzer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoctorProfileSerialzer'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorProfileSerialzer'
+          description: ''
+    patch:
+      operationId: doctors_profile_update_partial_update
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorProfileSerialzer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorProfileSerialzer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorProfileSerialzer'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorProfileSerialzer'
+          description: ''
+  /api/doctors/register/:
+    post:
+      operationId: doctors_register_create
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoctorRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoctorRegister'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorRegister'
+          description: ''
+  /api/patients/profile/:
+    put:
+      operationId: patients_profile_update
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientProfile'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfile'
+          description: ''
+    patch:
+      operationId: patients_profile_partial_update
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientProfile'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfile'
+          description: ''
+  /api/patients/register/:
+    post:
+      operationId: patients_register_create
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientRegister'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRegister'
+          description: ''
+  /api/token/:
+    post:
+      operationId: token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/token/verify/:
+    post:
+      operationId: token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin'
+          description: ''
+  /api/users/otp/resend:
+    post:
+      operationId: users_otp_resend_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendOtp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResendOtp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResendOtp'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResendOtp'
+          description: ''
+  /api/users/otp/verify:
+    post:
+      operationId: users_otp_verify_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyOtp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyOtp'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyOtp'
+          description: ''
+components:
+  schemas:
+    BlankEnum:
+      enum:
+      - ''
+    DoctorEducation:
+      type: object
+      properties:
+        degree:
+          type: string
+          maxLength: 100
+        institution:
+          type: string
+          maxLength: 100
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        license_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        certificate:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - degree
+      - institution
+    DoctorProfileSerialzer:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserUpdateSerialzer'
+        job_title:
+          $ref: '#/components/schemas/job_titleSerialzer'
+        experience:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        specialization:
+          type: string
+          nullable: true
+          maxLength: 100
+    DoctorRegister:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserDoctor'
+      required:
+      - user
+    GenderEnum:
+      enum:
+      - male
+      - female
+      type: string
+      description: |-
+        * `male` - Male
+        * `female` - Female
+    NullEnum:
+      enum:
+      - null
+    PatchedDoctorEducation:
+      type: object
+      properties:
+        degree:
+          type: string
+          maxLength: 100
+        institution:
+          type: string
+          maxLength: 100
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        license_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        certificate:
+          type: string
+          format: uri
+          nullable: true
+    PatchedDoctorProfileSerialzer:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserUpdateSerialzer'
+        job_title:
+          $ref: '#/components/schemas/job_titleSerialzer'
+        experience:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        specialization:
+          type: string
+          nullable: true
+          maxLength: 100
+    PatchedPatientProfile:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserUpdate'
+        psychological_history:
+          type: string
+          nullable: true
+    PatientProfile:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserUpdate'
+        psychological_history:
+          type: string
+          nullable: true
+      required:
+      - user
+    PatientRegister:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - user
+    ResendOtp:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    TokenObtainPair:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - email
+      - password
+      - refresh
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
+    User:
+      type: object
+      properties:
+        nickname:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - email
+      - password
+    UserDoctor:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - email
+      - password
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email
+      - password
+    UserUpdate:
+      type: object
+      properties:
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+    UserUpdateSerialzer:
+      type: object
+      properties:
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+    VerifyOtp:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+      required:
+      - code
+      - email
+    job_titleSerialzer:
+      type: object
+      properties:
+        title:
+          type: string
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+

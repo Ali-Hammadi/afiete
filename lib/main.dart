@@ -4,11 +4,14 @@ import 'core/di/injection_container.dart';
 import 'core/routes/app_route.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
+import 'feature/articles/presentation/cubits/articles_cubit.dart';
 import 'feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'feature/auth/presentation/cubits/auth_cubit.dart';
 import 'feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
+import 'feature/chat/presentation/cubit/chat_cubit.dart';
 import 'feature/doctors/presentation/cubits/doctors_cubit.dart';
 import 'feature/payment/presentation/cubit/payment_cubit.dart';
+import 'feature/report/presentation/cubits/report_cubit.dart';
 import 'feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'feature/settings/presentation/cubits/settings_cubit.dart';
 
@@ -33,9 +36,12 @@ class MyApp extends StatelessWidget {
         BlocProvider<AssignmentsCubit>(create: (_) => sl<AssignmentsCubit>()),
         BlocProvider<AppointmentsCubit>(create: (_) => sl<AppointmentsCubit>()),
         BlocProvider<DoctorsCubit>(create: (_) => sl<DoctorsCubit>()),
+        BlocProvider<ChatCubit>(create: (_) => ChatCubit()),
         BlocProvider<PaymentCubit>(create: (_) => sl<PaymentCubit>()),
+        BlocProvider<ReportCubit>(create: (_) => sl<ReportCubit>()),
         BlocProvider<SessionsCubit>(create: (_) => sl<SessionsCubit>()),
         BlocProvider<SettingsCubit>(create: (_) => sl<SettingsCubit>()),
+        BlocProvider<ArticlesCubit>(create: (_) => sl<ArticlesCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
@@ -45,7 +51,7 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeMode,
-            initialRoute: MyRoutes.homeScreen,
+            initialRoute: MyRoutes.splashScreen,
             onGenerateRoute: AppRouter.generateRoute,
           );
         },

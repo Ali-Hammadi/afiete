@@ -33,6 +33,7 @@ import 'package:afiete/feature/splash/presentation/views/splash_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/signup_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/login_screen.dart';
 import 'package:afiete/feature/splash/presentation/views/welcome_screens.dart';
+import 'package:afiete/feature/articles/presentation/screens/articles_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
@@ -226,6 +227,16 @@ class AppRouter {
           ),
         );
 
+      case MyRoutes.articlesListScreen:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (_) => ArticlesListScreen(
+            doctorId: args?['doctorId'],
+            doctorName: args?['doctorName'],
+            userDiagnosis: args?['userDiagnosis'],
+          ),
+        );
+
       default:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
@@ -292,4 +303,6 @@ class MyRoutes {
   // Report Screens
   static const String reportScreen = "/reportScreen";
   static const String reportHistoryScreen = "/reportHistoryScreen";
+  // Articles Screens
+  static const String articlesListScreen = "/articlesListScreen";
 }

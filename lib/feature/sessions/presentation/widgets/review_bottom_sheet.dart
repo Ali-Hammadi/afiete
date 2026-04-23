@@ -123,7 +123,7 @@ class _StarRating extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Icon(
                 i <= rating ? Icons.star : Icons.star_outline,
-                color: i <= rating ? Colors.amber : colorScheme.outline,
+                color: i <= rating ? Colors.yellow : colorScheme.outline,
                 size: 40,
               ),
             ),
