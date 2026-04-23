@@ -43,7 +43,7 @@ class CustomDoctorCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star, color: Colors.amber),
+                          Icon(Icons.star, color: Colors.yellow),
                           Text(
                             doctor.ratingValue.toString(),
                             style: AppStyles.bodySmall,
