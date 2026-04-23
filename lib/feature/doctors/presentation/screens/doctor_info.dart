@@ -3,6 +3,8 @@ import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/core/widget/error_custom_button.dart';
+import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
+import 'package:afiete/feature/articles/presentation/widgets/article_card_widget.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:afiete/feature/home/presentation/widgets/custom_container.dart';
@@ -24,6 +26,15 @@ class _DoctorInfoState extends State<DoctorInfo> {
   bool _isFirstReviewExpanded = false;
   bool _isSecondReviewExpanded = false;
   bool _isThirdReviewExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final doctorId = widget.doctor?.id;
+    if (doctorId != null && doctorId.isNotEmpty) {
+      context.read<ArticlesCubit>().loadArticlesByDoctor(doctorId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +115,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                 ],
               ),
             ),
+            _buildDoctorArticlesSection(colorScheme: colorScheme),
             _buildReviewsSection(colorScheme: colorScheme),
             SizedBox(height: 20),
             CustomButton(
@@ -188,7 +200,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.star, color: Colors.amber),
+                    Icon(Icons.star, color: Colors.yellow),
                     Text(
                       (doctor?.ratingValue ?? 4.9).toStringAsFixed(1),
                       style: AppStyles.bodySmall,
@@ -306,6 +318,97 @@ class _DoctorInfoState extends State<DoctorInfo> {
             onToggle: () => setState(
               () => _isThirdReviewExpanded = !_isThirdReviewExpanded,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDoctorArticlesSection({required ColorScheme colorScheme}) {
+    return CustomContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Articles', style: AppStyles.headingSmall),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    MyRoutes.articlesListScreen,
+                    arguments: {
+                      'doctorId': widget.doctor?.id,
+                      'doctorName': widget.doctor?.name,
+                    },
+                  );
+                },
+                child: Text(
+                  'Read all',
+                  style: AppStyles.bodySmall.copyWith(
+                    color: colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider(),
+          BlocBuilder<ArticlesCubit, ArticlesState>(
+            builder: (context, state) {
+              if (state is ArticlesLoading) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (state is ArticlesLoaded) {
+                final articles = state.articles;
+                if (articles.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'No articles available for this doctor yet.',
+                      style: AppStyles.bodySmall.copyWith(
+                        color: colorScheme.outline,
+                      ),
+                    ),
+                  );
+                }
+
+                return Column(
+                  children: articles
+                      .map(
+                        (article) => ArticleCardWidget(
+                          article: article,
+                          onReadMore: () {},
+                          onLike: () {
+                            context.read<ArticlesCubit>().toggleLike(article);
+                          },
+                          onDislike: () {
+                            context.read<ArticlesCubit>().toggleDislike(article);
+                          },
+                        ),
+                      )
+                      .toList(),
+                );
+              }
+
+              if (state is ArticlesError) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    state.message,
+                    style: AppStyles.bodySmall.copyWith(
+                      color: colorScheme.error,
+                    ),
+                  ),
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
           ),
         ],
       ),
