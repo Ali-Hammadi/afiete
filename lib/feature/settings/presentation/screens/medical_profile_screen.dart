@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
@@ -10,7 +11,7 @@ import 'package:afiete/feature/settings/presentation/screens/note_details_screen
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -381,37 +382,74 @@ class _PrescriptionTile extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              SizedBox(
-                width: 160,
-                child: OutlinedButton.icon(
-                  onPressed: _hasImage ? () => _openImageViewer(context) : null,
-                  icon: const Icon(Icons.visibility_outlined),
-                  label: const Text(SettingsStrings.viewDocument),
-                ),
-              ),
-              SizedBox(
-                width: 190,
-                child: OutlinedButton.icon(
-                  onPressed: _hasImage
-                      ? () => _downloadDocument(context)
-                      : null,
-                  icon: const Icon(Icons.download_outlined),
-                  label: const Text(SettingsStrings.downloadDocument),
-                ),
-              ),
-              SizedBox(
-                width: 150,
-                child: FilledButton.icon(
-                  onPressed: () => _shareWithPharmacist(context),
-                  icon: const Icon(Icons.local_pharmacy_outlined),
-                  label: const Text(SettingsStrings.shareWithPharmacist),
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final buttonSize = ((constraints.maxWidth - 16) / 3)
+                  .clamp(44.0, 56.0)
+                  .toDouble();
+
+              ButtonStyle actionStyle() =>
+                  OutlinedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    side: const BorderSide(
+                      color: AppColors.mutedBlackActionColor,
+                    ),
+                    foregroundColor: AppColors.mutedBlackActionColor,
+                    padding: EdgeInsets.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ).copyWith(
+                    overlayColor: WidgetStateProperty.resolveWith<Color?>((
+                      states,
+                    ) {
+                      if (states.contains(WidgetState.pressed)) {
+                        return colorScheme.primary.withValues(alpha: 0.20);
+                      }
+                      if (states.contains(WidgetState.hovered)) {
+                        return colorScheme.primary.withValues(alpha: 0.10);
+                      }
+                      if (states.contains(WidgetState.focused)) {
+                        return colorScheme.primary.withValues(alpha: 0.14);
+                      }
+                      return null;
+                    }),
+                  );
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox.square(
+                    dimension: buttonSize,
+                    child: OutlinedButton(
+                      style: actionStyle(),
+                      onPressed: _hasImage
+                          ? () => _openImageViewer(context)
+                          : null,
+                      child: const Icon(Icons.visibility_outlined),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox.square(
+                    dimension: buttonSize,
+                    child: OutlinedButton(
+                      style: actionStyle(),
+                      onPressed: _hasImage
+                          ? () => _downloadDocument(context)
+                          : null,
+                      child: const Icon(Icons.download_outlined),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox.square(
+                    dimension: buttonSize,
+                    child: OutlinedButton(
+                      style: actionStyle(),
+                      onPressed: () => _shareWithPharmacist(context),
+                      child: const Icon(Icons.share_outlined),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -432,46 +470,62 @@ class _PrescriptionTile extends StatelessWidget {
   }
 
   void _openImageViewer(BuildContext context) {
-    showDialog<void>(
+    showGeneralDialog<void>(
       context: context,
-      builder: (dialogContext) {
-        return Dialog(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700, maxHeight: 560),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item.medicine,
-                          style: AppStyles.headingSmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: InteractiveViewer(
-                      minScale: 1,
-                      maxScale: 4,
+      barrierDismissible: true,
+      barrierLabel: 'Image Viewer',
+      barrierColor: Colors.black.withValues(alpha: 0.9),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: InteractiveViewer(
+                    minScale: 1,
+                    maxScale: 5,
+                    child: Center(
                       child: Image.asset(item.imagePath, fit: BoxFit.contain),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                  ),
+                ),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      item.medicine,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppStyles.bodyMedium.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
       },
     );
   }
@@ -513,7 +567,7 @@ class _PrescriptionTile extends StatelessWidget {
       final imageName =
           '${safeNumber.isEmpty ? 'prescription' : safeNumber}_${DateTime.now().millisecondsSinceEpoch}';
       final bytes = await _loadAssetImageBytes();
-      final result = await ImageGallerySaver.saveImage(
+      final result = await ImageGallerySaverPlus.saveImage(
         bytes,
         quality: 100,
         name: imageName,
@@ -543,13 +597,15 @@ class _PrescriptionTile extends StatelessWidget {
 
     try {
       final file = await _saveAssetImageToFile();
-      await Share.shareXFiles(
+      final result = await Share.shareXFiles(
         [XFile(file.path)],
         text:
             '${SettingsStrings.prescriptionNameLabel} ${item.medicine}\n${SettingsStrings.prescriptionNumberLabel} ${item.prescriptionNumber}',
       );
       if (!context.mounted) return;
-      _showMessage(context, SettingsStrings.sharedWithPharmacistSuccess);
+      if (result.status == ShareResultStatus.success) {
+        _showMessage(context, SettingsStrings.sharedWithPharmacistSuccess);
+      }
     } catch (_) {
       if (!context.mounted) return;
       _showMessage(context, SettingsStrings.imageOperationFailed);

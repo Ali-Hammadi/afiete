@@ -9,7 +9,8 @@ class MockDoctorsData {
       'rating': '4.8',
       'ratingValue': 4.8,
       'imageUrl': 'https://via.placeholder.com/150?text=Ahmed+Malik',
-      'description': 'Specialized in treating depression, anxiety disorders, and PTSD with evidence-based approaches.',
+      'description':
+          'Specialized in treating depression, anxiety disorders, and PTSD with evidence-based approaches.',
       'isOnline': true,
       'createdAt': '2023-01-15T00:00:00Z',
       'availableTimes': [
@@ -30,7 +31,8 @@ class MockDoctorsData {
       'rating': '4.9',
       'ratingValue': 4.9,
       'imageUrl': 'https://via.placeholder.com/150?text=Fatima+Zahra',
-      'description': 'Expert in cognitive behavioral therapy and anxiety management. Compassionate and patient-centered approach.',
+      'description':
+          'Expert in cognitive behavioral therapy and anxiety management. Compassionate and patient-centered approach.',
       'isOnline': true,
       'createdAt': '2023-02-20T00:00:00Z',
       'availableTimes': [
@@ -51,7 +53,8 @@ class MockDoctorsData {
       'rating': '4.7',
       'ratingValue': 4.7,
       'imageUrl': 'https://via.placeholder.com/150?text=Mohammed+Hassan',
-      'description': 'Specializes in marriage and family therapy, relationship counseling. Expert in conflict resolution.',
+      'description':
+          'Specializes in marriage and family therapy, relationship counseling. Expert in conflict resolution.',
       'isOnline': false,
       'createdAt': '2023-03-10T00:00:00Z',
       'availableTimes': [
@@ -71,7 +74,8 @@ class MockDoctorsData {
       'rating': '4.6',
       'ratingValue': 4.6,
       'imageUrl': 'https://via.placeholder.com/150?text=Leila+Mansour',
-      'description': 'CBT specialist for anxiety, panic attacks, and OCD. Structured and goal-oriented therapy approach.',
+      'description':
+          'CBT specialist for anxiety, panic attacks, and OCD. Structured and goal-oriented therapy approach.',
       'isOnline': true,
       'createdAt': '2023-04-05T00:00:00Z',
       'availableTimes': [
@@ -91,7 +95,8 @@ class MockDoctorsData {
       'rating': '4.5',
       'ratingValue': 4.5,
       'imageUrl': 'https://via.placeholder.com/150?text=Sarah+Ali',
-      'description': 'Professional counselor for stress management, life coaching, and personal growth.',
+      'description':
+          'Professional counselor for stress management, life coaching, and personal growth.',
       'isOnline': true,
       'createdAt': '2023-05-12T00:00:00Z',
       'availableTimes': [
@@ -111,7 +116,8 @@ class MockDoctorsData {
       'rating': '4.8',
       'ratingValue': 4.8,
       'imageUrl': 'https://via.placeholder.com/150?text=Omar+Taha',
-      'description': 'Trauma specialist with expertise in EMDR and trauma processing. Certified and experienced.',
+      'description':
+          'Trauma specialist with expertise in EMDR and trauma processing. Certified and experienced.',
       'isOnline': false,
       'createdAt': '2023-06-08T00:00:00Z',
       'availableTimes': [
@@ -131,7 +137,8 @@ class MockDoctorsData {
       'rating': '4.7',
       'ratingValue': 4.7,
       'imageUrl': 'https://via.placeholder.com/150?text=Noor+Khalil',
-      'description': 'Marriage and family therapist helping couples and families improve relationships and communication.',
+      'description':
+          'Marriage and family therapist helping couples and families improve relationships and communication.',
       'isOnline': true,
       'createdAt': '2023-07-20T00:00:00Z',
       'availableTimes': [
@@ -151,7 +158,8 @@ class MockDoctorsData {
       'rating': '4.9',
       'ratingValue': 4.9,
       'imageUrl': 'https://via.placeholder.com/150?text=Karim+Hassan',
-      'description': 'Board-certified psychiatrist specializing in medication management and complex mental health cases.',
+      'description':
+          'Board-certified psychiatrist specializing in medication management and complex mental health cases.',
       'isOnline': true,
       'createdAt': '2023-08-15T00:00:00Z',
       'availableTimes': [
@@ -171,7 +179,8 @@ class MockDoctorsData {
       'rating': '4.6',
       'ratingValue': 4.6,
       'imageUrl': 'https://via.placeholder.com/150?text=Hana+Mohammad',
-      'description': 'Child psychologist specializing in developmental issues, behavioral problems, and educational support.',
+      'description':
+          'Child psychologist specializing in developmental issues, behavioral problems, and educational support.',
       'isOnline': true,
       'createdAt': '2023-09-10T00:00:00Z',
       'availableTimes': [
@@ -191,7 +200,8 @@ class MockDoctorsData {
       'rating': '4.8',
       'ratingValue': 4.8,
       'imageUrl': 'https://via.placeholder.com/150?text=Layla+Rahman',
-      'description': 'Experienced psychoanalyst offering deep insight-oriented therapy for long-term psychological growth.',
+      'description':
+          'Experienced psychoanalyst offering deep insight-oriented therapy for long-term psychological growth.',
       'isOnline': false,
       'createdAt': '2023-10-05T00:00:00Z',
       'availableTimes': [
@@ -203,11 +213,55 @@ class MockDoctorsData {
       'availableSessionTypes': ['video_call'],
       'consultationFee': {'text_chat': 50, 'voice_call': 60, 'video_call': 80},
     },
+    {
+      'id': 'doc_011',
+      'name': 'Dr. Yara Nabil',
+      'specialization': 'clinicalPsychologist',
+      'experience': '9 years',
+      'rating': '4.7',
+      'ratingValue': 4.7,
+      'imageUrl': 'https://via.placeholder.com/150?text=Yara+Nabil',
+      'description':
+          'Focuses on burnout recovery and emotional regulation plans.',
+      'isOnline': true,
+      'createdAt': '2023-11-01T00:00:00Z',
+      'availableTimes': [
+        '2024-04-21T12:00:00Z',
+        '2024-04-22T16:00:00Z',
+        '2024-04-23T09:00:00Z',
+      ],
+      'availableDurations': [45, 60],
+      'availableSessionTypes': ['video_call', 'text_chat'],
+      'consultationFee': {'text_chat': 33, 'voice_call': 43, 'video_call': 56},
+    },
+    {
+      'id': 'doc_012',
+      'name': 'Dr. Tamer Adel',
+      'specialization': 'cbtTherapist',
+      'experience': '11 years',
+      'rating': '4.8',
+      'ratingValue': 4.8,
+      'imageUrl': 'https://via.placeholder.com/150?text=Tamer+Adel',
+      'description':
+          'Structured CBT programs for panic, avoidance, and intrusive thoughts.',
+      'isOnline': true,
+      'createdAt': '2023-12-03T00:00:00Z',
+      'availableTimes': [
+        '2024-04-21T08:00:00Z',
+        '2024-04-22T12:00:00Z',
+        '2024-04-23T15:00:00Z',
+      ],
+      'availableDurations': [30, 60],
+      'availableSessionTypes': ['video_call', 'voice_call', 'text_chat'],
+      'consultationFee': {'text_chat': 36, 'voice_call': 46, 'video_call': 58},
+    },
   ];
 
   static List<Map<String, dynamic>> getMockDoctors() => mockDoctors;
 
-  static List<Map<String, dynamic>> getMockDoctorsBySpecialty(String specialty) {
+  static List<Map<String, dynamic>> getMockDoctorsBySpecialty(
+    String specialty,
+  ) {
     return mockDoctors
         .where((doc) => doc['specialization'] == specialty)
         .toList();
@@ -219,7 +273,9 @@ class MockDoctorsData {
 
   static List<Map<String, dynamic>> getTopRatedDoctors(int limit) {
     final sorted = List<Map<String, dynamic>>.from(mockDoctors);
-    sorted.sort((a, b) => (b['ratingValue'] as num).compareTo(a['ratingValue'] as num));
+    sorted.sort(
+      (a, b) => (b['ratingValue'] as num).compareTo(a['ratingValue'] as num),
+    );
     return sorted.take(limit).toList();
   }
 
@@ -234,9 +290,13 @@ class MockDoctorsData {
   static List<Map<String, dynamic>> searchDoctors(String query) {
     final lowerQuery = query.toLowerCase();
     return mockDoctors
-        .where((doc) =>
-            doc['name'].toString().toLowerCase().contains(lowerQuery) ||
-            doc['specialization'].toString().toLowerCase().contains(lowerQuery))
+        .where(
+          (doc) =>
+              doc['name'].toString().toLowerCase().contains(lowerQuery) ||
+              doc['specialization'].toString().toLowerCase().contains(
+                lowerQuery,
+              ),
+        )
         .toList();
   }
 }

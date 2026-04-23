@@ -16,5 +16,7 @@ abstract class ArticlesRepository {
   });
   Future<Either<Failure, ArticleEntity>> getArticleById(String articleId);
   Future<Either<Failure, void>> likeArticle(String articleId);
+  Future<Either<Failure, void>> unlikeArticle(String articleId);
   Future<Either<Failure, void>> dislikeArticle(String articleId);
+  Future<Either<Failure, void>> undislikeArticle(String articleId);
 }

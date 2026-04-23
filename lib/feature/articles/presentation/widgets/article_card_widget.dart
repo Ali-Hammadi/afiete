@@ -1,3 +1,4 @@
+import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/articles/domain/entities/article_entities.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ class ArticleCardWidget extends StatefulWidget {
   final VoidCallback onReadMore;
   final VoidCallback onLike;
   final VoidCallback onDislike;
+  final VoidCallback? onDoctorTap;
   final bool isExpanded;
 
   const ArticleCardWidget({
@@ -16,6 +18,7 @@ class ArticleCardWidget extends StatefulWidget {
     required this.onReadMore,
     required this.onLike,
     required this.onDislike,
+    this.onDoctorTap,
     this.isExpanded = false,
   });
 
@@ -35,16 +38,18 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final formattedDate = DateFormat('d MMM yyyy', 'en_US').format(
-      widget.article.createdAt,
-    );
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final formattedDate = DateFormat(
+      'd MMM yyyy',
+      'en_US',
+    ).format(widget.article.createdAt);
     final doctorImage = widget.article.doctor.imageUrl;
     final isNetworkImage = doctorImage.startsWith('http');
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+      margin: const EdgeInsets.only(bottom: AppStyles.padding),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppStyles.borderRadius * 1.5),
+        borderRadius: BorderRadius.circular(AppStyles.borderRadius),
       ),
       elevation: 2,
       child: Padding(
@@ -56,35 +61,39 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
             Row(
               children: [
                 // Doctor Image
-                ClipRRect(
+                InkWell(
                   borderRadius: BorderRadius.circular(50),
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    color: colorScheme.primary.withValues(alpha: 0.2),
-                    child: doctorImage.isNotEmpty
-                        ? (isNetworkImage
-                              ? Image.network(
-                                  doctorImage,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.person,
-                                      color: colorScheme.primary,
-                                    );
-                                  },
-                                )
-                              : Image.asset(
-                                  doctorImage,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.person,
-                                      color: colorScheme.primary,
-                                    );
-                                  },
-                                ))
-                        : Icon(Icons.person, color: colorScheme.primary),
+                  onTap: widget.onDoctorTap,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      color: colorScheme.primary.withValues(alpha: 0.2),
+                      child: doctorImage.isNotEmpty
+                          ? (isNetworkImage
+                                ? Image.network(
+                                    doctorImage,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(
+                                        Icons.person,
+                                        color: colorScheme.primary,
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                                    doctorImage,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(
+                                        Icons.person,
+                                        color: colorScheme.primary,
+                                      );
+                                    },
+                                  ))
+                          : Icon(Icons.person, color: colorScheme.primary),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -93,29 +102,43 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.article.doctor.name,
-                        style: AppStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
+                      InkWell(
+                        onTap: widget.onDoctorTap,
+                        child: Text(
+                          widget.article.doctor.name,
+                          style: AppStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      Text(
-                        widget.article.doctor.specialization,
-                        style: AppStyles.bodySmall.copyWith(
-                          color: colorScheme.outline,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.article.doctor.specialization,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppStyles.bodySmall.copyWith(
+                                color: isDark
+                                    ? AppColors.darkSecondaryTextColor
+                                    : AppColors.primarytextColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            formattedDate,
+                            style: AppStyles.bodySmall.copyWith(
+                              color: AppColors.secondarytextColor,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-
-            // Date
-            Text(
-              formattedDate,
-              style: AppStyles.bodySmall.copyWith(color: colorScheme.outline),
             ),
             const SizedBox(height: 8),
 
@@ -193,28 +216,37 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
     required VoidCallback onTap,
     required ColorScheme colorScheme,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final inactiveColor = isDark
+        ? AppColors.darkPrimaryTextColor
+        : AppColors.primarytextColor.withValues(alpha: 0.86);
+
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 20,
-                color: isActive ? colorScheme.primary : colorScheme.outline,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppStyles.bodySmall.copyWith(
-                  color: isActive ? colorScheme.primary : colorScheme.outline,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 20,
+                  color: isActive ? colorScheme.primary : inactiveColor,
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: AppStyles.bodySmall.copyWith(
+                    color: isActive ? colorScheme.primary : inactiveColor,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

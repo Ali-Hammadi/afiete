@@ -1,31 +1,20 @@
+import 'package:afiete/feature/articles/data/datasources/articles_remote_datasource.dart';
 import 'package:afiete/feature/articles/data/models/article_model.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 
-abstract class ArticlesRemoteDataSource {
-  Future<List<ArticleModel>> getArticlesForHome({
-    String? userDiagnosis,
-    int limit = 5,
-  });
-  Future<List<ArticleModel>> getArticlesByDoctor(String doctorId);
-  Future<List<ArticleModel>> getAllArticles({int page = 1, int pageSize = 10});
-  Future<ArticleModel> getArticleById(String articleId);
-  Future<void> likeArticle(String articleId);
-  Future<void> dislikeArticle(String articleId);
-}
-
 class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   final DoctorEntity _doctorAhmed = DoctorEntity(
     id: 'doc_001',
-    name: 'Dr. Ahmed Mohsen',
-    specialization: 'Psychiatrist',
-    experience: '8+ years',
-    rating: '4.9',
+    name: 'Dr. Ahmed Malik',
+    specialization: 'psychiatrist',
+    experience: '12 years',
+    rating: '4.8',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Ahmed',
     description: 'Specialized in depression and anxiety management.',
     isOnline: true,
-    ratingValue: 4.9,
-    createdAt: DateTime(2022, 1, 1),
+    ratingValue: 4.8,
+    createdAt: DateTime(2023, 1, 15),
     availableTimes: const [],
     consultationFee: const ConsultationFee(
       textChat: 10,
@@ -36,15 +25,15 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
 
   final DoctorEntity _doctorFatima = DoctorEntity(
     id: 'doc_002',
-    name: 'Dr. Fatima Ali',
-    specialization: 'Clinical Psychologist',
-    experience: '6+ years',
-    rating: '4.8',
+    name: 'Dr. Fatima Zahra',
+    specialization: 'clinicalPsychologist',
+    experience: '10 years',
+    rating: '4.9',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Fatima',
     description: 'Focused on insomnia and stress-related cases.',
     isOnline: true,
-    ratingValue: 4.8,
-    createdAt: DateTime(2023, 1, 1),
+    ratingValue: 4.9,
+    createdAt: DateTime(2023, 2, 20),
     availableTimes: const [],
     consultationFee: const ConsultationFee(
       textChat: 10,
@@ -55,15 +44,15 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
 
   final DoctorEntity _doctorMohammad = DoctorEntity(
     id: 'doc_003',
-    name: 'Dr. Mohammad Khaled',
-    specialization: 'Child Psychologist',
-    experience: '7+ years',
+    name: 'Dr. Mohammed Hassan',
+    specialization: 'psychotherapist',
+    experience: '15 years',
     rating: '4.7',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Mohammad',
-    description: 'Child and adolescent mental health specialist.',
+    description: 'Marriage and family therapy specialist.',
     isOnline: false,
     ratingValue: 4.7,
-    createdAt: DateTime(2021, 1, 1),
+    createdAt: DateTime(2023, 3, 10),
     availableTimes: const [],
     consultationFee: const ConsultationFee(
       textChat: 10,
@@ -74,15 +63,91 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
 
   final DoctorEntity _doctorSarah = DoctorEntity(
     id: 'doc_004',
-    name: 'Dr. Sarah Hassan',
-    specialization: 'Psychotherapist',
-    experience: '9+ years',
-    rating: '4.9',
+    name: 'Dr. Leila Mansour',
+    specialization: 'cbtTherapist',
+    experience: '9 years',
+    rating: '4.6',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Sarah',
-    description: 'Relationship and self-esteem therapist.',
+    description: 'CBT specialist for anxiety and OCD.',
+    isOnline: true,
+    ratingValue: 4.6,
+    createdAt: DateTime(2023, 4, 5),
+    availableTimes: const [],
+    consultationFee: const ConsultationFee(
+      textChat: 10,
+      videoCall: 20,
+      voiceCall: 15,
+    ),
+  );
+
+  final DoctorEntity _doctorSaraAli = DoctorEntity(
+    id: 'doc_005',
+    name: 'Dr. Sarah Ali',
+    specialization: 'counselor',
+    experience: '7 years',
+    rating: '4.5',
+    imageUrl: 'https://via.placeholder.com/150?text=Dr+Sarah+Ali',
+    description: 'Professional counselor for stress and personal growth.',
+    isOnline: true,
+    ratingValue: 4.5,
+    createdAt: DateTime(2023, 5, 12),
+    availableTimes: const [],
+    consultationFee: const ConsultationFee(
+      textChat: 10,
+      videoCall: 20,
+      voiceCall: 15,
+    ),
+  );
+
+  final DoctorEntity _doctorOmar = DoctorEntity(
+    id: 'doc_006',
+    name: 'Dr. Omar Taha',
+    specialization: 'traumaTherapist',
+    experience: '13 years',
+    rating: '4.8',
+    imageUrl: 'https://via.placeholder.com/150?text=Dr+Omar',
+    description: 'Trauma specialist with EMDR approach.',
+    isOnline: false,
+    ratingValue: 4.8,
+    createdAt: DateTime(2023, 6, 8),
+    availableTimes: const [],
+    consultationFee: const ConsultationFee(
+      textChat: 10,
+      videoCall: 20,
+      voiceCall: 15,
+    ),
+  );
+
+  final DoctorEntity _doctorNoor = DoctorEntity(
+    id: 'doc_007',
+    name: 'Dr. Noor Khalil',
+    specialization: 'marriageFamilyTherapist',
+    experience: '11 years',
+    rating: '4.7',
+    imageUrl: 'https://via.placeholder.com/150?text=Dr+Noor',
+    description: 'Family and couples communication specialist.',
+    isOnline: true,
+    ratingValue: 4.7,
+    createdAt: DateTime(2023, 7, 20),
+    availableTimes: const [],
+    consultationFee: const ConsultationFee(
+      textChat: 10,
+      videoCall: 20,
+      voiceCall: 15,
+    ),
+  );
+
+  final DoctorEntity _doctorKarim = DoctorEntity(
+    id: 'doc_008',
+    name: 'Dr. Karim Hassan',
+    specialization: 'psychiatrist',
+    experience: '14 years',
+    rating: '4.9',
+    imageUrl: 'https://via.placeholder.com/150?text=Dr+Karim',
+    description: 'Complex mental health and medication management.',
     isOnline: true,
     ratingValue: 4.9,
-    createdAt: DateTime(2020, 1, 1),
+    createdAt: DateTime(2023, 8, 15),
     availableTimes: const [],
     consultationFee: const ConsultationFee(
       textChat: 10,
@@ -226,6 +291,90 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
         'mild',
       ],
     ),
+    ArticleModel(
+      id: 'art_007',
+      title: 'Grounding Techniques for Panic Moments',
+      content:
+          'Grounding skills are useful when panic symptoms peak. Sensory focus and paced breathing can reduce overwhelm.\n\nPractice 5-4-3-2-1 sensory grounding and slow exhale breathing for 3-5 minutes.',
+      summary: 'Fast grounding methods for panic and overwhelm.',
+      doctor: _doctorSaraAli,
+      createdAt: DateTime.now().subtract(const Duration(days: 4)),
+      likesCount: 61,
+      dislikesCount: 1,
+      isLikedByUser: false,
+      isDislikedByUser: false,
+      relatedConditions: ['panic', 'anxiety', 'stress', 'counselor'],
+    ),
+    ArticleModel(
+      id: 'art_008',
+      title: 'Trauma Recovery: Building Daily Safety',
+      content:
+          'Recovery starts with safety routines, body regulation, and trusted support. Avoiding total isolation speeds recovery.\n\nSmall daily structure helps reduce flashback frequency and emotional exhaustion.',
+      summary: 'Practical routines that support trauma recovery.',
+      doctor: _doctorOmar,
+      createdAt: DateTime.now().subtract(const Duration(days: 6)),
+      likesCount: 74,
+      dislikesCount: 2,
+      isLikedByUser: false,
+      isDislikedByUser: false,
+      relatedConditions: ['trauma', 'ptsd', 'stress', 'traumaTherapist'],
+    ),
+    ArticleModel(
+      id: 'art_009',
+      title: 'Couple Communication Without Escalation',
+      content:
+          'Healthy communication depends on pacing, listening, and non-accusatory language. Use short pauses to prevent escalation.\n\nReplace blame language with needs language and reflective listening.',
+      summary: 'How couples can discuss conflict with less escalation.',
+      doctor: _doctorNoor,
+      createdAt: DateTime.now().subtract(const Duration(days: 9)),
+      likesCount: 66,
+      dislikesCount: 1,
+      isLikedByUser: false,
+      isDislikedByUser: false,
+      relatedConditions: ['relationships', 'family stress', 'counselor'],
+    ),
+    ArticleModel(
+      id: 'art_010',
+      title: 'When Medication Follow-up Matters Most',
+      content:
+          'Medication plans require regular follow-up to optimize outcomes and reduce side effects.\n\nTrack sleep, mood, and daily function to help your psychiatrist adjust treatment safely.',
+      summary: 'Why follow-up visits are key in psychiatric medication plans.',
+      doctor: _doctorKarim,
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      likesCount: 83,
+      dislikesCount: 3,
+      isLikedByUser: false,
+      isDislikedByUser: false,
+      relatedConditions: ['psychiatrist', 'depression', 'anxiety', 'severe'],
+    ),
+    ArticleModel(
+      id: 'art_011',
+      title: 'Managing Overthinking at Night',
+      content:
+          'Night overthinking is often linked to cognitive overload and unprocessed stress.\n\nUse thought journaling and a short shutdown routine before bed to calm mental loops.',
+      summary: 'Tools to reduce nighttime overthinking and mental loops.',
+      doctor: _doctorFatima,
+      createdAt: DateTime.now().subtract(const Duration(days: 11)),
+      likesCount: 71,
+      dislikesCount: 2,
+      isLikedByUser: false,
+      isDislikedByUser: false,
+      relatedConditions: ['stress', 'insomnia', 'anxiety', 'mild'],
+    ),
+    ArticleModel(
+      id: 'art_012',
+      title: 'Structured CBT Notes for Daily Triggers',
+      content:
+          'CBT thought logs help identify trigger-thought-emotion patterns and guide reframing.\n\nA daily 5-minute note can improve emotional regulation within weeks.',
+      summary: 'Use CBT thought logs to manage daily emotional triggers.',
+      doctor: _doctorSarah,
+      createdAt: DateTime.now().subtract(const Duration(days: 12)),
+      likesCount: 69,
+      dislikesCount: 1,
+      isLikedByUser: false,
+      isDislikedByUser: false,
+      relatedConditions: ['cbtTherapist', 'anxiety', 'depression', 'moderate'],
+    ),
   ];
 
   @override
@@ -340,6 +489,16 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
 
   @override
   Future<void> dislikeArticle(String articleId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+  }
+
+  @override
+  Future<void> unlikeArticle(String articleId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+  }
+
+  @override
+  Future<void> undislikeArticle(String articleId) async {
     await Future.delayed(const Duration(milliseconds: 300));
   }
 }

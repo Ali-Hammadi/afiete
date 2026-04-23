@@ -7,6 +7,18 @@ abstract class SettingsStrings {
   static const String supportTitle = 'Support';
   static const String supportSubtitle = '24/7 Support';
   static const String supportComingSoon = 'Support center is coming soon.';
+  static const String supportCenterTitle = 'Support Center';
+  static const String supportCenterSubtitle =
+      'Choose the fastest way to get help based on your situation.';
+  static const String supportQuickCall = 'Quick Call';
+  static const String supportQuickCallHint =
+      'Talk to support immediately for urgent technical or account issues.';
+  static const String supportLiveChat = 'Live Chat';
+  static const String supportLiveChatHint =
+      'Best for non-urgent questions and follow-up support.';
+  static const String supportEmergencyTitle = 'Critical Situation';
+  static const String supportEmergencyHint =
+      'If you or someone else is in immediate danger, call local emergency services now.';
   static const String themeTitle = 'Theme';
   static const String termsPrivacyTitle = 'Terms & Privacy';
   static const String contactUsTitle = 'Contact us';
@@ -17,6 +29,7 @@ abstract class SettingsStrings {
   static const String select = 'Select';
   static const String english = 'English';
   static const String arabic = 'Arabic';
+  static const String arabicNative = 'العربية';
 
   static const String medicalTabPrescriptions = 'Prescriptions';
   static const String medicalTabMedicine = 'Medicine';
@@ -65,7 +78,7 @@ abstract class SettingsStrings {
 
   static const String profileTitle = 'Profile';
   static const String editProfileTitle = 'Edit Profile';
-  static const String fullNameTitle = 'Full Name';
+  static const String fullNameTitle = 'NickName';
   static const String emailTitleProfile = 'Email Address';
   static const String phoneTitleProfile = 'Phone Number';
   static const String birthDateTitle = 'Birth Date';

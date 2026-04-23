@@ -22,6 +22,8 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lightNavColor = colorScheme.onSurface.withValues(alpha: 0.72);
 
     return Scaffold(
       appBar: _appBarForIndex(selectedItemIndex),
@@ -31,7 +33,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         currentIndex: selectedItemIndex,
         elevation: 0,
         selectedItemColor: colorScheme.primary,
-        unselectedItemColor: colorScheme.outline,
+        unselectedItemColor: isDark ? colorScheme.outline : lightNavColor,
         onTap: (value) {
           setState(() {
             selectedItemIndex = value;

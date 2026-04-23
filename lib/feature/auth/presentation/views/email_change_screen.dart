@@ -80,7 +80,10 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
                   decoration: InputDecoration(
                     labelText: SettingsStrings.emailAddressLabel,
                     hintText: 'new@example.com',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    prefixIcon: Icon(
+                      Icons.email_outlined,
+                      color: colorScheme.primary,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

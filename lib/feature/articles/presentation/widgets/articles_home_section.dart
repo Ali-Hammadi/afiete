@@ -20,57 +20,51 @@ class ArticlesHomeSection extends StatelessWidget {
             child: const Center(child: CircularProgressIndicator()),
           );
         } else if (state is ArticlesLoaded && state.articles.isNotEmpty) {
+          final previewArticles = state.articles.take(3).toList();
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Best articles for you',
-                      style: AppStyles.headingMedium,
-                    ),
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Best articles for you', style: AppStyles.headingMedium),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Column(
+                children: previewArticles.map((article) {
+                  return ArticleCardWidget(
+                    article: article,
+                    onReadMore: () {},
+                    onLike: () {
+                      context.read<ArticlesCubit>().toggleLike(article);
+                    },
+                    onDislike: () {
+                      context.read<ArticlesCubit>().toggleDislike(article);
+                    },
+                    onDoctorTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutes.doctorInfoScreen,
+                        arguments: article.doctor,
+                      );
+                    },
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 12),
               SizedBox(
-                height: 500,
-                child: ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                  itemCount: state.articles.length,
-                  itemBuilder: (context, index) {
-                    final article = state.articles[index];
-                    return ArticleCardWidget(
-                      article: article,
-                      onReadMore: () {},
-                      onLike: () {
-                        context.read<ArticlesCubit>().toggleLike(article);
-                      },
-                      onDislike: () {
-                        context.read<ArticlesCubit>().toggleDislike(article);
-                      },
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutes.articlesListScreen,
+                      arguments: {'userDiagnosis': userDiagnosis},
                     );
                   },
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        MyRoutes.articlesListScreen,
-                        arguments: {'userDiagnosis': userDiagnosis},
-                      );
-                    },
-                    child: const Text('See All'),
-                  ),
+                  child: const Text('See All'),
                 ),
               ),
               const SizedBox(height: 20),

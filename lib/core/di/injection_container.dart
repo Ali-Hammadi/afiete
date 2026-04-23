@@ -78,6 +78,7 @@ import 'package:afiete/feature/report/domain/usecases/submit_report_usecase.dart
 import 'package:afiete/feature/report/domain/usecases/get_report_history_usecase.dart';
 import 'package:afiete/feature/report/domain/usecases/get_reports_by_type_usecase.dart';
 import 'package:afiete/feature/report/presentation/cubits/report_cubit.dart';
+import 'package:afiete/feature/articles/data/datasources/articles_remote_datasource.dart';
 import 'package:afiete/feature/articles/data/datasources/articles_mock_datasource.dart';
 import 'package:afiete/feature/articles/data/repositories/articles_repository_impl.dart';
 import 'package:afiete/feature/articles/domain/repositories/articles_repository.dart';
@@ -444,7 +445,9 @@ Future<void> init() async {
 
   // Articles data sources
   sl.registerLazySingleton<ArticlesRemoteDataSource>(
-    () => ArticlesMockDataSourceImpl(),
+    () => useMockDataSources
+        ? ArticlesMockDataSourceImpl()
+        : ArticlesRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
   // Articles repositories
@@ -470,8 +473,14 @@ Future<void> init() async {
   sl.registerLazySingleton<LikeArticleUseCase>(
     () => LikeArticleUseCase(sl<ArticlesRepository>()),
   );
+  sl.registerLazySingleton<UnlikeArticleUseCase>(
+    () => UnlikeArticleUseCase(sl<ArticlesRepository>()),
+  );
   sl.registerLazySingleton<DislikeArticleUseCase>(
     () => DislikeArticleUseCase(sl<ArticlesRepository>()),
+  );
+  sl.registerLazySingleton<UndislikeArticleUseCase>(
+    () => UndislikeArticleUseCase(sl<ArticlesRepository>()),
   );
 
   // Articles cubit
@@ -482,7 +491,9 @@ Future<void> init() async {
       getAllArticlesUseCase: sl<GetAllArticlesUseCase>(),
       getArticleByIdUseCase: sl<GetArticleByIdUseCase>(),
       likeArticleUseCase: sl<LikeArticleUseCase>(),
+      unlikeArticleUseCase: sl<UnlikeArticleUseCase>(),
       dislikeArticleUseCase: sl<DislikeArticleUseCase>(),
+      undislikeArticleUseCase: sl<UndislikeArticleUseCase>(),
     ),
   );
 }

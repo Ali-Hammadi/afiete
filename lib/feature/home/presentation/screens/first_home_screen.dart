@@ -32,44 +32,45 @@ class FirstHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppStyles.padding),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "How are you felling today ?",
-                style: AppStyles.headingSmall,
-                textAlign: TextAlign.left,
-              ),
-
-              CustomEmotionsWidget(),
-              CustomAssignmentWidget(),
-              CustomMusicWidget(),
-              Text("Top Doctors", style: AppStyles.headingMedium),
-              CustomTopDoctorsWidget(),
-              const SizedBox(height: 20),
-              BlocBuilder<AssignmentsCubit, AssignmentsState>(
-                builder: (context, assignmentsState) {
-                  return BlocBuilder<ArticlesCubit, ArticlesState>(
-                    builder: (context, articlesState) {
-                      if (articlesState is ArticlesInitial) {
-                        context.read<ArticlesCubit>().loadArticlesForHome(
-                          userDiagnosis: _resolveClosestDiagnosis(assignmentsState),
-                        );
-                      }
-                      return ArticlesHomeSection(
-                        userDiagnosis: _resolveClosestDiagnosis(assignmentsState),
-                      );
-                    },
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(
+        AppStyles.padding,
+        AppStyles.padding,
+        AppStyles.padding,
+        24,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "How are you felling today ?",
+            style: AppStyles.headingSmall,
+            textAlign: TextAlign.left,
+          ),
+          CustomEmotionsWidget(),
+          CustomAssignmentWidget(),
+          CustomMusicWidget(),
+          Text("Top Doctors", style: AppStyles.headingMedium),
+          CustomTopDoctorsWidget(),
+          const SizedBox(height: 20),
+          BlocBuilder<AssignmentsCubit, AssignmentsState>(
+            builder: (context, assignmentsState) {
+              return BlocBuilder<ArticlesCubit, ArticlesState>(
+                builder: (context, articlesState) {
+                  if (articlesState is ArticlesInitial) {
+                    context.read<ArticlesCubit>().loadArticlesForHome(
+                      userDiagnosis: _resolveClosestDiagnosis(assignmentsState),
+                    );
+                  }
+                  return ArticlesHomeSection(
+                    userDiagnosis: _resolveClosestDiagnosis(assignmentsState),
                   );
                 },
-              ),
-            ],
+              );
+            },
           ),
-        ),
+        ],
       ),
     );
   }

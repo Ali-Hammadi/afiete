@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:afiete/core/error/failure.dart';
-import 'package:afiete/feature/articles/data/datasources/articles_mock_datasource.dart';
+import 'package:afiete/feature/articles/data/datasources/articles_remote_datasource.dart';
 import 'package:afiete/feature/articles/domain/entities/article_entities.dart';
 import 'package:afiete/feature/articles/domain/repositories/articles_repository.dart';
 
@@ -62,8 +62,10 @@ class ArticlesRepositoryImpl implements ArticlesRepository {
     int pageSize = 10,
   }) async {
     try {
-      final articles =
-          await remoteDataSource.getAllArticles(page: page, pageSize: pageSize);
+      final articles = await remoteDataSource.getAllArticles(
+        page: page,
+        pageSize: pageSize,
+      );
       return Right(
         _onlyDoctorLinked(articles.map((model) => model.toEntity()).toList()),
       );
@@ -111,6 +113,30 @@ class ArticlesRepositoryImpl implements ArticlesRepository {
   Future<Either<Failure, void>> dislikeArticle(String articleId) async {
     try {
       await remoteDataSource.dislikeArticle(articleId);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> unlikeArticle(String articleId) async {
+    try {
+      await remoteDataSource.unlikeArticle(articleId);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> undislikeArticle(String articleId) async {
+    try {
+      await remoteDataSource.undislikeArticle(articleId);
       return const Right(null);
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));

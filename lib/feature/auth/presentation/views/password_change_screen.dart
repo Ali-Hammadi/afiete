@@ -72,7 +72,10 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
                 decoration: InputDecoration(
                   labelText: SettingsStrings.oldPasswordLabel,
                   hintText: SettingsStrings.oldPasswordHint,
-                  prefixIcon: const Icon(Icons.lock_outline),
+                  prefixIcon: Icon(
+                    Icons.lock_outline,
+                    color: colorScheme.primary,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _showOldPassword
@@ -106,7 +109,10 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
                 decoration: InputDecoration(
                   labelText: SettingsStrings.newPasswordLabel,
                   hintText: SettingsStrings.newPasswordHint,
-                  prefixIcon: const Icon(Icons.lock_outline),
+                  prefixIcon: Icon(
+                    Icons.lock_outline,
+                    color: colorScheme.primary,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _showNewPassword
@@ -140,7 +146,10 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
                 decoration: InputDecoration(
                   labelText: SettingsStrings.confirmPasswordLabel,
                   hintText: SettingsStrings.confirmPasswordHint,
-                  prefixIcon: const Icon(Icons.lock_outline),
+                  prefixIcon: Icon(
+                    Icons.lock_outline,
+                    color: colorScheme.primary,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _showConfirmPassword

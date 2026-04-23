@@ -62,6 +62,16 @@ class LikeArticleUseCase {
   }
 }
 
+class UnlikeArticleUseCase {
+  final ArticlesRepository repository;
+
+  UnlikeArticleUseCase(this.repository);
+
+  Future<Either<Failure, void>> call(String articleId) {
+    return repository.unlikeArticle(articleId);
+  }
+}
+
 class DislikeArticleUseCase {
   final ArticlesRepository repository;
 
@@ -69,5 +79,15 @@ class DislikeArticleUseCase {
 
   Future<Either<Failure, void>> call(String articleId) {
     return repository.dislikeArticle(articleId);
+  }
+}
+
+class UndislikeArticleUseCase {
+  final ArticlesRepository repository;
+
+  UndislikeArticleUseCase(this.repository);
+
+  Future<Either<Failure, void>> call(String articleId) {
+    return repository.undislikeArticle(articleId);
   }
 }

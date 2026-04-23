@@ -11,7 +11,9 @@ class ArticlesCubit extends Cubit<ArticlesState> {
   final GetAllArticlesUseCase getAllArticlesUseCase;
   final GetArticleByIdUseCase getArticleByIdUseCase;
   final LikeArticleUseCase likeArticleUseCase;
+  final UnlikeArticleUseCase unlikeArticleUseCase;
   final DislikeArticleUseCase dislikeArticleUseCase;
+  final UndislikeArticleUseCase undislikeArticleUseCase;
 
   ArticlesCubit({
     required this.getArticlesForHomeUseCase,
@@ -19,8 +21,40 @@ class ArticlesCubit extends Cubit<ArticlesState> {
     required this.getAllArticlesUseCase,
     required this.getArticleByIdUseCase,
     required this.likeArticleUseCase,
+    required this.unlikeArticleUseCase,
     required this.dislikeArticleUseCase,
+    required this.undislikeArticleUseCase,
   }) : super(const ArticlesInitial());
+
+  ArticleEntity _resolveCurrentArticle(ArticleEntity article) {
+    final currentState = state;
+    if (currentState is! ArticlesLoaded) {
+      return article;
+    }
+
+    return currentState.articles.firstWhere(
+      (item) => item.id == article.id,
+      orElse: () => article,
+    );
+  }
+
+  void _emitUpdatedArticle(ArticleEntity updatedArticle) {
+    final currentState = state;
+    if (currentState is! ArticlesLoaded) {
+      return;
+    }
+
+    final updatedArticles = currentState.articles
+        .map((item) => item.id == updatedArticle.id ? updatedArticle : item)
+        .toList();
+
+    emit(
+      ArticlesLoaded(
+        articles: updatedArticles,
+        isForHome: currentState.isForHome,
+      ),
+    );
+  }
 
   Future<void> loadArticlesForHome({String? userDiagnosis}) async {
     emit(const ArticlesLoading());
@@ -66,34 +100,64 @@ class ArticlesCubit extends Cubit<ArticlesState> {
   }
 
   Future<void> toggleLike(ArticleEntity article) async {
-    final newArticle = article.copyWith(
-      isLikedByUser: !article.isLikedByUser,
-      likesCount: article.isLikedByUser
-          ? article.likesCount - 1
-          : article.likesCount + 1,
+    final currentArticle = _resolveCurrentArticle(article);
+
+    final wasLiked = currentArticle.isLikedByUser;
+    final wasDisliked = currentArticle.isDislikedByUser;
+
+    final newArticle = currentArticle.copyWith(
+      // Like acts as toggle: tap again removes it.
+      isLikedByUser: !wasLiked,
+      // If like is turned on, dislike must be turned off.
+      isDislikedByUser: wasLiked ? wasDisliked : false,
+      likesCount: wasLiked
+          ? (currentArticle.likesCount > 0 ? currentArticle.likesCount - 1 : 0)
+          : currentArticle.likesCount + 1,
+      dislikesCount: (!wasLiked && wasDisliked)
+          ? (currentArticle.dislikesCount > 0
+                ? currentArticle.dislikesCount - 1
+                : 0)
+          : currentArticle.dislikesCount,
     );
 
-    if (!article.isLikedByUser) {
-      await likeArticleUseCase(article.id);
+    _emitUpdatedArticle(newArticle);
+
+    if (wasLiked) {
+      await unlikeArticleUseCase(article.id);
+      return;
     }
 
-    emit(
-      ArticleLikeToggled(article: newArticle, liked: newArticle.isLikedByUser),
-    );
+    await likeArticleUseCase(article.id);
   }
 
   Future<void> toggleDislike(ArticleEntity article) async {
-    final newArticle = article.copyWith(
-      isDislikedByUser: !article.isDislikedByUser,
-      dislikesCount: article.isDislikedByUser
-          ? article.dislikesCount - 1
-          : article.dislikesCount + 1,
+    final currentArticle = _resolveCurrentArticle(article);
+
+    final wasLiked = currentArticle.isLikedByUser;
+    final wasDisliked = currentArticle.isDislikedByUser;
+
+    final newArticle = currentArticle.copyWith(
+      // Dislike acts as toggle: tap again removes it.
+      isDislikedByUser: !wasDisliked,
+      // If dislike is turned on, like must be turned off.
+      isLikedByUser: wasDisliked ? wasLiked : false,
+      dislikesCount: wasDisliked
+          ? (currentArticle.dislikesCount > 0
+                ? currentArticle.dislikesCount - 1
+                : 0)
+          : currentArticle.dislikesCount + 1,
+      likesCount: (!wasDisliked && wasLiked)
+          ? (currentArticle.likesCount > 0 ? currentArticle.likesCount - 1 : 0)
+          : currentArticle.likesCount,
     );
 
-    if (!article.isDislikedByUser) {
-      await dislikeArticleUseCase(article.id);
+    _emitUpdatedArticle(newArticle);
+
+    if (wasDisliked) {
+      await undislikeArticleUseCase(article.id);
+      return;
     }
 
-    emit(ArticleLikeToggled(article: newArticle, liked: false));
+    await dislikeArticleUseCase(article.id);
   }
 }

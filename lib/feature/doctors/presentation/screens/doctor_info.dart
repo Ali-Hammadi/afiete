@@ -4,7 +4,7 @@ import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/core/widget/error_custom_button.dart';
 import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
-import 'package:afiete/feature/articles/presentation/widgets/article_card_widget.dart';
+import 'package:afiete/feature/articles/presentation/widgets/doctor_articles_comments_widget.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:afiete/feature/home/presentation/widgets/custom_container.dart';
@@ -377,21 +377,14 @@ class _DoctorInfoState extends State<DoctorInfo> {
                   );
                 }
 
-                return Column(
-                  children: articles
-                      .map(
-                        (article) => ArticleCardWidget(
-                          article: article,
-                          onReadMore: () {},
-                          onLike: () {
-                            context.read<ArticlesCubit>().toggleLike(article);
-                          },
-                          onDislike: () {
-                            context.read<ArticlesCubit>().toggleDislike(article);
-                          },
-                        ),
-                      )
-                      .toList(),
+                return DoctorArticlesCommentsWidget(
+                  articles: articles,
+                  onLike: (article) {
+                    context.read<ArticlesCubit>().toggleLike(article);
+                  },
+                  onDislike: (article) {
+                    context.read<ArticlesCubit>().toggleDislike(article);
+                  },
                 );
               }
 

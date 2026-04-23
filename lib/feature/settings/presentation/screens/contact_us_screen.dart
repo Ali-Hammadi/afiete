@@ -201,6 +201,8 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     required ColorScheme colorScheme,
     int maxLines = 1,
   }) {
+    final isMessageField = maxLines > 1;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -216,7 +218,15 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             hintText: hint,
             filled: true,
             fillColor: Theme.of(context).cardColor,
-            prefixIcon: Icon(icon, color: colorScheme.outline),
+            prefixIcon: isMessageField
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 12, top: 12, right: 8),
+                    child: Icon(icon, color: colorScheme.primary),
+                  )
+                : Icon(icon, color: colorScheme.primary),
+            prefixIconConstraints: isMessageField
+                ? const BoxConstraints(minWidth: 0, minHeight: 0)
+                : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: colorScheme.outline),

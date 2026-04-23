@@ -124,7 +124,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 keyboardType: TextInputType.name,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Name is required';
+                    return 'Nickname is required';
                   }
                   return null;
                 },
@@ -165,7 +165,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 child: InputDecorator(
                   decoration: InputDecoration(
                     labelText: SettingsStrings.birthDateTitle,
-                    prefixIcon: const Icon(Icons.cake_outlined),
+                    prefixIcon: Icon(
+                      Icons.cake_outlined,
+                      color: colorScheme.primary,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -184,7 +187,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  prefixIcon: const Icon(Icons.transgender),
+                  prefixIcon: Icon(
+                    Icons.transgender,
+                    color: colorScheme.primary,
+                  ),
                 ),
                 items: const [
                   DropdownMenuItem(value: 'Male', child: Text('Male')),
@@ -204,7 +210,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 children: [
                   Icon(
                     Icons.cake_outlined,
-                    color: colorScheme.outline,
+                    color: colorScheme.primary,
                     size: 30,
                   ),
                   const SizedBox(width: 8),
@@ -301,7 +307,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       ),
       onChanged: (_) => setState(() {}),

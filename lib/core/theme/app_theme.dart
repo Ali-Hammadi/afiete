@@ -93,6 +93,10 @@ abstract class AppTheme {
               ? AppColors.selectedFieldColor
               : AppColors.primaryFillColor,
         ),
+        trackOutlineColor: const WidgetStatePropertyAll(
+          AppColors.themeToggleOutlineColor,
+        ),
+        trackOutlineWidth: const WidgetStatePropertyAll(1.2),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -180,6 +184,10 @@ abstract class AppTheme {
               ? AppColors.darkSwitchSelectedTrackColor
               : AppColors.darkSwitchTrackColor,
         ),
+        trackOutlineColor: const WidgetStatePropertyAll(
+          AppColors.themeToggleOutlineColor,
+        ),
+        trackOutlineWidth: const WidgetStatePropertyAll(1.2),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

@@ -80,6 +80,9 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
             }
 
             return ListView.builder(
+              scrollDirection: Axis.vertical,
+              physics: const BouncingScrollPhysics(),
+
               padding: EdgeInsets.all(AppStyles.padding),
               itemCount: state.articles.length,
               itemBuilder: (context, index) {

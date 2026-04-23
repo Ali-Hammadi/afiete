@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/di/injection_container.dart';
 import 'core/routes/app_route.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/language_cubit.dart';
 import 'core/theme/theme_cubit.dart';
 import 'feature/articles/presentation/cubits/articles_cubit.dart';
 import 'feature/assignments/presentation/cubits/assignments_cubit.dart';
@@ -19,19 +20,26 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await init();
   final themeCubit = await ThemeCubit.create();
-  runApp(MyApp(themeCubit: themeCubit));
+  final languageCubit = await LanguageCubit.create();
+  runApp(MyApp(themeCubit: themeCubit, languageCubit: languageCubit));
 }
 
 class MyApp extends StatelessWidget {
   final ThemeCubit themeCubit;
+  final LanguageCubit languageCubit;
 
-  const MyApp({super.key, required this.themeCubit});
+  const MyApp({
+    super.key,
+    required this.themeCubit,
+    required this.languageCubit,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeCubit>.value(value: themeCubit),
+        BlocProvider<LanguageCubit>.value(value: languageCubit),
         BlocProvider<AuthCubit>(create: (_) => sl<AuthCubit>()),
         BlocProvider<AssignmentsCubit>(create: (_) => sl<AssignmentsCubit>()),
         BlocProvider<AppointmentsCubit>(create: (_) => sl<AppointmentsCubit>()),
@@ -45,14 +53,20 @@ class MyApp extends StatelessWidget {
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Afiete',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeMode,
-            initialRoute: MyRoutes.splashScreen,
-            onGenerateRoute: AppRouter.generateRoute,
+          return BlocBuilder<LanguageCubit, Locale>(
+            builder: (context, locale) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Afiete',
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeMode,
+                locale: locale,
+                supportedLocales: const [Locale('en'), Locale('ar')],
+                initialRoute: MyRoutes.homeScreen,
+                onGenerateRoute: AppRouter.generateRoute,
+              );
+            },
           );
         },
       ),
