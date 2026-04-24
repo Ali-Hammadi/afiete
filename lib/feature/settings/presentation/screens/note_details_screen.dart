@@ -90,7 +90,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
             ),
             const SizedBox(height: 12),
             Align(
-              alignment: Alignment.centerRight,
+              alignment: AlignmentDirectional.centerEnd,
               child: Text(widget.note.updatedAt, style: AppStyles.bodySmall),
             ),
             const SizedBox(height: 16),

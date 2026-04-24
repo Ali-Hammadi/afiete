@@ -1,3 +1,4 @@
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -29,9 +30,12 @@ class CustomAssignmentProgressHeader extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Align(
-          alignment: Alignment.centerRight,
+          alignment: AlignmentDirectional.centerEnd,
           child: Text(
-            'Question $questionIndex of $totalQuestions',
+            SettingsStrings.assignmentProgressLabel(
+              questionIndex,
+              totalQuestions,
+            ),
             style: AppStyles.bodySmall,
           ),
         ),

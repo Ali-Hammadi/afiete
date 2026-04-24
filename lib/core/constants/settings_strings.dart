@@ -77,6 +77,8 @@ abstract class SettingsStrings {
   static String get totalNotesLabel => _t('Total notes:', 'إجمالي الملاحظات:');
   static String get editNote => _t('Edit', 'تعديل');
   static String get shareNote => _t('Share', 'مشاركة');
+  static String assignmentProgressLabel(int questionIndex, int totalQuestions) =>
+      _t('Question $questionIndex of $totalQuestions', 'السؤال $questionIndex من $totalQuestions');
   static String get editMedicalNoteTitle =>
       _t('Edit Medical Note', 'تعديل الملاحظة الطبية');
   static String get noteTitleLabel => _t('Note title', 'عنوان الملاحظة');

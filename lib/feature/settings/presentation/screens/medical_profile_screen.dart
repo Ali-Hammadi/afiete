@@ -673,7 +673,7 @@ class _NoteTile extends StatelessWidget {
           Text(note.content, style: AppStyles.bodyMedium),
           const SizedBox(height: 6),
           Align(
-            alignment: Alignment.centerRight,
+            alignment: AlignmentDirectional.centerEnd,
             child: Text(note.updatedAt, style: AppStyles.bodySmall),
           ),
         ],
