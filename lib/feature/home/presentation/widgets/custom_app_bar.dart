@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -21,10 +22,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         contentPadding: EdgeInsets.zero,
         title: Text(
-          'Welcome $userName',
+          SettingsStrings.welcomeUser(userName),
           style: AppStyles.headingMedium.copyWith(color: colorScheme.primary),
         ),
-        subtitle: Text('Start your journey', style: AppStyles.bodyMedium),
+        subtitle: Text(
+          SettingsStrings.startYourJourney,
+          style: AppStyles.bodyMedium,
+        ),
       ),
     );
   }

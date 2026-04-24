@@ -275,7 +275,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Reviews', style: AppStyles.headingSmall),
+              Text(SettingsStrings.reviewsLabel, style: AppStyles.headingSmall),
               TextButton(
                 onPressed: () {},
                 child: Text(

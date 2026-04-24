@@ -124,6 +124,11 @@ abstract class SettingsStrings {
   static String get chatTitle => _t('Chat', 'الدردشة');
   static String get videoCallTitle => _t('Video Call', 'مكالمة فيديو');
   static String get voiceCallTitle => _t('Voice Call', 'مكالمة صوتية');
+  static String get viewDetails => _t('View details', 'عرض التفاصيل');
+  static String get consultationLabel => _t('Consultation', 'الاستشارة');
+  static String get onlineLabel => _t('Online', 'متصل');
+  static String get availableLabel => _t('Available', 'متاح');
+  static String get offlineLabel => _t('Offline', 'غير متصل');
   static String get bookSessionNow =>
       _t('Book a session now', 'احجز جلسة الآن');
   static String get reportDoctorButton =>
@@ -548,6 +553,11 @@ abstract class SettingsStrings {
   static String get login => _t('Login', 'تسجيل الدخول');
   static String get enterYourAccount => _t('Enter your account', 'أدخل حسابك');
   static String get emailLabel => _t('Email', 'البريد الإلكتروني');
+  static String welcomeUser(String userName) =>
+      _t('Welcome $userName', 'مرحبًا $userName');
+  static String get startYourJourney => _t('Start your journey', 'ابدأ رحلتك');
+  static String get findSpecialistTitle =>
+      _t('Find specialist', 'ابحث عن متخصص');
 
   static String get letsGetToKnowYou =>
       _t("Let's get to know you", 'دعنا نتعرف عليك');

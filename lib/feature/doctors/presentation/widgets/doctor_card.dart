@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
@@ -64,7 +65,10 @@ class CustomDoctorCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Experience", textAlign: TextAlign.center),
+                      Text(
+                        SettingsStrings.experienceLabel,
+                        textAlign: TextAlign.center,
+                      ),
                       Text(doctor.experience, textAlign: TextAlign.center),
                     ],
                   ),
@@ -75,7 +79,10 @@ class CustomDoctorCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Consultation", textAlign: TextAlign.center),
+                      Text(
+                        SettingsStrings.consultationLabel,
+                        textAlign: TextAlign.center,
+                      ),
                       Text(doctor.rating, textAlign: TextAlign.center),
                     ],
                   ),
@@ -86,9 +93,14 @@ class CustomDoctorCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Online", textAlign: TextAlign.center),
                       Text(
-                        doctor.isOnline ? "Available" : "Offline",
+                        SettingsStrings.onlineLabel,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        doctor.isOnline
+                            ? SettingsStrings.availableLabel
+                            : SettingsStrings.offlineLabel,
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -99,7 +111,7 @@ class CustomDoctorCard extends StatelessWidget {
             Divider(),
             CustomButton(
               widget: Text(
-                "View details",
+                SettingsStrings.viewDetails,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onPrimary,
                 ),
