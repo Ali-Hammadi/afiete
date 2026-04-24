@@ -128,6 +128,9 @@ abstract class SettingsStrings {
       _t('Book a session now', 'احجز جلسة الآن');
   static String get reportDoctorButton =>
       _t('Report Doctor', 'الإبلاغ عن الطبيب');
+  static String get cardiology => _t('Cardiology', 'أمراض القلب');
+  static String get cbt => _t('CBT', 'العلاج المعرفي السلوكي');
+  static String get depression => _t('Depression', 'الاكتئاب');
   static String get doctorProfileUnavailable => _t(
     'Doctor profile details are not available right now.',
     'تفاصيل ملف الطبيب غير متاحة حاليًا.',
@@ -161,6 +164,26 @@ abstract class SettingsStrings {
   static String get typeMessageHint => _t('Type a message...', 'اكتب رسالة...');
   static String get bestArticlesForYou =>
       _t('Best articles for you', 'أفضل المقالات لك');
+  static String get articleAnxietyAndStressTitle =>
+      _t('Understanding Anxiety and Stress', 'فهم القلق والتوتر');
+  static String get articleDepressionTitle => _t(
+    'Depression: Symptoms and Treatment Options',
+    'الاكتئاب: الأعراض وخيارات العلاج',
+  );
+  static String get articleBetterSleepTitle => _t(
+    'Better Sleep: Evidence-Based Habits',
+    'نوم أفضل: عادات مبنية على الأدلة',
+  );
+  static String get articleChildMentalHealthTitle => _t(
+    'Child Mental Health: Early Signs and Support',
+    'صحة الطفل النفسية: العلامات المبكرة والدعم',
+  );
+  static String get articleMindfulnessTitle =>
+      _t('Mindfulness and Guided Breathing', 'اليقظة الذهنية والتنفس الموجه');
+  static String get articleHealthyRelationshipsTitle => _t(
+    'Healthy Relationships and Self-Worth',
+    'العلاقات الصحية وتقدير الذات',
+  );
   static String get seeAll => _t('See All', 'عرض الكل');
   static String get assessmentResultTitle =>
       _t('Assessment Result', 'نتيجة التقييم');
@@ -189,6 +212,8 @@ abstract class SettingsStrings {
   );
   static String get definedByProviderAvailability =>
       _t('Defined by provider availability', 'يتم تحديده حسب توفر المزود');
+  static String minutesLabel(int minutes) =>
+      _t('$minutes min', '$minutes دقيقة');
   static String get noInternetConnectionPleaseReconnectAndTryAgain => _t(
     'No internet connection. Please reconnect and try again.',
     'لا يوجد اتصال بالإنترنت. يرجى إعادة الاتصال والمحاولة مرة أخرى.',
@@ -214,6 +239,12 @@ abstract class SettingsStrings {
   static String get noMedicines =>
       _t('No medicine records yet.', 'لا توجد سجلات أدوية بعد.');
   static String get noNotes => _t('No notes yet.', 'لا توجد ملاحظات بعد.');
+  static String get therapyProgressTitle =>
+      _t('Therapy Progress', 'تقدم العلاج');
+  static String get lifestyleRecommendationTitle =>
+      _t('Lifestyle Recommendation', 'توصية نمط الحياة');
+  static String get followUpPlanTitle => _t('Follow-up Plan', 'خطة المتابعة');
+  static String get sleepHygieneTitle => _t('Sleep Hygiene', 'نظافة النوم');
   static String get oral => _t('ORAL', 'فموي');
   static String get prescriptionNumberLabel =>
       _t('Prescription No:', 'رقم الوصفة:');

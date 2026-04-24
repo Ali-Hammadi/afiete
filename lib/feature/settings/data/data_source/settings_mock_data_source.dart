@@ -1,4 +1,5 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/settings/data/data_source/settings_remote_data_source.dart';
 import 'package:afiete/feature/settings/data/models/medical_profile_model.dart';
 
@@ -50,25 +51,25 @@ class SettingsMockDataSourceImpl implements SettingsRemoteDataSource {
     ),
   ];
 
-  List<MedicalNoteModel> _notes = const [
+  List<MedicalNoteModel> _notes = [
     MedicalNoteModel(
-      title: 'Therapy Progress',
+      title: SettingsStrings.therapyProgressTitle,
       content: 'Patient reports improved sleep and fewer panic episodes.',
       updatedAt: '2026-04-10',
     ),
     MedicalNoteModel(
-      title: 'Lifestyle Recommendation',
+      title: SettingsStrings.lifestyleRecommendationTitle,
       content: '30 minutes walking 5 days/week and reduce caffeine intake.',
       updatedAt: '2026-04-12',
     ),
     MedicalNoteModel(
-      title: 'Follow-up Plan',
+      title: SettingsStrings.followUpPlanTitle,
       content:
           'Continue current medication for 6 weeks then reassess anxiety score.',
       updatedAt: '2026-04-14',
     ),
     MedicalNoteModel(
-      title: 'Sleep Hygiene',
+      title: SettingsStrings.sleepHygieneTitle,
       content:
           'Avoid screens 1 hour before bedtime and maintain fixed sleep schedule.',
       updatedAt: '2026-04-15',

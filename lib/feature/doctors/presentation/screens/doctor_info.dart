@@ -86,9 +86,9 @@ class _DoctorInfoState extends State<DoctorInfo> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(doctorSpecialization, style: AppStyles.bodySmall),
-                  Text('Cardiology'),
-                  Text('CBT'),
-                  Text('Depression'),
+                  Text(SettingsStrings.cardiology),
+                  Text(SettingsStrings.cbt),
+                  Text(SettingsStrings.depression),
                 ],
               ),
             ),
@@ -122,7 +122,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
             SizedBox(height: 20),
             CustomButton(
               widget: Text(
-                "Book a session now",
+                SettingsStrings.bookSessionNow,
                 style: AppStyles.headingSmall.copyWith(
                   color: colorScheme.onPrimary,
                 ),
@@ -162,8 +162,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
 
                 if (userId.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please sign in to report a doctor.'),
+                    SnackBar(
+                      content: Text(
+                        SettingsStrings.pleaseSignInToReportADoctor,
+                      ),
                     ),
                   );
                   return;
@@ -209,7 +211,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                     ),
                   ],
                 ),
-                Text(' Reviews', style: AppStyles.bodySmall),
+                Text(SettingsStrings.reviewsLabel, style: AppStyles.bodySmall),
               ],
             ),
           ),
@@ -218,7 +220,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(doctor?.experience ?? '+ 5 years'),
-                Text('Experience', style: AppStyles.bodySmall),
+                Text(
+                  SettingsStrings.experienceLabel,
+                  style: AppStyles.bodySmall,
+                ),
               ],
             ),
           ),
@@ -227,7 +232,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('+1.2K'),
-                Text('Patients', style: AppStyles.bodySmall),
+                Text(SettingsStrings.patientsLabel, style: AppStyles.bodySmall),
               ],
             ),
           ),

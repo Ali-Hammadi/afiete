@@ -1,6 +1,7 @@
 import 'package:afiete/feature/articles/data/models/article_model.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 
 abstract class ArticlesRemoteDataSource {
   Future<List<ArticleModel>> getArticlesForHome({
@@ -104,7 +105,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   List<ArticleModel> _buildMockArticles() => [
     ArticleModel(
       id: 'art_001',
-      title: 'Understanding Anxiety and Stress',
+      title: SettingsStrings.articleAnxietyAndStressTitle,
       content:
           'Anxiety is a natural emotion, but persistent anxiety can affect daily life. This article explains common triggers and practical management strategies. You will also learn the difference between expected stress and clinically significant anxiety.\n\nHelpful tools include controlled breathing, structured routines, and early support from a mental health professional when symptoms become frequent.',
       summary: 'Causes of anxiety and practical ways to manage it.',
@@ -125,7 +126,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
     ArticleModel(
       id: 'art_002',
-      title: 'Depression: Symptoms and Treatment Options',
+      title: SettingsStrings.articleDepressionTitle,
       content:
           'Depression is more than sadness. It can include low mood, low energy, sleep disturbance, and loss of interest for weeks. Recognizing early signs improves outcomes.\n\nEvidence-based treatment includes psychotherapy, medication when indicated, and ongoing follow-up with a specialist.',
       summary: 'How to recognize depression and access effective treatment.',
@@ -146,7 +147,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
     ArticleModel(
       id: 'art_003',
-      title: 'Better Sleep: Evidence-Based Habits',
+      title: SettingsStrings.articleBetterSleepTitle,
       content:
           'Quality sleep supports emotional regulation and recovery. This article outlines habits that improve sleep depth and consistency.\n\nUse a fixed bedtime, reduce screen exposure before sleep, and avoid caffeine late in the day. Brief relaxation exercises can also improve sleep quality.',
       summary: 'Daily habits that measurably improve sleep quality.',
@@ -167,7 +168,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
     ArticleModel(
       id: 'art_004',
-      title: 'Child Mental Health: Early Signs and Support',
+      title: SettingsStrings.articleChildMentalHealthTitle,
       content:
           'Children need emotional safety to grow well. Parents should monitor behavior, mood, and school changes without judgment.\n\nA supportive home environment, active listening, and early specialist referral can make a major difference in outcomes.',
       summary: 'How to identify and support child mental health needs.',
@@ -186,7 +187,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
     ArticleModel(
       id: 'art_005',
-      title: 'Mindfulness and Guided Breathing',
+      title: SettingsStrings.articleMindfulnessTitle,
       content:
           'Mindfulness improves emotional awareness and cognitive clarity. Practicing short guided sessions daily can reduce stress reactivity.\n\nStart with five minutes of breathing focus and body scanning. Consistency is more important than duration.',
       summary: 'Simple mindfulness techniques to reduce stress and rumination.',
@@ -207,7 +208,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
     ArticleModel(
       id: 'art_006',
-      title: 'Healthy Relationships and Self-Worth',
+      title: SettingsStrings.articleHealthyRelationshipsTitle,
       content:
           'Stable relationships are built on boundaries, communication, and mutual respect. This article explores practical skills for healthier interactions.\n\nSelf-worth and emotional boundaries reduce burnout and improve relationship outcomes over time.',
       summary: 'Practical relationship skills and self-worth strategies.',

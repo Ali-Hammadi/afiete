@@ -320,7 +320,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         final minutes = slots * 30;
         final isSelected = _selectedDurationSlots == slots;
         return _OptionCard(
-          title: '$minutes min',
+          title: SettingsStrings.minutesLabel(minutes),
           subtitle: SettingsStrings.definedByProviderAvailability,
           isSelected: isSelected,
           onTap: () => setState(() => _selectedDurationSlots = slots),
