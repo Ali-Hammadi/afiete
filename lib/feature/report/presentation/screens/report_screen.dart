@@ -112,10 +112,7 @@ class _ReportScreenState extends State<ReportScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: theme.scaffoldBackgroundColor,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: true,
         title: Text(_getScreenTitle(), style: AppStyles.headingMedium),
       ),
       body: BlocListener<ReportCubit, ReportState>(
@@ -255,6 +252,7 @@ class _ReportScreenState extends State<ReportScreen> {
             child: Text(
               SettingsStrings.reportWillBeReviewed,
               style: AppStyles.bodySmall.copyWith(color: colorScheme.onSurface),
+              textAlign: TextAlign.start,
             ),
           ),
         ],

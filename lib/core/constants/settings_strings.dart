@@ -124,6 +124,43 @@ abstract class SettingsStrings {
     'Your report will be reviewed by our team. We will take appropriate action.',
     'سيتم مراجعة بلاغك من قبل فريقنا. سنتخذ الإجراء المناسب.',
   );
+  static String get reportHistoryTitle => _t('Report History', 'سجل التقارير');
+  static String get noReportsYet => _t('No Reports Yet', 'لا توجد تقارير بعد');
+  static String get yourSubmittedReportsWillAppearHere => _t(
+    'Your submitted reports will appear here',
+    'ستظهر التقارير التي أرسلتها هنا',
+  );
+  static String get errorLoadingReports =>
+      _t('Error Loading Reports', 'خطأ في تحميل التقارير');
+  static String get noReportsFound => _t('No reports found', 'لا توجد تقارير');
+  static String get allFilter => _t('All', 'الكل');
+  static String get doctorFilter => _t('Doctor', 'الطبيب');
+  static String get appFilter => _t('App', 'التطبيق');
+  static String get reportDetailsTitle => _t('Report Details', 'تفاصيل البلاغ');
+  static String get descriptionLabel => _t('Description', 'الوصف');
+  static String get submittedLabel => _t('Submitted', 'تم الإرسال');
+  static String get resolvedLabel => _t('Resolved', 'تم الحل');
+  static String get pendingStatus => _t('Pending', 'قيد المراجعة');
+  static String get underReviewStatus => _t('Under Review', 'قيد المراجعة');
+  static String get resolvedStatus => _t('Resolved', 'تم الحل');
+  static String get doctorReportType => _t('Doctor Report', 'بلاغ طبيب');
+  static String get sessionReportType => _t('Session Report', 'بلاغ جلسة');
+  static String get appReportType => _t('App Report', 'بلاغ التطبيق');
+  static String get reasonLabel => _t('Reason:', 'السبب:');
+  static String get unprofessionalBehavior =>
+      _t('Unprofessional behavior', 'سلوك غير مهني');
+  static String get harassment => _t('Harassment', 'تحرش');
+  static String get inappropriateContent =>
+      _t('Inappropriate content', 'محتوى غير مناسب');
+  static String get missingAppointments =>
+      _t('Missing appointments', 'تفويت المواعيد');
+  static String get appBugOrIssue =>
+      _t('App bug or issue', 'خلل أو مشكلة في التطبيق');
+  static String get appCrashesOrFreezes =>
+      _t('App crashes or freezes', 'يتعطل التطبيق أو يتجمد');
+  static String get paymentOrTransactionIssue =>
+      _t('Payment or transaction issue', 'مشكلة في الدفع أو المعاملة');
+  static String get otherIssue => _t('Other issue', 'مشكلة أخرى');
   static String get doctorDefaultName => _t('Dr. John Doe', 'د. جون دو');
   static String get doctorSpecialist => _t('Specialist', 'متخصص');
   static String get doctorAboutTitle => _t('About Doctor', 'عن الطبيب');

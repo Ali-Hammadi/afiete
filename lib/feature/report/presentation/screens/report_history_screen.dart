@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/report/domain/entities/report_entity.dart';
 import 'package:afiete/feature/report/presentation/cubits/report_cubit.dart';
@@ -36,11 +37,11 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: theme.scaffoldBackgroundColor,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-          onPressed: () => Navigator.pop(context),
+        automaticallyImplyLeading: true,
+        title: Text(
+          SettingsStrings.reportHistoryTitle,
+          style: AppStyles.headingMedium,
         ),
-        title: Text('Report History', style: AppStyles.headingMedium),
       ),
       body: BlocBuilder<ReportCubit, ReportState>(
         builder: (context, state) {
@@ -64,14 +65,14 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No Reports Yet',
+                    SettingsStrings.noReportsYet,
                     style: AppStyles.headingMedium.copyWith(
                       color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Your submitted reports will appear here',
+                    SettingsStrings.yourSubmittedReportsWillAppearHere,
                     style: AppStyles.bodyMedium.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.75),
                     ),
@@ -90,7 +91,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                   Icon(Icons.error_outline, size: 64, color: colorScheme.error),
                   const SizedBox(height: 16),
                   Text(
-                    'Error Loading Reports',
+                    SettingsStrings.errorLoadingReports,
                     style: AppStyles.headingMedium.copyWith(
                       color: colorScheme.error,
                     ),
@@ -114,7 +115,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                       ),
                     ),
                     child: Text(
-                      'Retry',
+                      SettingsStrings.retry,
                       style: AppStyles.bodyMedium.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w600,
@@ -143,7 +144,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                     spacing: 8,
                     children: [
                       _buildFilterChip(
-                        label: 'All',
+                        label: SettingsStrings.allFilter,
                         isSelected: _selectedFilter == null,
                         onTap: () {
                           setState(() {
@@ -152,7 +153,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                         },
                       ),
                       _buildFilterChip(
-                        label: 'Doctor',
+                        label: SettingsStrings.doctorFilter,
                         isSelected: _selectedFilter == ReportType.doctor,
                         onTap: () {
                           setState(() {
@@ -161,7 +162,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                         },
                       ),
                       _buildFilterChip(
-                        label: 'App',
+                        label: SettingsStrings.appFilter,
                         isSelected: _selectedFilter == ReportType.app,
                         onTap: () {
                           setState(() {
@@ -179,7 +180,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 32),
                         child: Text(
-                          'No reports found',
+                          SettingsStrings.noReportsFound,
                           style: AppStyles.bodyMedium.copyWith(
                             color: colorScheme.onSurface.withValues(
                               alpha: 0.75,
@@ -253,7 +254,10 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Report Details', style: AppStyles.headingSmall),
+                Text(
+                  SettingsStrings.reportDetailsTitle,
+                  style: AppStyles.headingSmall,
+                ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: const Icon(Icons.close),
@@ -262,7 +266,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Description',
+              SettingsStrings.descriptionLabel,
               style: AppStyles.bodyLarge.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurface,

@@ -1,63 +1,65 @@
+import 'package:afiete/core/constants/settings_strings.dart';
+
 class MockReportData {
   // Mock report reasons (predefined for doctor and session reports)
-  static const List<Map<String, dynamic>> mockDoctorReportReasons = [
+  static List<Map<String, dynamic>> get mockDoctorReportReasons => [
     {
       'id': 'reason_001',
       'key': 'unprofessional',
-      'label': 'Unprofessional behavior',
+      'label': SettingsStrings.unprofessionalBehavior,
       'icon': 'warning',
       'color': 'orange',
     },
     {
       'id': 'reason_002',
       'key': 'harassment',
-      'label': 'Harassment',
+      'label': SettingsStrings.harassment,
       'icon': 'block',
       'color': 'red',
     },
     {
       'id': 'reason_003',
       'key': 'inappropriateContent',
-      'label': 'Inappropriate content',
+      'label': SettingsStrings.inappropriateContent,
       'icon': 'error',
       'color': 'red',
     },
     {
       'id': 'reason_004',
       'key': 'missingAppointment',
-      'label': 'Missing appointments',
+      'label': SettingsStrings.missingAppointments,
       'icon': 'schedule',
       'color': 'orange',
     },
   ];
 
   // Mock app report reasons
-  static const List<Map<String, dynamic>> mockAppReportReasons = [
+  static List<Map<String, dynamic>> get mockAppReportReasons => [
     {
       'id': 'reason_005',
       'key': 'appBug',
-      'label': 'App bug or issue',
+      'label': SettingsStrings.appBugOrIssue,
       'icon': 'bug_report',
       'color': 'red',
     },
     {
       'id': 'reason_006',
       'key': 'crashOrFreeze',
-      'label': 'App crashes or freezes',
+      'label': SettingsStrings.appCrashesOrFreezes,
       'icon': 'close',
       'color': 'red',
     },
     {
       'id': 'reason_007',
       'key': 'paymentIssue',
-      'label': 'Payment or transaction issue',
+      'label': SettingsStrings.paymentOrTransactionIssue,
       'icon': 'payment',
       'color': 'orange',
     },
     {
       'id': 'reason_008',
       'key': 'other',
-      'label': 'Other issue',
+      'label': SettingsStrings.otherIssue,
       'icon': 'help',
       'color': 'gray',
     },
