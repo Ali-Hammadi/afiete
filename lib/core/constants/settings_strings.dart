@@ -12,7 +12,8 @@ abstract class SettingsStrings {
   static String get medicalProfileSubtitle =>
       _t('Prescriptions | Medicine | Notes', 'الوصفات | الأدوية | الملاحظات');
   static String get languageTitle => _t('Language', 'اللغة');
-    static String get currentLanguageTitle => _t('Current language', 'اللغة الحالية');
+  static String get currentLanguageTitle =>
+      _t('Current language', 'اللغة الحالية');
   static String get supportTitle => _t('Support', 'الدعم');
   static String get supportSubtitle => _t('24/7 Support', 'دعم 24/7');
   static String get supportComingSoon =>

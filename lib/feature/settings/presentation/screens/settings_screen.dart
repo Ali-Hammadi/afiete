@@ -65,9 +65,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               CustomSettingTile(
                 icon: Icons.language,
                 title: SettingsStrings.languageTitle,
-                subtitle: '${SettingsStrings.currentLanguageTitle}: $selectedLanguage',
+                subtitle:
+                    '${SettingsStrings.currentLanguageTitle}: $selectedLanguage',
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer.withValues(alpha: 0.35),
                     borderRadius: BorderRadius.circular(999),
@@ -190,9 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showLanguageSheet(BuildContext context) {
     final currentLocale = context.read<LanguageCubit>().state;
-    String tempLanguage = currentLocale.languageCode == 'ar'
-        ? SettingsStrings.arabic
-        : SettingsStrings.english;
+    String tempLanguage = currentLocale.languageCode == 'ar' ? 'ar' : 'en';
     final colorScheme = Theme.of(context).colorScheme;
 
     showModalBottomSheet<void>(
@@ -215,19 +217,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: AppStyles.headingMedium,
                   ),
                   const SizedBox(height: 12),
-                  RadioGroup<String>(
-                    onChanged: (value) {
-                      if (value != null) {
-                        setModalState(() {
-                          tempLanguage = value;
-                        });
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        CustomLanguageOption(value: SettingsStrings.english),
-                        CustomLanguageOption(value: SettingsStrings.arabic),
-                      ],
+                  Column(
+                    children: [
+                      CustomLanguageOption(
+                        value: 'en',
+                        groupValue: tempLanguage,
+                        label: SettingsStrings.english,
+                        onTap: () => setModalState(() => tempLanguage = 'en'),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomLanguageOption(
+                        value: 'ar',
+                        groupValue: tempLanguage,
+                        label: SettingsStrings.arabic,
+                        onTap: () => setModalState(() => tempLanguage = 'ar'),
+                      ),
+                    ],
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -244,10 +249,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(width: 8),
                       FilledButton(
                         onPressed: () {
-                          final code = tempLanguage == SettingsStrings.arabic
-                              ? 'ar'
-                              : 'en';
-                          context.read<LanguageCubit>().setLanguageCode(code);
+                          context.read<LanguageCubit>().setLanguageCode(
+                            tempLanguage,
+                          );
                           Navigator.pop(context);
                         },
                         child: Text(
