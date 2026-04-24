@@ -65,10 +65,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
               CustomSettingTile(
                 icon: Icons.language,
                 title: SettingsStrings.languageTitle,
-                trailing: Text(
-                  selectedLanguage,
-                  style: AppStyles.bodySmall.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                subtitle: '${SettingsStrings.currentLanguageTitle}: $selectedLanguage',
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        selectedLanguage,
+                        style: AppStyles.bodySmall.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                    ],
                   ),
                 ),
                 onTap: () => _showLanguageSheet(context),

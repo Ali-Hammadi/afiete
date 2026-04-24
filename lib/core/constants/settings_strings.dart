@@ -12,6 +12,7 @@ abstract class SettingsStrings {
   static String get medicalProfileSubtitle =>
       _t('Prescriptions | Medicine | Notes', 'الوصفات | الأدوية | الملاحظات');
   static String get languageTitle => _t('Language', 'اللغة');
+    static String get currentLanguageTitle => _t('Current language', 'اللغة الحالية');
   static String get supportTitle => _t('Support', 'الدعم');
   static String get supportSubtitle => _t('24/7 Support', 'دعم 24/7');
   static String get supportComingSoon =>
@@ -115,6 +116,12 @@ abstract class SettingsStrings {
   static String get reportDescriptionHint => _t(
     'Please provide more information about your report. Be as specific as possible.',
     'يرجى تقديم المزيد من المعلومات حول البلاغ. كن محددًا قدر الإمكان.',
+  );
+  static String get submitReport => _t('Submit Report', 'إرسال البلاغ');
+  static String get submitting => _t('Submitting...', 'جارٍ الإرسال...');
+  static String get reportWillBeReviewed => _t(
+    'Your report will be reviewed by our team. We will take appropriate action.',
+    'سيتم مراجعة بلاغك من قبل فريقنا. سنتخذ الإجراء المناسب.',
   );
   static String get doctorDefaultName => _t('Dr. John Doe', 'د. جون دو');
   static String get doctorSpecialist => _t('Specialist', 'متخصص');
@@ -228,6 +235,9 @@ abstract class SettingsStrings {
       _t('No upcoming appointments.', 'لا توجد مواعيد قادمة.');
   static String get noPastAppointments =>
       _t('No past appointments.', 'لا توجد مواعيد سابقة.');
+  static String get specialistLabelInAppointment => _t('Specialist', 'المتخصص');
+  static String durationMinutesLabel(int minutes) =>
+      _t('Duration: $minutes minutes', 'المدة: $minutes دقيقة');
   static String get selectLanguageTitle => _t('Select language', 'اختر اللغة');
   static String get cancel => _t('Cancel', 'إلغاء');
   static String get select => _t('Select', 'اختيار');
@@ -404,6 +414,18 @@ abstract class SettingsStrings {
       _t('Terms of Service', 'شروط الخدمة');
   static String get cookiePolicyTitle =>
       _t('Cookie Policy', 'سياسة ملفات الارتباط');
+  static String get privacyPolicyBody => _t(
+    'We are committed to protecting your privacy and ensuring you have a positive experience on our platform. This privacy policy explains how we collect, use, and protect your personal information.\n\nData Collection:\n• We collect information you provide directly, such as your name, email, and medical history.\n• We automatically collect certain information about your device and usage patterns.\n\nData Usage:\n• Your information is used to provide and improve our services.\n• We use your data to communicate with you about appointments and updates.\n• We may use aggregated data for research and analytics.\n\nData Protection:\n• We implement industry-standard security measures to protect your data.\n• Your data is encrypted both in transit and at rest.\n• We comply with all relevant data protection regulations.\n\nThird-Party Sharing:\n• We do not sell your personal information to third parties.\n• We only share your information with healthcare providers as needed for your care.\n• Third parties are bound by confidentiality agreements.',
+    'نحن ملتزمون بحماية خصوصيتك وضمان حصولك على تجربة إيجابية على منصتنا. توضح سياسة الخصوصية هذه كيفية جمع معلوماتك الشخصية واستخدامها وحمايتها.\n\nجمع البيانات:\n• نجمع المعلومات التي تقدمها مباشرة، مثل اسمك وبريدك الإلكتروني وتاريخك الطبي.\n• نجمع تلقائيًا بعض المعلومات حول جهازك وأنماط الاستخدام.\n\nاستخدام البيانات:\n• تُستخدم معلوماتك لتقديم خدماتنا وتحسينها.\n• نستخدم بياناتك للتواصل معك بشأن المواعيد والتحديثات.\n• قد نستخدم البيانات المجمعة للبحث والتحليلات.\n\nحماية البيانات:\n• نطبق إجراءات أمان معيارية لحماية بياناتك.\n• يتم تشفير بياناتك أثناء النقل وعند التخزين.\n• نلتزم بجميع لوائح حماية البيانات ذات الصلة.\n\nالمشاركة مع أطراف ثالثة:\n• نحن لا نبيع معلوماتك الشخصية لأطراف ثالثة.\n• نشارك معلوماتك فقط مع مقدمي الرعاية الصحية عند الحاجة إلى ذلك من أجل رعايتك.\n• تلتزم الأطراف الثالثة باتفاقيات السرية.',
+  );
+  static String get termsBody => _t(
+    'By using our platform, you agree to these terms and conditions. Please read them carefully.\n\nAcceptable Use:\n• You must be at least 18 years old or have parental consent.\n• You agree not to use the platform for illegal activities.\n• You must provide accurate and truthful information.\n\nUser Responsibilities:\n• You are responsible for maintaining your account security.\n• You must not share your login credentials with others.\n• You agree to use the platform only for legitimate healthcare purposes.\n\nPlatform Limitations:\n• Our platform is not a substitute for emergency medical care.\n• In case of emergency, please contact local emergency services.\n• We are not liable for interruptions or unavailability of service.\n\nIntellectual Property:\n• All content on our platform is protected by copyright.\n• You may not reproduce, distribute, or transmit any content without permission.\n\nDisclaimer:\n• We provide medical information for educational purposes only.\n• Consult with healthcare professionals before making medical decisions.\n• We are not liable for any health outcomes resulting from the use of our platform.',
+    'باستخدامك لمنصتنا، فإنك توافق على هذه الشروط والأحكام. يرجى قراءتها بعناية.\n\nالاستخدام المقبول:\n• يجب أن يكون عمرك 18 عامًا على الأقل أو لديك موافقة ولي الأمر.\n• توافق على عدم استخدام المنصة في أنشطة غير قانونية.\n• يجب أن تقدم معلومات دقيقة وصحيحة.\n\nمسؤوليات المستخدم:\n• أنت مسؤول عن الحفاظ على أمان حسابك.\n• يجب ألا تشارك بيانات تسجيل الدخول مع الآخرين.\n• توافق على استخدام المنصة فقط لأغراض الرعاية الصحية المشروعة.\n\nقيود المنصة:\n• منصتنا ليست بديلاً عن الرعاية الطبية الطارئة.\n• في حالة الطوارئ، يرجى الاتصال بخدمات الطوارئ المحلية.\n• نحن غير مسؤولين عن الانقطاعات أو عدم توفر الخدمة.\n\nالملكية الفكرية:\n• جميع المحتويات على منصتنا محمية بحقوق النشر.\n• لا يجوز لك إعادة إنتاج أي محتوى أو توزيعه أو نقله دون إذن.\n\nإخلاء المسؤولية:\n• نقدم معلومات طبية لأغراض تعليمية فقط.\n• استشر المختصين قبل اتخاذ أي قرارات طبية.\n• نحن غير مسؤولين عن أي نتائج صحية ناتجة عن استخدام منصتنا.',
+  );
+  static String get cookieBody => _t(
+    'We use cookies to enhance your experience on our platform.\n\nTypes of Cookies:\n• Essential cookies are necessary for the platform to function.\n• Analytical cookies help us understand how you use our platform.\n• Preference cookies remember your settings and preferences.\n\nCookie Management:\n• You can control cookies through your browser settings.\n• Disabling cookies may affect platform functionality.',
+    'نستخدم ملفات تعريف الارتباط لتحسين تجربتك على منصتنا.\n\nأنواع ملفات الارتباط:\n• ملفات الارتباط الأساسية ضرورية لعمل المنصة.\n• تساعدنا ملفات الارتباط التحليلية على فهم كيفية استخدامك للمنصة.\n• تتذكر ملفات الارتباط التفضيلية إعداداتك وتفضيلاتك.\n\nإدارة ملفات الارتباط:\n• يمكنك التحكم في ملفات الارتباط من خلال إعدادات المتصفح.\n• قد يؤدي تعطيل ملفات الارتباط إلى التأثير على وظائف المنصة.',
+  );
   static String get privacyLastUpdated =>
       _t('Last updated: April 2026', 'آخر تحديث: أبريل 2026');
   static String get privacyContactHint => _t(

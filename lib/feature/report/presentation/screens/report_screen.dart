@@ -59,7 +59,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   String _getScreenTitle() {
     if (widget.reportType == ReportType.doctor) {
-      return 'Report Doctor';
+      return SettingsStrings.reportDoctorTitle;
     } else if (widget.reportType == ReportType.session) {
       return SettingsStrings.reportSessionTitle;
     } else {
@@ -222,7 +222,9 @@ class _ReportScreenState extends State<ReportScreen> {
 
         return CustomButton(
           widget: Text(
-            isLoading ? 'Submitting...' : 'Submit Report',
+            isLoading
+                ? SettingsStrings.submitting
+                : SettingsStrings.submitReport,
             style: AppStyles.bodyLarge.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w600,
@@ -251,7 +253,7 @@ class _ReportScreenState extends State<ReportScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Your report will be reviewed by our team. We will take appropriate action.',
+              SettingsStrings.reportWillBeReviewed,
               style: AppStyles.bodySmall.copyWith(color: colorScheme.onSurface),
             ),
           ),

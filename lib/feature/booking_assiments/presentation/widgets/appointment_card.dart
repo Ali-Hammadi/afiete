@@ -1,4 +1,5 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
@@ -56,7 +57,8 @@ class CustomAppointmentCard extends StatelessWidget {
                       style: AppStyles.headingSmall,
                     ),
                     subtitle: Text(
-                      doctor?.specialization ?? 'Specialist',
+                      doctor?.specialization ??
+                          SettingsStrings.specialistLabelInAppointment,
                       style: AppStyles.bodyMedium,
                     ),
                   ),
@@ -78,7 +80,9 @@ class CustomAppointmentCard extends StatelessWidget {
                   Text(dateText, style: AppStyles.bodyMedium),
                   const SizedBox(height: 6),
                   Text(
-                    'Duration: ${appointment.durationSlots * 30} minutes',
+                    SettingsStrings.durationMinutesLabel(
+                      appointment.durationSlots * 30,
+                    ),
                     style: AppStyles.bodyMedium,
                   ),
                   const SizedBox(height: 6),
@@ -99,7 +103,7 @@ class CustomAppointmentCard extends StatelessWidget {
                 children: [
                   CustomButton(
                     widget: Text(
-                      "Join Session",
+                      SettingsStrings.joinSession,
                       style: AppStyles.bodySmall.copyWith(
                         color: colorScheme.onPrimary,
                       ),
@@ -108,7 +112,7 @@ class CustomAppointmentCard extends StatelessWidget {
                   ),
                   CustomButton(
                     widget: Text(
-                      "Reschedule",
+                      SettingsStrings.reschedule,
                       style: AppStyles.bodySmall.copyWith(
                         color: colorScheme.onPrimary,
                       ),
