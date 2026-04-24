@@ -258,11 +258,16 @@ abstract class SettingsStrings {
     'لا توجد مقالات متاحة لهذا الطبيب بعد.',
   );
   static String specialtyLabel(String specialty) {
-    final normalized = specialty.trim().toLowerCase();
+    final normalized = specialty.trim().toLowerCase().replaceAll(
+      RegExp(r'[^a-z0-9]+'),
+      '',
+    );
     switch (normalized) {
       case 'psychiatrist':
         return _t('Psychiatrist', 'طبيب نفسي');
       case 'clinicalpsychologist':
+      case 'clinclepsychologist':
+      case 'clinclepsycologist':
         return _t('Clinical Psychologist', 'أخصائي نفسي إكلينيكي');
       case 'psychotherapist':
         return _t('Psychotherapist', 'معالج نفسي');
@@ -272,15 +277,23 @@ abstract class SettingsStrings {
         return _t('Psychoanalyst', 'محلل نفسي');
       case 'traumatherapist':
         return _t('Trauma Therapist', 'معالج صدمات');
+      case 'trumatherapist':
+        return _t('Trauma Therapist', 'معالج صدمات');
       case 'marriageandfamilytherapist':
+        return _t('Marriage and Family Therapist', 'معالج أسري وزواجي');
+      case 'marriage':
         return _t('Marriage and Family Therapist', 'معالج أسري وزواجي');
       case 'counselor':
         return _t('Counselor', 'مرشد نفسي');
       case 'psychiatricsocialworker':
+      case 'psychiarticsocialworker':
+      case 'psychiarticsocial':
         return _t('Psychiatric Social Worker', 'أخصائي اجتماعي نفسي');
       case 'childpsychologist':
+      case 'child':
         return _t('Child Psychologist', 'أخصائي نفسي للأطفال');
       case 'speechlanguagepathologist':
+      case 'speechlanguage':
         return _t('Speech-Language Pathologist', 'أخصائي علاج النطق');
       case 'all':
         return _t('All', 'الكل');
