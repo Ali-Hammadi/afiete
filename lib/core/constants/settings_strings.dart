@@ -173,6 +173,7 @@ abstract class SettingsStrings {
   static String get doctorPriceContactTitle =>
       _t('Price Contact Doctor details', 'تفاصيل الأسعار والتواصل مع الطبيب');
   static String get chatTitle => _t('Chat', 'الدردشة');
+  static String get textChatTitle => _t('Text Chat', 'دردشة نصية');
   static String get videoCallTitle => _t('Video Call', 'مكالمة فيديو');
   static String get voiceCallTitle => _t('Voice Call', 'مكالمة صوتية');
   static String get viewDetails => _t('View details', 'عرض التفاصيل');
@@ -322,6 +323,12 @@ abstract class SettingsStrings {
       _t('Retake Assessment', 'إعادة التقييم');
   static String get bookYourSessionTitle =>
       _t('Book Your Session', 'احجز جلستك');
+  static String get chooseDayTitle => _t('Choose day', 'اختر اليوم');
+  static String get chooseTimeTitle => _t('Choose time', 'اختر الوقت');
+  static String get chooseSessionDurationTitle =>
+      _t('Choose session duration', 'اختر مدة الجلسة');
+  static String get chooseSessionTypeTitle =>
+      _t('Choose session type', 'اختر نوع الجلسة');
   static String get continueToPayment =>
       _t('Continue to payment', 'المتابعة إلى الدفع');
   static String get continueTextShort => _t('Continue', 'متابعة');
@@ -329,9 +336,18 @@ abstract class SettingsStrings {
       _t('Booking draft created successfully.', 'تم إنشاء مسودة الحجز بنجاح.');
   static String get availableFromDatabase =>
       _t('Available from database', 'متاح من قاعدة البيانات');
+  static String get sessionAvailableLabel => _t('Available', 'متاح');
+  static String bookingFeePerSession(double amount) => _t(
+    '\$${amount.toStringAsFixed(2)} per session',
+    '\$${amount.toStringAsFixed(2)} لكل جلسة',
+  );
   static String get noAvailableTimesForThisDate => _t(
     'No available times for this date.',
     'لا توجد أوقات متاحة لهذا التاريخ.',
+  );
+  static String get noAvailableScheduleLoadedYet => _t(
+    'This doctor has no available schedule loaded from the database yet.',
+    'لم يتم تحميل أي جدول متاح لهذا الطبيب من قاعدة البيانات بعد.',
   );
   static String get definedByProviderAvailability =>
       _t('Defined by provider availability', 'يتم تحديده حسب توفر المزود');

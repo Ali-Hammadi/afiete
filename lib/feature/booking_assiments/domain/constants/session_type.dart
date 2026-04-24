@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/app_colors.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:flutter/material.dart';
 
 abstract class SessionType {
@@ -11,11 +12,11 @@ abstract class SessionType {
   static String displayName(String type) {
     switch (type) {
       case textChat:
-        return 'Text Chat';
+        return SettingsStrings.textChatTitle;
       case videoCall:
-        return 'Video Call';
+        return SettingsStrings.videoCallTitle;
       case voiceCall:
-        return 'Voice Call';
+        return SettingsStrings.voiceCallTitle;
       default:
         return type;
     }

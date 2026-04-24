@@ -342,8 +342,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         return _OptionCard(
           title: SessionType.displayName(type),
           subtitle: fee > 0
-              ? '\$${fee.toStringAsFixed(2)} per session'
-              : 'Available',
+              ? SettingsStrings.bookingFeePerSession(fee.toDouble())
+              : SettingsStrings.sessionAvailableLabel,
           isSelected: isSelected,
           onTap: () => setState(() => _selectedSessionType = type),
           leading: SessionType.icon(type),
@@ -366,7 +366,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              'This doctor has no available schedule loaded from the database yet.',
+              SettingsStrings.noAvailableScheduleLoadedYet,
               textAlign: TextAlign.center,
               style: AppStyles.bodyMedium,
             ),
@@ -379,13 +379,13 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
   String _titleForStep(_BookingStep step) {
     switch (step) {
       case _BookingStep.date:
-        return 'Choose day';
+        return SettingsStrings.chooseDayTitle;
       case _BookingStep.time:
-        return 'Choose time';
+        return SettingsStrings.chooseTimeTitle;
       case _BookingStep.duration:
-        return 'Choose session duration';
+        return SettingsStrings.chooseSessionDurationTitle;
       case _BookingStep.type:
-        return 'Choose session type';
+        return SettingsStrings.chooseSessionTypeTitle;
     }
   }
 }
