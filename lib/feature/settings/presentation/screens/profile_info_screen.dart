@@ -56,7 +56,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.profileTitle,
           style: AppStyles.headingSmall,
         ),
@@ -319,16 +319,16 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text(SettingsStrings.editProfileTitle),
+          title: Text(SettingsStrings.editProfileTitle),
           content: const Text('Save these profile changes?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text(SettingsStrings.cancel),
+              child: Text(SettingsStrings.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text(SettingsStrings.select),
+              child: Text(SettingsStrings.select),
             ),
           ],
         );
@@ -352,7 +352,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       if (!mounted || !saved) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(SettingsStrings.profileUpdatedSuccess)),
+        SnackBar(content: Text(SettingsStrings.profileUpdatedSuccess)),
       );
     } finally {
       if (mounted) {

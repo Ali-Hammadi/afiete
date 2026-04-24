@@ -30,7 +30,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.forgotPasswordTitle,
           style: AppStyles.headingMedium,
         ),
@@ -99,7 +99,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final email = _emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(SettingsStrings.invalidEmailError)),
+        SnackBar(content: Text(SettingsStrings.invalidEmailError)),
       );
       return;
     }

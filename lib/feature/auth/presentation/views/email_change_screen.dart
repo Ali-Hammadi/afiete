@@ -50,7 +50,7 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.changeEmailTitle,
           style: AppStyles.headingMedium,
         ),
@@ -244,7 +244,7 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(SettingsStrings.emailUpdatedSuccess)),
+          SnackBar(content: Text(SettingsStrings.emailUpdatedSuccess)),
         );
         Navigator.pop(context);
       } else {

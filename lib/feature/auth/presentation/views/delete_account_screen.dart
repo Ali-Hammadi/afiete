@@ -37,7 +37,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.deleteAccountTitle,
           style: AppStyles.headingMedium,
         ),
@@ -210,19 +210,19 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text(SettingsStrings.deleteAccountTitle),
+          title: Text(SettingsStrings.deleteAccountTitle),
           content: const Text(
             'This action cannot be undone. Are you absolutely sure?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text(SettingsStrings.cancel),
+              child: Text(SettingsStrings.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
               style: FilledButton.styleFrom(backgroundColor: errorColor),
-              child: const Text(SettingsStrings.deleteAccountTitle),
+              child: Text(SettingsStrings.deleteAccountTitle),
             ),
           ],
         );

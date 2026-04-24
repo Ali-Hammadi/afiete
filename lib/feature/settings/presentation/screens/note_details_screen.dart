@@ -64,7 +64,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.editMedicalNoteTitle,
           style: AppStyles.headingMedium,
         ),
@@ -76,7 +76,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: SettingsStrings.noteTitleLabel,
               ),
             ),
@@ -84,7 +84,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
             TextField(
               controller: _contentController,
               maxLines: 6,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: SettingsStrings.noteContentLabel,
               ),
             ),
@@ -194,7 +194,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
 
     if (message == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(SettingsStrings.noteUpdatedSuccess)),
+        SnackBar(content: Text(SettingsStrings.noteUpdatedSuccess)),
       );
       Navigator.pop(context);
     }
@@ -203,7 +203,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   Future<void> _shareNote() async {
     if (_selectedDoctor == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(SettingsStrings.selectDoctorError)),
+        SnackBar(content: Text(SettingsStrings.selectDoctorError)),
       );
       return;
     }

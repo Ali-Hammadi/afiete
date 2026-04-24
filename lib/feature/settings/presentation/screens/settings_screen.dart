@@ -1,6 +1,7 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
+import 'package:afiete/core/theme/language_cubit.dart';
 import 'package:afiete/core/theme/theme_cubit.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
@@ -18,8 +19,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String selectedLanguage = SettingsStrings.english;
-
   static const UserSettingsProfileEntity _profile = UserSettingsProfileEntity(
     fullName: 'ALi Hammadi',
     userId: '1253465',
@@ -37,6 +36,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final authState = context.watch<AuthCubit>().state;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final locale = context.select<LanguageCubit, Locale>(
+      (cubit) => cubit.state,
+    );
+    final selectedLanguage = locale.languageCode == 'ar'
+        ? SettingsStrings.arabic
+        : SettingsStrings.english;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -60,20 +65,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               CustomSettingTile(
                 icon: Icons.language,
                 title: SettingsStrings.languageTitle,
-                trailing: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    selectedLanguage,
-                    style: AppStyles.bodySmall.copyWith(
-                      color: colorScheme.onPrimary,
-                    ),
+                trailing: Text(
+                  selectedLanguage,
+                  style: AppStyles.bodySmall.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 onTap: () => _showLanguageSheet(context),
@@ -90,10 +85,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               CustomSettingTile(
                 icon: Icons.dark_mode_outlined,
                 title: SettingsStrings.themeTitle,
-                trailing: Switch(
-                  value: isDarkMode,
-                  onChanged: (value) =>
-                      context.read<ThemeCubit>().toggleTheme(value),
+                trailing: Transform.scale(
+                  scale: 0.88,
+                  child: Switch(
+                    value: isDarkMode,
+                    onChanged: (value) =>
+                        context.read<ThemeCubit>().toggleTheme(value),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -171,7 +169,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showLanguageSheet(BuildContext context) {
-    String tempLanguage = selectedLanguage;
+    final currentLocale = context.read<LanguageCubit>().state;
+    String tempLanguage = currentLocale.languageCode == 'ar'
+        ? SettingsStrings.arabic
+        : SettingsStrings.english;
     final colorScheme = Theme.of(context).colorScheme;
 
     showModalBottomSheet<void>(
@@ -223,9 +224,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(width: 8),
                       FilledButton(
                         onPressed: () {
-                          setState(() {
-                            selectedLanguage = tempLanguage;
-                          });
+                          final code = tempLanguage == SettingsStrings.arabic
+                              ? 'ar'
+                              : 'en';
+                          context.read<LanguageCubit>().setLanguageCode(code);
                           Navigator.pop(context);
                         },
                         child: Text(

@@ -48,11 +48,11 @@ class MedicalProfileScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: theme.scaffoldBackgroundColor,
           elevation: 0,
-          title: const Text(
+          title: Text(
             SettingsStrings.medicalProfileTitle,
             style: AppStyles.headingMedium,
           ),
-          bottom: const PreferredSize(
+          bottom: PreferredSize(
             preferredSize: Size.fromHeight(48),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
@@ -118,7 +118,7 @@ class _PrescriptionsTab extends StatelessWidget {
             '${SettingsStrings.totalLabel} ${profile.prescriptions.length}',
         footerEnabled: false,
         child: profile.prescriptions.isEmpty
-            ? const _EmptySection(message: SettingsStrings.noPrescriptions)
+            ? _EmptySection(message: SettingsStrings.noPrescriptions)
             : Column(
                 children: profile.prescriptions
                     .map(
@@ -150,7 +150,7 @@ class _MedicineTab extends StatelessWidget {
         footerAction: '${SettingsStrings.activeMedicinesLabel} ${items.length}',
         footerEnabled: false,
         child: items.isEmpty
-            ? const _EmptySection(message: SettingsStrings.noMedicines)
+            ? _EmptySection(message: SettingsStrings.noMedicines)
             : Column(
                 children: items
                     .map(
@@ -183,7 +183,7 @@ class _NotesTab extends StatelessWidget {
             '${SettingsStrings.totalNotesLabel} ${profile.notes.length}',
         footerEnabled: false,
         child: profile.notes.isEmpty
-            ? const _EmptySection(message: SettingsStrings.noNotes)
+            ? _EmptySection(message: SettingsStrings.noNotes)
             : Column(
                 children: [
                   ...profile.notes.map(
@@ -390,7 +390,7 @@ class _PrescriptionTile extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: _hasImage ? () => _openImageViewer(context) : null,
                   icon: const Icon(Icons.visibility_outlined),
-                  label: const Text(SettingsStrings.viewDocument),
+                  label: Text(SettingsStrings.viewDocument),
                 ),
               ),
               SizedBox(
@@ -400,7 +400,7 @@ class _PrescriptionTile extends StatelessWidget {
                       ? () => _downloadDocument(context)
                       : null,
                   icon: const Icon(Icons.download_outlined),
-                  label: const Text(SettingsStrings.downloadDocument),
+                  label: Text(SettingsStrings.downloadDocument),
                 ),
               ),
               SizedBox(
@@ -408,7 +408,7 @@ class _PrescriptionTile extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: () => _shareWithPharmacist(context),
                   icon: const Icon(Icons.local_pharmacy_outlined),
-                  label: const Text(SettingsStrings.shareWithPharmacist),
+                  label: Text(SettingsStrings.shareWithPharmacist),
                 ),
               ),
             ],

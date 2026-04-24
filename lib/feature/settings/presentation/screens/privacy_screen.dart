@@ -15,7 +15,7 @@ class PrivacyScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.privacyTermsTitle,
           style: AppStyles.headingMedium,
         ),

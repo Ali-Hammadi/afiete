@@ -40,7 +40,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.changePasswordTitle,
           style: AppStyles.headingMedium,
         ),
