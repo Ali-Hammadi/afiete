@@ -12,11 +12,15 @@ import 'package:intl/intl.dart';
 class CustomAppointmentCard extends StatelessWidget {
   final AppointmentEntity appointment;
   final DoctorEntity? doctor;
+  final VoidCallback? onReschedule;
+  final VoidCallback? onCancel;
 
   const CustomAppointmentCard({
     super.key,
     required this.appointment,
     this.doctor,
+    this.onReschedule,
+    this.onCancel,
   });
 
   @override
@@ -66,7 +70,11 @@ class CustomAppointmentCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                IconButton(onPressed: () {}, icon: Icon(Icons.close_sharp)),
+                IconButton(
+                  onPressed: onCancel,
+                  icon: const Icon(Icons.close_sharp),
+                  tooltip: SettingsStrings.cancelAction,
+                ),
               ],
             ), //01142611737
             const SizedBox(height: 8),
@@ -120,9 +128,7 @@ class CustomAppointmentCard extends StatelessWidget {
                         color: colorScheme.onPrimary,
                       ),
                     ),
-                    onPressed: () {
-                      // Handle cancel action
-                    },
+                    onPressed: onReschedule,
                   ),
                 ],
               ),

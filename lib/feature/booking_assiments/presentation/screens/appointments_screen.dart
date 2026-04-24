@@ -2,6 +2,7 @@ import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/widgets/appointment_card.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -239,6 +240,14 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           return CustomAppointmentCard(
             doctor: matchedDoctor,
             appointment: appointment,
+            onReschedule: matchedDoctor == null
+                ? null
+                : () => _handleReschedule(
+                    appointmentId: appointment.id,
+                    doctor: matchedDoctor,
+                  ),
+            onCancel: () =>
+                _confirmCancel(context, appointmentId: appointment.id),
           );
         },
       ),
@@ -258,5 +267,62 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     }
 
     return null;
+  }
+
+  Future<void> _handleReschedule({
+    required String appointmentId,
+    required DoctorEntity doctor,
+  }) async {
+    final selectedTime = await Navigator.pushNamed<DateTime?>(
+      context,
+      MyRoutes.bookSessionScreen,
+      arguments: {'doctor': doctor, 'rescheduleMode': true},
+    );
+
+    if (selectedTime == null || !mounted) {
+      return;
+    }
+
+    final success = await context
+        .read<AppointmentsCubit>()
+        .rescheduleAppointment(
+          appointmentId: appointmentId,
+          newScheduledAt: selectedTime,
+        );
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.sessionRescheduledSuccessfully)),
+      );
+    }
+  }
+
+  void _confirmCancel(BuildContext context, {required String appointmentId}) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(SettingsStrings.cancelSessionTitle),
+        content: Text(SettingsStrings.cancelSessionQuestion),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(SettingsStrings.no),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final success = await context
+                  .read<AppointmentsCubit>()
+                  .cancelAppointment(appointmentId);
+              if (context.mounted && success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(SettingsStrings.sessionCancelled)),
+                );
+              }
+            },
+            child: Text(SettingsStrings.yesCancel),
+          ),
+        ],
+      ),
+    );
   }
 }

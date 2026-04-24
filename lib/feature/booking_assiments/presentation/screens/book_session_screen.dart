@@ -15,8 +15,13 @@ enum _BookingStep { date, time, duration, type }
 
 class BookSessionScreen extends StatefulWidget {
   final DoctorEntity doctor;
+  final bool rescheduleMode;
 
-  const BookSessionScreen({super.key, required this.doctor});
+  const BookSessionScreen({
+    super.key,
+    required this.doctor,
+    this.rescheduleMode = false,
+  });
 
   @override
   State<BookSessionScreen> createState() => _BookSessionScreenState();
@@ -125,6 +130,16 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
 
     setState(() => _isSubmitting = true);
 
+    if (widget.rescheduleMode) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _isSubmitting = false);
+      Navigator.pop(context, _selectedTime!);
+      return;
+    }
+
     final authState = context.read<AuthCubit>().state;
     String patientId = 'unknown-patient';
     if (authState is AuthLoaded) {
@@ -191,7 +206,9 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          SettingsStrings.bookYourSessionTitle,
+          widget.rescheduleMode
+              ? SettingsStrings.reschedule
+              : SettingsStrings.bookYourSessionTitle,
           style: AppStyles.headingMedium,
         ),
       ),
@@ -232,7 +249,9 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
                     )
                   : Text(
                       _step == _BookingStep.type
-                          ? SettingsStrings.continueToPayment
+                          ? (widget.rescheduleMode
+                                ? SettingsStrings.reschedule
+                                : SettingsStrings.continueToPayment)
                           : SettingsStrings.continueTextShort,
                       style: AppStyles.headingSmall.copyWith(
                         color: colorScheme.onPrimary,

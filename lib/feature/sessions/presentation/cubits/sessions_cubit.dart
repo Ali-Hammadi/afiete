@@ -43,17 +43,26 @@ class SessionsCubit extends Cubit<SessionsState> {
     );
   }
 
-  Future<void> cancelSession(String sessionId) async {
+  Future<bool> cancelSession({
+    required String sessionId,
+    required String doctorId,
+  }) async {
     final result = await cancelSessionUseCase(
-      CancelSessionParams(sessionId: sessionId),
+      CancelSessionParams(sessionId: sessionId, doctorId: doctorId),
     );
-    result.fold(
-      (failure) => emit(SessionsError(failure.errorMessage)),
-      (_) => loadUpcomingSessions(),
+    return result.fold<Future<bool>>(
+      (failure) {
+        emit(SessionsError(failure.errorMessage));
+        return Future.value(false);
+      },
+      (_) async {
+        await loadUpcomingSessions();
+        return true;
+      },
     );
   }
 
-  Future<void> rescheduleSession({
+  Future<bool> rescheduleSession({
     required String sessionId,
     required DateTime newScheduledAt,
   }) async {
@@ -64,9 +73,15 @@ class SessionsCubit extends Cubit<SessionsState> {
       ),
     );
 
-    result.fold(
-      (failure) => emit(SessionsError(failure.errorMessage)),
-      (_) => loadUpcomingSessions(),
+    return result.fold<Future<bool>>(
+      (failure) {
+        emit(SessionsError(failure.errorMessage));
+        return Future.value(false);
+      },
+      (_) async {
+        await loadUpcomingSessions();
+        return true;
+      },
     );
   }
 

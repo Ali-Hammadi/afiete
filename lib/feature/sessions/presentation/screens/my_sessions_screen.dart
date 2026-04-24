@@ -1,7 +1,9 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
+import 'package:afiete/feature/doctors/domain/usecase/get_doctors_usecase.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:afiete/feature/sessions/presentation/widgets/review_bottom_sheet.dart';
@@ -123,7 +125,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
               _showSnackBar(SettingsStrings.bookingFeatureComingSoon),
           onReschedule: () => _handleReschedule(session),
           onJoinSession: () => _handleJoinSession(session),
-          onCancel: () => _confirmCancel(context, session.id),
+          onCancel: () => _confirmCancel(context, session),
         );
       },
     );
@@ -208,30 +210,59 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
   }
 
   Future<void> _handleReschedule(SessionEntity session) async {
-    final nextSlot = session.scheduledAt.add(const Duration(days: 7));
-    await _cubit.rescheduleSession(
-      sessionId: session.id,
-      newScheduledAt: nextSlot,
+    final doctorResult = await sl<GetDoctorByIdUseCase>()(
+      GetDoctorByIdParams(id: session.doctorId),
     );
-    _showSnackBar(SettingsStrings.sessionRescheduledSuccessfully);
+
+    await doctorResult.fold(
+      (failure) async {
+        if (mounted) {
+          _showSnackBar(failure.errorMessage);
+        }
+      },
+      (doctor) async {
+        final selectedTime = await Navigator.pushNamed<DateTime?>(
+          context,
+          MyRoutes.bookSessionScreen,
+          arguments: {'doctor': doctor, 'rescheduleMode': true},
+        );
+
+        if (selectedTime == null) {
+          return;
+        }
+
+        final success = await _cubit.rescheduleSession(
+          sessionId: session.id,
+          newScheduledAt: selectedTime,
+        );
+        if (success && mounted) {
+          _showSnackBar(SettingsStrings.sessionRescheduledSuccessfully);
+        }
+      },
+    );
   }
 
-  void _confirmCancel(BuildContext context, String sessionId) {
+  void _confirmCancel(BuildContext context, SessionEntity session) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(SettingsStrings.cancelSessionTitle),
         content: Text(SettingsStrings.cancelSessionQuestion),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(SettingsStrings.no),
           ),
           FilledButton(
-            onPressed: () {
-              _cubit.cancelSession(sessionId);
-              Navigator.pop(context);
-              _showSnackBar(SettingsStrings.sessionCancelled);
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final success = await _cubit.cancelSession(
+                sessionId: session.id,
+                doctorId: session.doctorId,
+              );
+              if (success && mounted) {
+                _showSnackBar(SettingsStrings.sessionCancelled);
+              }
             },
             child: Text(SettingsStrings.yesCancel),
           ),

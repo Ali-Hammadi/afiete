@@ -637,6 +637,56 @@ abstract class SettingsStrings {
   static String assignmentQuestionLabel(String text) {
     final normalized = text.trim().toLowerCase();
     switch (normalized) {
+      case 'i feel nervous or anxious without a clear reason.':
+        return _t(
+          'I feel nervous or anxious without a clear reason.',
+          'أشعر بالتوتر أو القلق دون سبب واضح.',
+        );
+      case 'أشعر بالتوتر أو القلق دون سبب واضح.':
+        return _t(
+          'I feel nervous or anxious without a clear reason.',
+          'أشعر بالتوتر أو القلق دون سبب واضح.',
+        );
+      case 'i have difficulty sleeping because of stress.':
+        return _t(
+          'I have difficulty sleeping because of stress.',
+          'أواجه صعوبة في النوم بسبب التوتر.',
+        );
+      case 'أواجه صعوبة في النوم بسبب التوتر.':
+        return _t(
+          'I have difficulty sleeping because of stress.',
+          'أواجه صعوبة في النوم بسبب التوتر.',
+        );
+      case 'i avoid social interactions more than usual.':
+        return _t(
+          'I avoid social interactions more than usual.',
+          'أتجنب التفاعل الاجتماعي أكثر من المعتاد.',
+        );
+      case 'أتجنب التفاعل الاجتماعي أكثر من المعتاد.':
+        return _t(
+          'I avoid social interactions more than usual.',
+          'أتجنب التفاعل الاجتماعي أكثر من المعتاد.',
+        );
+      case 'i struggle to concentrate during daily tasks.':
+        return _t(
+          'I struggle to concentrate during daily tasks.',
+          'أجد صعوبة في التركيز أثناء المهام اليومية.',
+        );
+      case 'أجد صعوبة في التركيز أثناء المهام اليومية.':
+        return _t(
+          'I struggle to concentrate during daily tasks.',
+          'أجد صعوبة في التركيز أثناء المهام اليومية.',
+        );
+      case 'i feel emotionally drained most days.':
+        return _t(
+          'I feel emotionally drained most days.',
+          'أشعر بالإرهاق النفسي معظم الأيام.',
+        );
+      case 'أشعر بالإرهاق النفسي معظم الأيام.':
+        return _t(
+          'I feel emotionally drained most days.',
+          'أشعر بالإرهاق النفسي معظم الأيام.',
+        );
       case 'little interest or pleasure in doing things':
         return _t(
           'Little interest or pleasure in doing things',
@@ -691,26 +741,20 @@ abstract class SettingsStrings {
     final normalized = option.trim().toLowerCase();
     switch (normalized) {
       case 'never':
-        return _t('Never / أبدًا', 'أبدًا / Never');
+        return _t('Never', 'أبدًا');
       case 'not at all':
-        return _t('Not at all / على الإطلاق', 'على الإطلاق / Not at all');
+        return _t('Not at all', 'على الإطلاق');
       case 'sometimes':
       case 'several days':
-        return _t('Several days / عدة أيام', 'عدة أيام / Several days');
+        return _t('Several days', 'عدة أيام');
       case 'often':
       case 'more than half the days':
-        return _t(
-          'More than half the days / أكثر من نصف الأيام',
-          'أكثر من نصف الأيام / More than half the days',
-        );
+        return _t('More than half the days', 'أكثر من نصف الأيام');
       case 'always':
       case 'nearly every day':
-        return _t(
-          'Nearly every day / تقريبًا كل يوم',
-          'تقريبًا كل يوم / Nearly every day',
-        );
+        return _t('Nearly every day', 'تقريبًا كل يوم');
       case 'extremely':
-        return _t('Extremely / بشكل كبير', 'بشكل كبير / Extremely');
+        return _t('Extremely', 'بشكل كبير');
       default:
         return option;
     }
@@ -719,8 +763,12 @@ abstract class SettingsStrings {
   static String assignmentSeverityLabel(String severity) {
     final normalized = severity.trim().toLowerCase();
     switch (normalized) {
+      case 'low':
+        return _t('Low', 'منخفض');
       case 'minimal':
         return _t('Minimal', 'بسيط جدًا');
+      case 'medium':
+        return _t('Medium', 'متوسط');
       case 'mild':
         return _t('Mild', 'خفيف');
       case 'moderate':
@@ -728,6 +776,8 @@ abstract class SettingsStrings {
       case 'moderately_severe':
       case 'moderately severe':
         return _t('Moderately severe', 'متوسط إلى شديد');
+      case 'high':
+        return _t('High', 'مرتفع');
       case 'severe':
         return _t('Severe', 'شديد');
       default:
@@ -743,12 +793,15 @@ abstract class SettingsStrings {
 
       final normalized = severity.trim().toLowerCase();
       switch (normalized) {
+        case 'low':
         case 'minimal':
           return 'Your assessment indicates minimal symptoms. Continue with healthy lifestyle habits.';
+        case 'medium':
         case 'mild':
           return 'Your assessment indicates mild symptoms. Consider speaking with a mental health professional.';
         case 'moderate':
           return 'Your assessment indicates moderate symptoms. Professional support is recommended.';
+        case 'high':
         case 'moderately_severe':
         case 'moderately severe':
           return 'Your assessment indicates moderately severe symptoms. Professional psychological or psychiatric care is strongly recommended.';
@@ -761,11 +814,13 @@ abstract class SettingsStrings {
 
     final normalized = severity.trim().toLowerCase();
     switch (normalized) {
+      case 'low':
       case 'minimal':
         return _t(
           'Your assessment indicates minimal symptoms. Continue with healthy lifestyle habits.',
           'تشير نتيجتك إلى أعراض بسيطة جدًا. واصل العادات الصحية الجيدة.',
         );
+      case 'medium':
       case 'mild':
         return _t(
           'Your assessment indicates mild symptoms. Consider speaking with a mental health professional.',
@@ -776,6 +831,7 @@ abstract class SettingsStrings {
           'Your assessment indicates moderate symptoms. Professional support is recommended.',
           'تشير نتيجتك إلى أعراض متوسطة. يُنصح بالحصول على دعم مهني.',
         );
+      case 'high':
       case 'moderately_severe':
       case 'moderately severe':
         return _t(

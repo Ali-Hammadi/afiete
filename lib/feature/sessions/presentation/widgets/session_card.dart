@@ -61,6 +61,12 @@ class CustomSessionCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (!isPast && onCancel != null)
+                  IconButton(
+                    onPressed: onCancel,
+                    icon: Icon(Icons.close, color: colorScheme.error),
+                    tooltip: SettingsStrings.cancelAction,
+                  ),
               ],
             ),
             const SizedBox(height: 12),
@@ -81,8 +87,6 @@ class CustomSessionCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, bool isPast) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     if (isPast) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -123,18 +127,6 @@ class CustomSessionCard extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.error,
-                foregroundColor: colorScheme.onError,
-              ),
-              onPressed: onCancel,
-              child: Text(SettingsStrings.cancelAction),
-            ),
           ),
         ],
       );

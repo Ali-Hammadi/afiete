@@ -52,7 +52,11 @@ class AppRouter {
       case MyRoutes.welcomeScreens:
         return MaterialPageRoute(builder: (_) => const WelcomeScreens());
       case MyRoutes.homeScreen:
-        return MaterialPageRoute(builder: (_) => const GlobalHomeScreen());
+        final homeArgs = settings.arguments;
+        final initialIndex = homeArgs is int ? homeArgs : 0;
+        return MaterialPageRoute(
+          builder: (_) => GlobalHomeScreen(initialIndex: initialIndex),
+        );
       case MyRoutes.firstHomeScreen:
         return MaterialPageRoute(builder: (_) => const FirstHomeScreen());
       case MyRoutes.verifyAccountScreen:
@@ -85,8 +89,17 @@ class AppRouter {
         );
       case MyRoutes.bookSessionScreen:
         final args = settings.arguments;
-        if (args is! DoctorEntity) {
-          return MaterialPageRoute(
+        final doctor = args is DoctorEntity
+            ? args
+            : args is Map<String, dynamic>
+            ? args['doctor'] as DoctorEntity?
+            : null;
+        final isReschedule = args is Map<String, dynamic>
+            ? args['rescheduleMode'] == true
+            : false;
+
+        if (doctor == null) {
+          return MaterialPageRoute<DateTime?>(
             builder: (context) => Scaffold(
               appBar: AppBar(),
               body: const Center(
@@ -98,8 +111,9 @@ class AppRouter {
             ),
           );
         }
-        return MaterialPageRoute(
-          builder: (_) => BookSessionScreen(doctor: args),
+        return MaterialPageRoute<DateTime?>(
+          builder: (_) =>
+              BookSessionScreen(doctor: doctor, rescheduleMode: isReschedule),
         );
       case MyRoutes.doctorsHomeScreen:
         return MaterialPageRoute(builder: (_) => const DoctorsHomeScreen());

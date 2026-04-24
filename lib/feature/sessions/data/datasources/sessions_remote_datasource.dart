@@ -10,7 +10,10 @@ abstract class SessionsRemoteDataSource {
 
   Future<SessionModel> joinSession(String sessionId);
 
-  Future<void> cancelSession(String sessionId);
+  Future<void> cancelSession({
+    required String sessionId,
+    required String doctorId,
+  });
 
   Future<SessionModel> rescheduleSession({
     required String sessionId,
@@ -114,11 +117,14 @@ class SessionsRemoteDataSourceImpl implements SessionsRemoteDataSource {
   }
 
   @override
-  Future<void> cancelSession(String sessionId) async {
+  Future<void> cancelSession({
+    required String sessionId,
+    required String doctorId,
+  }) async {
     try {
       final response = await _dio.post(
         ApiEndpoints.sessionsCancel,
-        data: {'sessionId': sessionId},
+        data: {'sessionId': sessionId, 'doctorId': doctorId},
       );
       if (response.statusCode != 200) {
         throw DioException(

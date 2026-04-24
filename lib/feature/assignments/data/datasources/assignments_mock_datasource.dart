@@ -1,34 +1,53 @@
 import 'package:afiete/feature/assignments/data/datasources/assignments_remote_datasource.dart';
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 
 class AssignmentsMockDataSourceImpl implements AssignmentsRemoteDataSource {
+  static String _localized(String en, String ar) =>
+      SettingsStrings.isArabic ? ar : en;
+
   @override
   Future<List<AssignmentEntity>> getAssignmentQuestions() async {
     await Future<void>.delayed(const Duration(milliseconds: 280));
-    return const [
+    return [
       AssignmentEntity.question(
         id: 'q1',
-        questionText: 'I feel nervous or anxious without a clear reason.',
+        questionText: _localized(
+          'I feel nervous or anxious without a clear reason.',
+          'أشعر بالتوتر أو القلق دون سبب واضح.',
+        ),
         options: AssignmentEntity.standardOptions,
       ),
       AssignmentEntity.question(
         id: 'q2',
-        questionText: 'I have difficulty sleeping because of stress.',
+        questionText: _localized(
+          'I have difficulty sleeping because of stress.',
+          'أواجه صعوبة في النوم بسبب التوتر.',
+        ),
         options: AssignmentEntity.standardOptions,
       ),
       AssignmentEntity.question(
         id: 'q3',
-        questionText: 'I avoid social interactions more than usual.',
+        questionText: _localized(
+          'I avoid social interactions more than usual.',
+          'أتجنب التفاعل الاجتماعي أكثر من المعتاد.',
+        ),
         options: AssignmentEntity.standardOptions,
       ),
       AssignmentEntity.question(
         id: 'q4',
-        questionText: 'I struggle to concentrate during daily tasks.',
+        questionText: _localized(
+          'I struggle to concentrate during daily tasks.',
+          'أجد صعوبة في التركيز أثناء المهام اليومية.',
+        ),
         options: AssignmentEntity.standardOptions,
       ),
       AssignmentEntity.question(
         id: 'q5',
-        questionText: 'I feel emotionally drained most days.',
+        questionText: _localized(
+          'I feel emotionally drained most days.',
+          'أشعر بالإرهاق النفسي معظم الأيام.',
+        ),
         options: AssignmentEntity.standardOptions,
       ),
     ];

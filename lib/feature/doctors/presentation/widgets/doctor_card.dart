@@ -20,7 +20,7 @@ class CustomDoctorCard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: dense ? AppStyles.padding / 2 : AppStyles.padding,
+        horizontal: dense ? 0 : AppStyles.padding,
         vertical: dense ? 6 : AppStyles.padding / 2,
       ),
       child: Container(

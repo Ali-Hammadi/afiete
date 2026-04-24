@@ -12,14 +12,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GlobalHomeScreen extends StatefulWidget {
-  const GlobalHomeScreen({super.key});
+  const GlobalHomeScreen({super.key, this.initialIndex = 0});
+
+  final int initialIndex;
 
   @override
   State<GlobalHomeScreen> createState() => _GlobalHomeScreenState();
 }
 
 class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
-  int selectedItemIndex = 0;
+  late int selectedItemIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedItemIndex = widget.initialIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;

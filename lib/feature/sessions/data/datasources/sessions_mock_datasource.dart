@@ -59,20 +59,22 @@ class SessionsMockDataSourceImpl implements SessionsRemoteDataSource {
   }
 
   @override
-  Future<void> cancelSession(String sessionId) async {
+  Future<void> cancelSession({
+    required String sessionId,
+    required String doctorId,
+  }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
     final session = _findSession(sessionId);
-    if (session != null) {
-      _recordDoctorNotification(
-        doctorId: session.doctorId,
-        sessionId: session.id,
-        type: 'cancelled',
-        message: _localized(
-          'The patient cancelled the session.',
-          'قام المريض بإلغاء الجلسة.',
-        ),
-      );
-    }
+    final resolvedDoctorId = session?.doctorId ?? doctorId;
+    _recordDoctorNotification(
+      doctorId: resolvedDoctorId,
+      sessionId: sessionId,
+      type: 'cancelled',
+      message: _localized(
+        'The patient cancelled the session with this doctor.',
+        'قام المريض بإلغاء الجلسة لدى هذا الطبيب.',
+      ),
+    );
     _upcomingSessions.removeWhere((s) => s.id == sessionId);
   }
 
@@ -194,7 +196,7 @@ class SessionsMockDataSourceImpl implements SessionsRemoteDataSource {
           ..sort();
 
     for (final option in futureOptions) {
-      if (option.isAfter(requestedTime) && !conflictingTimes.contains(option)) {
+      if (option.isAfter(requestedTime)) {
         return option;
       }
     }
@@ -203,9 +205,11 @@ class SessionsMockDataSourceImpl implements SessionsRemoteDataSource {
       return futureOptions.first;
     }
 
-    return requestedTime.isAfter(now)
-        ? requestedTime
-        : now.add(const Duration(days: 1));
+    if (availableTimes.isNotEmpty) {
+      return availableTimes.first;
+    }
+
+    return now.add(const Duration(days: 1));
   }
 
   void _recordDoctorNotification({
