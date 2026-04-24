@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 
 class CustomDoctorCard extends StatelessWidget {
   final DoctorEntity doctor;
+  final bool dense;
 
-  const CustomDoctorCard({super.key, required this.doctor});
+  const CustomDoctorCard({super.key, required this.doctor, this.dense = false});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +19,9 @@ class CustomDoctorCard extends StatelessWidget {
     final cardBackground = colorScheme.primaryContainer.withValues(alpha: 0.45);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppStyles.padding,
-        vertical: AppStyles.padding / 2,
+      padding: EdgeInsets.symmetric(
+        horizontal: dense ? AppStyles.padding / 2 : AppStyles.padding,
+        vertical: dense ? 6 : AppStyles.padding / 2,
       ),
       child: Container(
         decoration: BoxDecoration(

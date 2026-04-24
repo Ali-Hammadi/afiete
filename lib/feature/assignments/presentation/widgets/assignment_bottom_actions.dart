@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +32,7 @@ class CustomAssignmentBottomActions extends StatelessWidget {
             Expanded(
               child: CustomButton(
                 widget: Text(
-                  'Back',
+                  SettingsStrings.backButton,
                   style: AppStyles.bodyMedium.copyWith(
                     color: colorScheme.onPrimary,
                   ),
@@ -43,7 +44,9 @@ class CustomAssignmentBottomActions extends StatelessWidget {
           Expanded(
             child: CustomButton(
               widget: Text(
-                isLastQuestion ? 'Submit' : 'Continue',
+                isLastQuestion
+                    ? SettingsStrings.submitButton
+                    : SettingsStrings.continueButton,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onPrimary,
                 ),

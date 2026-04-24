@@ -6,6 +6,7 @@ abstract class SettingsStrings {
   }
 
   static String _t(String en, String ar) => _languageCode == 'ar' ? ar : en;
+  static bool get isArabic => _languageCode == 'ar';
 
   static String get settingsTitle => _t('Settings', 'الإعدادات');
   static String get medicalProfileTitle => _t('Medical Profile', 'الملف الطبي');
@@ -608,6 +609,184 @@ abstract class SettingsStrings {
   static String get emailRequired =>
       _t('Email is required', 'البريد الإلكتروني مطلوب');
   static String get continueText => _t('Continue', 'متابعة');
+
+  static String get assessmentTitle => _t('Assessment', 'التقييم');
+  static String get assessmentPrompt => _t(
+    'Select the option that best represents your current state of mind.',
+    'اختر الخيار الذي يصف حالتك الحالية بشكل أفضل.',
+  );
+  static String get backButton => _t('Back', 'رجوع');
+  static String get continueButton => _t('Continue', 'متابعة');
+  static String get submitButton => _t('Submit', 'إرسال');
+  static String get retryButton => _t('Retry', 'إعادة المحاولة');
+  static String get chooseAnswerBeforeContinuing => _t(
+    'Please choose an answer before continuing.',
+    'يرجى اختيار إجابة قبل المتابعة.',
+  );
+  static String get answerAllQuestionsBeforeSubmitting => _t(
+    'Please answer all questions before submitting.',
+    'يرجى الإجابة عن جميع الأسئلة قبل الإرسال.',
+  );
+  static String get assignmentRecommendedSpecialistSummary => _t(
+    'Based on your answers, we recommend speaking with a specialist that matches your current mental health state.',
+    'بناءً على إجاباتك، نوصي بالتحدث مع متخصص يناسب حالتك النفسية الحالية.',
+  );
+
+  static String assignmentQuestionLabel(String text) {
+    final normalized = text.trim().toLowerCase();
+    switch (normalized) {
+      case 'little interest or pleasure in doing things':
+        return _t(
+          'Little interest or pleasure in doing things',
+          'قلة الاهتمام أو المتعة في القيام بالأشياء',
+        );
+      case 'feeling down, depressed, or hopeless':
+        return _t(
+          'Feeling down, depressed, or hopeless',
+          'الشعور بالحزن أو الاكتئاب أو اليأس',
+        );
+      case 'trouble falling or staying asleep, or sleeping too much':
+        return _t(
+          'Trouble falling or staying asleep, or sleeping too much',
+          'صعوبة في النوم أو الاستمرار فيه، أو النوم أكثر من اللازم',
+        );
+      case 'feeling tired or having little energy':
+        return _t(
+          'Feeling tired or having little energy',
+          'الشعور بالتعب أو قلة الطاقة',
+        );
+      case 'poor appetite or overeating':
+        return _t(
+          'Poor appetite or overeating',
+          'ضعف الشهية أو الإفراط في الأكل',
+        );
+      case 'feeling bad about yourself or that you are a failure':
+        return _t(
+          'Feeling bad about yourself or that you are a failure',
+          'الشعور بالسوء تجاه نفسك أو أنك فاشل',
+        );
+      case 'trouble concentrating on things':
+        return _t(
+          'Trouble concentrating on things',
+          'صعوبة في التركيز على الأمور',
+        );
+      case 'moving or speaking so slowly that others have noticed':
+        return _t(
+          'Moving or speaking so slowly that others have noticed',
+          'التحرك أو الكلام ببطء لدرجة يلاحظها الآخرون',
+        );
+      case 'thoughts that you would be better off dead':
+        return _t(
+          'Thoughts that you would be better off dead',
+          'أفكار بأنك ستكون أفضل لو كنت ميتًا',
+        );
+      default:
+        return text;
+    }
+  }
+
+  static String assignmentOptionLabel(String option) {
+    final normalized = option.trim().toLowerCase();
+    switch (normalized) {
+      case 'never':
+        return _t('Never', 'أبدًا');
+      case 'not at all':
+        return _t('Not at all', 'على الإطلاق');
+      case 'sometimes':
+      case 'several days':
+        return _t('Several days', 'عدة أيام');
+      case 'often':
+      case 'more than half the days':
+        return _t('More than half the days', 'أكثر من نصف الأيام');
+      case 'always':
+      case 'nearly every day':
+        return _t('Nearly every day', 'تقريبًا كل يوم');
+      case 'extremely':
+        return _t('Extremely', 'بشكل كبير');
+      default:
+        return option;
+    }
+  }
+
+  static String assignmentSeverityLabel(String severity) {
+    final normalized = severity.trim().toLowerCase();
+    switch (normalized) {
+      case 'minimal':
+        return _t('Minimal', 'بسيط جدًا');
+      case 'mild':
+        return _t('Mild', 'خفيف');
+      case 'moderate':
+        return _t('Moderate', 'متوسط');
+      case 'moderately_severe':
+      case 'moderately severe':
+        return _t('Moderately severe', 'متوسط إلى شديد');
+      case 'severe':
+        return _t('Severe', 'شديد');
+      default:
+        return severity;
+    }
+  }
+
+  static String assignmentSummaryLabel(String severity, String backendSummary) {
+    if (!isArabic) {
+      if (backendSummary.trim().isNotEmpty) {
+        return backendSummary;
+      }
+
+      final normalized = severity.trim().toLowerCase();
+      switch (normalized) {
+        case 'minimal':
+          return 'Your assessment indicates minimal symptoms. Continue with healthy lifestyle habits.';
+        case 'mild':
+          return 'Your assessment indicates mild symptoms. Consider speaking with a mental health professional.';
+        case 'moderate':
+          return 'Your assessment indicates moderate symptoms. Professional support is recommended.';
+        case 'moderately_severe':
+        case 'moderately severe':
+          return 'Your assessment indicates moderately severe symptoms. Professional psychological or psychiatric care is strongly recommended.';
+        case 'severe':
+          return 'Your assessment indicates severe symptoms. Immediate professional help is recommended. Please reach out to a mental health professional.';
+        default:
+          return 'Based on your answers, we recommend speaking with a specialist that matches your current mental health state.';
+      }
+    }
+
+    final normalized = severity.trim().toLowerCase();
+    switch (normalized) {
+      case 'minimal':
+        return _t(
+          'Your assessment indicates minimal symptoms. Continue with healthy lifestyle habits.',
+          'تشير نتيجتك إلى أعراض بسيطة جدًا. واصل العادات الصحية الجيدة.',
+        );
+      case 'mild':
+        return _t(
+          'Your assessment indicates mild symptoms. Consider speaking with a mental health professional.',
+          'تشير نتيجتك إلى أعراض خفيفة. فكر في التحدث مع متخصص في الصحة النفسية.',
+        );
+      case 'moderate':
+        return _t(
+          'Your assessment indicates moderate symptoms. Professional support is recommended.',
+          'تشير نتيجتك إلى أعراض متوسطة. يُنصح بالحصول على دعم مهني.',
+        );
+      case 'moderately_severe':
+      case 'moderately severe':
+        return _t(
+          'Your assessment indicates moderately severe symptoms. Professional psychological or psychiatric care is strongly recommended.',
+          'تشير نتيجتك إلى أعراض متوسطة إلى شديدة. يُنصح بشدة بالرعاية النفسية أو النفسية الطبية المتخصصة.',
+        );
+      case 'severe':
+        return _t(
+          'Your assessment indicates severe symptoms. Immediate professional help is recommended. Please reach out to a mental health professional.',
+          'تشير نتيجتك إلى أعراض شديدة. يُنصح بالحصول على مساعدة مهنية فورًا. يرجى التواصل مع متخصص في الصحة النفسية.',
+        );
+      default:
+        return _t(
+          'Based on your answers, we recommend speaking with a specialist that matches your current mental health state.',
+          'بناءً على إجاباتك، نوصي بالتحدث مع متخصص يناسب حالتك النفسية الحالية.',
+        );
+    }
+  }
+
   static String get verifyYourNewEmail =>
       _t('Verify your new email', 'تحقق من بريدك الإلكتروني الجديد');
   static String verificationCodeSentTo(String email) => _t(

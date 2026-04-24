@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -47,15 +48,16 @@ class CustomAssignmentResultSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            result.severity,
+            SettingsStrings.assignmentSeverityLabel(result.severity),
             style: AppStyles.headingMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
-            result.summary.isEmpty
-                ? 'Based on your answers, we recommend speaking with a specialist that matches your current mental health state.'
-                : result.summary,
+            SettingsStrings.assignmentSummaryLabel(
+              result.severity,
+              result.summary,
+            ),
             style: AppStyles.bodyMedium,
             textAlign: TextAlign.center,
           ),

@@ -45,7 +45,9 @@ class AssignmentResultScreen extends StatelessWidget {
             Column(
               children: state.doctors
                   .take(3)
-                  .map((doctor) => CustomDoctorCard(doctor: doctor))
+                  .map(
+                    (doctor) => CustomDoctorCard(doctor: doctor, dense: true),
+                  )
                   .toList(),
             ),
           const SizedBox(height: 20),

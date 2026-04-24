@@ -1,5 +1,7 @@
 import 'package:afiete/core/constants/psychology_specialties.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/usecases/usecase.dart';
+import 'package:afiete/feature/assignments/data/assignment_visibility_store.dart';
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
 import 'package:afiete/feature/assignments/domain/usecase/get_assignment_questions_usecase.dart';
 import 'package:afiete/feature/assignments/domain/usecase/submit_assignment_usecase.dart';
@@ -68,7 +70,7 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
     if (currentAnswer == null || currentAnswer.trim().isEmpty) {
       emit(
         currentState.copyWith(
-          validationError: 'Please choose an answer before continuing.',
+          validationError: SettingsStrings.chooseAnswerBeforeContinuing,
         ),
       );
       return;
@@ -114,7 +116,7 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
     if (currentState.selectedAnswers.length != currentState.questions.length) {
       emit(
         currentState.copyWith(
-          validationError: 'Please answer all questions before submitting.',
+          validationError: SettingsStrings.answerAllQuestionsBeforeSubmitting,
         ),
       );
       return;
@@ -138,6 +140,7 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
     await submissionResult.fold(
       (failure) async => emit(AssignmentsError(failure.errorMessage)),
       (result) async {
+        await AssignmentVisibilityStore.markAssignmentCompleted();
         final doctors = await _resolveRecommendedDoctors(result);
         emit(AssignmentsResultLoaded(result: result, doctors: doctors));
       },

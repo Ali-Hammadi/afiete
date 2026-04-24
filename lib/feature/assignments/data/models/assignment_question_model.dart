@@ -1,4 +1,5 @@
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 
 abstract class AssignmentModel {
   static AssignmentEntity fromQuestionJson(Map<String, dynamic> json) {
@@ -17,9 +18,10 @@ abstract class AssignmentModel {
 
     return AssignmentEntity.question(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
-      questionText:
-          (json['questionText'] ?? json['question'] ?? json['text'] ?? '')
-              .toString(),
+      questionText: SettingsStrings.assignmentQuestionLabel(
+        (json['questionText'] ?? json['question'] ?? json['text'] ?? '')
+            .toString(),
+      ),
       options: options,
       validation: (json['validation'] ?? '').toString(),
     );
@@ -59,14 +61,25 @@ abstract class AssignmentModel {
     final value = option.trim().toLowerCase();
     switch (value) {
       case 'never':
+      case 'أبدًا':
         return 'Never';
+      case 'not at all':
+      case 'على الإطلاق':
+        return 'Not at all';
       case 'sometimes':
+      case 'several days':
+      case 'عدة أيام':
         return 'Sometimes';
       case 'often':
+      case 'more than half the days':
+      case 'أكثر من نصف الأيام':
         return 'Often';
       case 'always':
+      case 'nearly every day':
+      case 'تقريبًا كل يوم':
         return 'Always';
       case 'extremely':
+      case 'بشكل كبير':
         return 'Extremely';
       default:
         return '';

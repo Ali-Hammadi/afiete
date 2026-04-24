@@ -48,12 +48,24 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
       return doctors;
     }
 
-    final query = searchQuery.toLowerCase();
+    final query = _normalizeSearchText(searchQuery);
     return doctors.where((doctor) {
-      final name = doctor.name.toLowerCase();
-      final specialization = doctor.specialization.toLowerCase();
-      return name.contains(query) || specialization.contains(query);
+      final name = _normalizeSearchText(doctor.name);
+      final specialization = _normalizeSearchText(doctor.specialization);
+      final localizedSpecialization = _normalizeSearchText(
+        SettingsStrings.specialtyLabel(doctor.specialization),
+      );
+      return name.contains(query) ||
+          specialization.contains(query) ||
+          localizedSpecialization.contains(query);
     }).toList();
+  }
+
+  String _normalizeSearchText(String text) {
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[\s\p{P}\p{S}]+', unicode: true), '')
+        .replaceAll(RegExp(r'[^\p{L}\p{N}]+', unicode: true), '');
   }
 
   @override

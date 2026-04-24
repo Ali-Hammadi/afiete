@@ -1,4 +1,5 @@
 import 'package:afiete/core/usecases/usecase.dart';
+import 'package:afiete/feature/assignments/data/assignment_visibility_store.dart';
 import 'package:afiete/feature/booking_assiments/domain/entities/appointment_entity.dart';
 import 'package:afiete/feature/booking_assiments/domain/usecase/create_appointment_usecase.dart';
 import 'package:afiete/feature/booking_assiments/domain/usecase/get_appointments_usecase.dart';
@@ -70,17 +71,21 @@ class AppointmentsCubit extends Cubit<AppointmentsState> {
       ),
     );
 
-    result.fold((failure) => emit(AppointmentsError(failure.errorMessage)), (
-      created,
-    ) {
-      final currentState = state;
-      if (currentState is AppointmentsLoaded) {
-        final updated = [created, ...currentState.appointments]
-          ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
-        emit(AppointmentsLoaded(updated, doctors: currentState.doctors));
-      } else {
-        emit(AppointmentsLoaded([created], doctors: const []));
-      }
-    });
+    await result.fold<Future<void>>(
+      (failure) async {
+        emit(AppointmentsError(failure.errorMessage));
+      },
+      (created) async {
+        await AssignmentVisibilityStore.markAssignmentBooked();
+        final currentState = state;
+        if (currentState is AppointmentsLoaded) {
+          final updated = [created, ...currentState.appointments]
+            ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+          emit(AppointmentsLoaded(updated, doctors: currentState.doctors));
+        } else {
+          emit(AppointmentsLoaded([created], doctors: const []));
+        }
+      },
+    );
   }
 }
