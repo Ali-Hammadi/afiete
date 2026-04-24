@@ -16,6 +16,9 @@ class ArticlesCubit extends Cubit<ArticlesState> {
   final DislikeArticleUseCase dislikeArticleUseCase;
   List<ArticleEntity>? _currentArticles;
   bool _currentIsForHome = false;
+  String? _currentDoctorId;
+  String? _currentUserDiagnosis;
+  bool _loadedAllArticles = false;
 
   ArticlesCubit({
     required this.getArticlesForHomeUseCase,
@@ -28,6 +31,9 @@ class ArticlesCubit extends Cubit<ArticlesState> {
 
   Future<void> loadArticlesForHome({String? userDiagnosis}) async {
     emit(const ArticlesLoading());
+    _currentDoctorId = null;
+    _loadedAllArticles = false;
+    _currentUserDiagnosis = userDiagnosis;
     final result = await getArticlesForHomeUseCase(
       userDiagnosis: userDiagnosis,
       limit: 5,
@@ -44,6 +50,9 @@ class ArticlesCubit extends Cubit<ArticlesState> {
 
   Future<void> loadArticlesByDoctor(String doctorId) async {
     emit(const ArticlesLoading());
+    _currentDoctorId = doctorId;
+    _loadedAllArticles = false;
+    _currentUserDiagnosis = null;
     final result = await getArticlesByDoctorUseCase(doctorId);
 
     result.fold((failure) => emit(ArticlesError(failure.errorMessage)), (
@@ -57,6 +66,9 @@ class ArticlesCubit extends Cubit<ArticlesState> {
 
   Future<void> loadAllArticles({int page = 1, int pageSize = 10}) async {
     emit(const ArticlesLoading());
+    _currentDoctorId = null;
+    _currentUserDiagnosis = null;
+    _loadedAllArticles = true;
     final result = await getAllArticlesUseCase(page: page, pageSize: pageSize);
 
     result.fold((failure) => emit(ArticlesError(failure.errorMessage)), (
@@ -76,6 +88,20 @@ class ArticlesCubit extends Cubit<ArticlesState> {
       (failure) => emit(ArticlesError(failure.errorMessage)),
       (article) => emit(ArticleDetailsLoaded(article)),
     );
+  }
+
+  Future<void> reloadCurrent() async {
+    if (_currentDoctorId != null) {
+      await loadArticlesByDoctor(_currentDoctorId!);
+      return;
+    }
+
+    if (_loadedAllArticles) {
+      await loadAllArticles();
+      return;
+    }
+
+    await loadArticlesForHome(userDiagnosis: _currentUserDiagnosis);
   }
 
   Future<void> toggleLike(ArticleEntity article) async {

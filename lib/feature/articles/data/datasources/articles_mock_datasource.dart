@@ -21,6 +21,11 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   static String _localized(String en, String ar) =>
       SettingsStrings.isArabic ? ar : en;
 
+  static final Map<String, bool> _likedState = {};
+  static final Map<String, bool> _dislikedState = {};
+  static final Map<String, int> _likesCountState = {};
+  static final Map<String, int> _dislikesCountState = {};
+
   DoctorEntity get _doctorAhmed => DoctorEntity(
     id: 'doc_001',
     name: _localized('Dr. Ahmed Mohsen', 'د. أحمد محسن'),
@@ -109,7 +114,27 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
   );
 
-  late final List<ArticleModel> _articlesStore = _buildMockArticles();
+  List<ArticleModel> get _articlesStore =>
+      _applyInteractionState(_buildMockArticles());
+
+  List<ArticleModel> _applyInteractionState(List<ArticleModel> articles) {
+    return articles
+        .map((article) {
+          final liked = _likedState[article.id] ?? article.isLikedByUser;
+          final disliked =
+              _dislikedState[article.id] ?? article.isDislikedByUser;
+          final likesCount = _likesCountState[article.id] ?? article.likesCount;
+          final dislikesCount =
+              _dislikesCountState[article.id] ?? article.dislikesCount;
+          return article.copyWith(
+            isLikedByUser: liked,
+            isDislikedByUser: disliked,
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+          );
+        })
+        .toList(growable: false);
+  }
 
   List<ArticleModel> get _mockArticles => _articlesStore;
 
@@ -135,14 +160,6 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
 
   int _articleIndex(String articleId) =>
       _articlesStore.indexWhere((article) => article.id == articleId);
-
-  void _replaceArticle(ArticleModel updatedArticle) {
-    final index = _articleIndex(updatedArticle.id);
-    if (index == -1) {
-      return;
-    }
-    _articlesStore[index] = updatedArticle;
-  }
 
   List<ArticleModel> _buildMockArticles() => [
     ArticleModel(
@@ -436,21 +453,17 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     }
 
     final article = _articlesStore[index];
-    final updatedArticle = article.isLikedByUser
-        ? article.copyWith(
-            isLikedByUser: false,
-            likesCount: max(0, article.likesCount - 1),
-          )
-        : article.copyWith(
-            isLikedByUser: true,
-            isDislikedByUser: false,
-            likesCount: article.likesCount + 1,
-            dislikesCount: article.isDislikedByUser
-                ? max(0, article.dislikesCount - 1)
-                : article.dislikesCount,
-          );
-
-    _replaceArticle(updatedArticle);
+    final isCurrentlyLiked = article.isLikedByUser;
+    _likedState[articleId] = !isCurrentlyLiked;
+    if (!isCurrentlyLiked) {
+      _dislikedState[articleId] = false;
+      _likesCountState[articleId] = article.likesCount + 1;
+      _dislikesCountState[articleId] = article.isDislikedByUser
+          ? max(0, article.dislikesCount - 1)
+          : article.dislikesCount;
+    } else {
+      _likesCountState[articleId] = max(0, article.likesCount - 1);
+    }
   }
 
   @override
@@ -463,20 +476,16 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     }
 
     final article = _articlesStore[index];
-    final updatedArticle = article.isDislikedByUser
-        ? article.copyWith(
-            isDislikedByUser: false,
-            dislikesCount: max(0, article.dislikesCount - 1),
-          )
-        : article.copyWith(
-            isDislikedByUser: true,
-            isLikedByUser: false,
-            dislikesCount: article.dislikesCount + 1,
-            likesCount: article.isLikedByUser
-                ? max(0, article.likesCount - 1)
-                : article.likesCount,
-          );
-
-    _replaceArticle(updatedArticle);
+    final isCurrentlyDisliked = article.isDislikedByUser;
+    _dislikedState[articleId] = !isCurrentlyDisliked;
+    if (!isCurrentlyDisliked) {
+      _likedState[articleId] = false;
+      _dislikesCountState[articleId] = article.dislikesCount + 1;
+      _likesCountState[articleId] = article.isLikedByUser
+          ? max(0, article.likesCount - 1)
+          : article.likesCount;
+    } else {
+      _dislikesCountState[articleId] = max(0, article.dislikesCount - 1);
+    }
   }
 }

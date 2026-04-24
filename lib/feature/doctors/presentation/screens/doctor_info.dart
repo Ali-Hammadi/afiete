@@ -41,7 +41,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final doctor = widget.doctor;
+    final doctor = _resolveDoctor(widget.doctor);
     final doctorName = doctor?.name ?? SettingsStrings.doctorDefaultName;
     final doctorSpecialization = doctor == null
         ? SettingsStrings.doctorSpecialist
@@ -191,6 +191,40 @@ class _DoctorInfoState extends State<DoctorInfo> {
     );
   }
 
+  DoctorEntity? _resolveDoctor(DoctorEntity? doctor) {
+    if (doctor == null) {
+      return null;
+    }
+
+    final currentDoctorData = MockDoctorsData.getMockDoctorById(doctor.id);
+    if (currentDoctorData == null) {
+      return doctor;
+    }
+
+    return DoctorEntity(
+      id: doctor.id,
+      name: currentDoctorData['name'] as String? ?? doctor.name,
+      specialization:
+          currentDoctorData['specialization'] as String? ??
+          doctor.specialization,
+      experience:
+          currentDoctorData['experience'] as String? ?? doctor.experience,
+      rating: currentDoctorData['rating'] as String? ?? doctor.rating,
+      imageUrl: currentDoctorData['imageUrl'] as String? ?? doctor.imageUrl,
+      description:
+          currentDoctorData['description'] as String? ?? doctor.description,
+      isOnline: currentDoctorData['isOnline'] as bool? ?? doctor.isOnline,
+      ratingValue:
+          (currentDoctorData['ratingValue'] as num?)?.toDouble() ??
+          doctor.ratingValue,
+      createdAt: doctor.createdAt,
+      availableTimes: doctor.availableTimes,
+      availableDurations: doctor.availableDurations,
+      availableSessionTypes: doctor.availableSessionTypes,
+      consultationFee: doctor.consultationFee,
+    );
+  }
+
   Widget _buildStatsCard({
     required ColorScheme colorScheme,
     required DoctorEntity? doctor,
@@ -221,11 +255,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  SettingsStrings.experienceYearsLabel(
-                    doctor?.experience ?? '+ 5 years',
-                  ),
-                ),
+                Text(doctor?.experience ?? '+ 5 years'),
                 Text(
                   SettingsStrings.experienceLabel,
                   style: AppStyles.bodySmall,

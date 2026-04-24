@@ -72,10 +72,7 @@ class CustomDoctorCard extends StatelessWidget {
                         SettingsStrings.experienceLabel,
                         textAlign: TextAlign.center,
                       ),
-                      Text(
-                        SettingsStrings.experienceYearsLabel(doctor.experience),
-                        textAlign: TextAlign.center,
-                      ),
+                      Text(doctor.experience, textAlign: TextAlign.center),
                     ],
                   ),
                 ),

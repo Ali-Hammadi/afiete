@@ -52,29 +52,38 @@ class MyApp extends StatelessWidget {
         BlocProvider<SettingsCubit>(create: (_) => sl<SettingsCubit>()),
         BlocProvider<ArticlesCubit>(create: (_) => sl<ArticlesCubit>()),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeMode) {
-          return BlocBuilder<LanguageCubit, Locale>(
-            builder: (context, locale) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                title: 'Afiete',
-                theme: AppTheme.lightTheme,
-                darkTheme: AppTheme.darkTheme,
-                themeMode: themeMode,
-                locale: locale,
-                supportedLocales: const [Locale('en'), Locale('ar')],
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                ],
-                initialRoute: MyRoutes.homeScreen,
-                onGenerateRoute: AppRouter.generateRoute,
-              );
-            },
-          );
+      child: BlocListener<LanguageCubit, Locale>(
+        listenWhen: (previous, current) =>
+            previous.languageCode != current.languageCode,
+        listener: (context, locale) {
+          context.read<DoctorsCubit>().reloadCurrent();
+          context.read<ArticlesCubit>().reloadCurrent();
+          context.read<AppointmentsCubit>().loadAppointments();
         },
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return BlocBuilder<LanguageCubit, Locale>(
+              builder: (context, locale) {
+                return MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  title: 'Afiete',
+                  theme: AppTheme.lightTheme,
+                  darkTheme: AppTheme.darkTheme,
+                  themeMode: themeMode,
+                  locale: locale,
+                  supportedLocales: const [Locale('en'), Locale('ar')],
+                  localizationsDelegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                  ],
+                  initialRoute: MyRoutes.homeScreen,
+                  onGenerateRoute: AppRouter.generateRoute,
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
