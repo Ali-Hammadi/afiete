@@ -220,6 +220,49 @@ abstract class SettingsStrings {
   static String get topDoctorsTitle => _t('Top Doctors', 'أفضل الأطباء');
   static String get howAreYouFeelingToday =>
       _t('How are you feeling today?', 'كيف تشعر اليوم؟');
+  static String get feelingHappyLabel => _t('Happy', 'سعيد');
+  static String get feelingSadLabel => _t('Sad', 'حزين');
+  static String get feelingAngryLabel => _t('Angry', 'غاضب');
+  static String get feelingNeutralLabel => _t('Neutral', 'عادي');
+  static String get feelingAnxiousLabel => _t('Anxious', 'قلق');
+  static String get musicTitle => _t('Music', 'الموسيقى');
+  static String get musicSubtitle => _t(
+    'Listen from your last mood or choose a new one',
+    'استمع حسب آخر مزاج محفوظ أو اختر حالة جديدة',
+  );
+  static String get recommendedForYou => _t('Recommended for you', 'مقترح لك');
+  static String get continueFromLastMood =>
+      _t('Continue from last mood', 'الاستمرار من آخر حالة شعورية');
+  static String get chooseMoodHint => _t(
+    'Choose a feeling or keep the last one',
+    'اختر شعورًا أو ابقَ على آخر اختيار',
+  );
+  static String get breathingTitle => _t('Breathing', 'تمارين التنفس');
+  static String get breathingSubtitle => _t(
+    'Medical breathing exercises for calm and regulation',
+    'تمارين تنفس علاجية للتهدئة وتنظيم الجسم',
+  );
+  static String get startExercise => _t('Start exercise', 'ابدأ التمرين');
+  static String get pauseExercise => _t('Pause', 'إيقاف مؤقت');
+  static String get resumeExercise => _t('Resume', 'متابعة');
+  static String get openMusicLibrary =>
+      _t('Open music library', 'فتح مكتبة الموسيقى');
+  static String get viewAllExercises =>
+      _t('View all exercises', 'عرض جميع التمارين');
+  static String get noTracksAvailable =>
+      _t('No tracks available yet.', 'لا توجد مقاطع متاحة بعد.');
+  static String get noExerciseAvailable =>
+      _t('No breathing exercises available.', 'لا توجد تمارين تنفس متاحة.');
+  static String get savedMoodLabel => _t('Saved mood', 'الحالة المحفوظة');
+  static String get currentSessionLabel =>
+      _t('Current session', 'الجلسة الحالية');
+  static String get musicTabLabel => _t('Music', 'الموسيقى');
+  static String get breathingTabLabel => _t('Breathing', 'التنفس');
+  static String get playLabel => _t('Play', 'تشغيل');
+  static String get inhaleLabel => _t('Inhale', 'شهيق');
+  static String get holdLabel => _t('Hold', 'حبس');
+  static String get exhaleLabel => _t('Exhale', 'زفير');
+  static String get restLabel => _t('Rest', 'راحة');
   static String get takeAssignmentTitle =>
       _t('Not sure where to start?', 'لست متأكدًا من أين تبدأ؟');
   static String get takeAssignmentDescription => _t(

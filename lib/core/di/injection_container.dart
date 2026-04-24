@@ -35,6 +35,16 @@ import 'package:afiete/feature/doctors/data/repositories/doctors_repository_impl
 import 'package:afiete/feature/doctors/domain/repositories/doctors_repository.dart';
 import 'package:afiete/feature/doctors/domain/usecase/get_doctors_usecase.dart';
 import 'package:afiete/feature/doctors/presentation/cubits/doctors_cubit.dart';
+import 'package:afiete/feature/feeling/data/datasources/feeling_local_data_source.dart';
+import 'package:afiete/feature/feeling/data/repositories/feeling_repository_impl.dart';
+import 'package:afiete/feature/feeling/domain/repositories/feeling_repository.dart';
+import 'package:afiete/feature/feeling/domain/usecase/feeling_usecases.dart';
+import 'package:afiete/feature/feeling/presentation/cubit/feeling_cubit.dart';
+import 'package:afiete/feature/music/data/datasources/music_local_data_source.dart';
+import 'package:afiete/feature/music/data/repositories/music_repository_impl.dart';
+import 'package:afiete/feature/music/domain/repositories/music_repository.dart';
+import 'package:afiete/feature/music/domain/usecase/get_recommended_music_usecase.dart';
+import 'package:afiete/feature/music/presentation/cubit/music_cubit.dart';
 import 'package:afiete/feature/payment/data/datasources/payment_mock_datasource.dart';
 import 'package:afiete/feature/payment/data/datasources/payment_remote_datasource.dart';
 import 'package:afiete/feature/payment/data/repositories/payment_repository_impl.dart';
@@ -347,6 +357,76 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<GetDoctorByIdUseCase>(
     () => GetDoctorByIdUseCase(sl<DoctorsRepository>()),
+  );
+
+  // Feeling data sources
+  sl.registerLazySingleton<FeelingLocalDataSource>(
+    () => FeelingLocalDataSourceImpl(),
+  );
+
+  // Feeling repositories
+  sl.registerLazySingleton<FeelingRepository>(
+    () => FeelingRepositoryImpl(localDataSource: sl<FeelingLocalDataSource>()),
+  );
+
+  // Feeling use cases
+  sl.registerLazySingleton<SaveFeelingUseCase>(
+    () => SaveFeelingUseCase(sl<FeelingRepository>()),
+  );
+  sl.registerLazySingleton<GetCurrentFeelingUseCase>(
+    () => GetCurrentFeelingUseCase(sl<FeelingRepository>()),
+  );
+  sl.registerLazySingleton<GetFeelingHistoryUseCase>(
+    () => GetFeelingHistoryUseCase(sl<FeelingRepository>()),
+  );
+
+  // Feeling cubit
+  sl.registerFactory<FeelingCubit>(
+    () => FeelingCubit(
+      sl<SaveFeelingUseCase>(),
+      sl<GetCurrentFeelingUseCase>(),
+      sl<GetFeelingHistoryUseCase>(),
+    ),
+  );
+
+  // Music data sources
+  sl.registerLazySingleton<MusicLocalDataSource>(
+    () => MusicLocalDataSourceImpl(),
+  );
+
+  // Music repositories
+  sl.registerLazySingleton<MusicRepository>(
+    () => MusicRepositoryImpl(dataSource: sl<MusicLocalDataSource>()),
+  );
+
+  // Music use cases
+  sl.registerLazySingleton<GetRecommendedMusicUseCase>(
+    () => GetRecommendedMusicUseCase(sl<MusicRepository>()),
+  );
+  sl.registerLazySingleton<GetTracksByGoalUseCase>(
+    () => GetTracksByGoalUseCase(sl<MusicRepository>()),
+  );
+  sl.registerLazySingleton<GetTrackByIdUseCase>(
+    () => GetTrackByIdUseCase(sl<MusicRepository>()),
+  );
+  sl.registerLazySingleton<GetBreathingExercisesUseCase>(
+    () => GetBreathingExercisesUseCase(sl<MusicRepository>()),
+  );
+  sl.registerLazySingleton<SaveLastSelectedFeelingUseCase>(
+    () => SaveLastSelectedFeelingUseCase(sl<MusicRepository>()),
+  );
+  sl.registerLazySingleton<GetLastSelectedFeelingUseCase>(
+    () => GetLastSelectedFeelingUseCase(sl<MusicRepository>()),
+  );
+
+  // Music cubit
+  sl.registerFactory<MusicCubit>(
+    () => MusicCubit(
+      sl<GetRecommendedMusicUseCase>(),
+      sl<GetBreathingExercisesUseCase>(),
+      sl<GetLastSelectedFeelingUseCase>(),
+      sl<SaveLastSelectedFeelingUseCase>(),
+    ),
   );
 
   // Assignments data sources
