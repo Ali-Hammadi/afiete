@@ -20,7 +20,9 @@ class ArticlesHomeSection extends StatelessWidget {
             height: 200,
             child: const Center(child: CircularProgressIndicator()),
           );
-        } else if (state is ArticlesLoaded && state.articles.isNotEmpty) {
+        }
+
+        if (state is ArticlesLoaded && state.articles.isNotEmpty) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -37,23 +39,25 @@ class ArticlesHomeSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                itemCount: state.articles.length,
-                itemBuilder: (context, index) {
-                  final article = state.articles[index];
-                  return ArticleCardWidget(
-                    article: article,
-                    onReadMore: () {},
-                    onLike: () {
-                      context.read<ArticlesCubit>().toggleLike(article);
-                    },
-                    onDislike: () {
-                      context.read<ArticlesCubit>().toggleDislike(article);
-                    },
-                  );
+                child: Column(
+                  children: state.articles
+                      .map(
+                        (article) => ArticleCardWidget(
+                          article: article,
+                          onReadMore: () {},
+                          onLike: () {
+                            context.read<ArticlesCubit>().toggleLike(article);
+                          },
+                          onDislike: () {
+                            context.read<ArticlesCubit>().toggleDislike(
+                              article,
+                            );
+                          },
+                        ),
+                      )
+                      .toList(growable: false),
                 ),
               ),
               const SizedBox(height: 12),
@@ -76,7 +80,9 @@ class ArticlesHomeSection extends StatelessWidget {
               const SizedBox(height: 20),
             ],
           );
-        } else if (state is ArticlesError) {
+        }
+
+        if (state is ArticlesError) {
           return Padding(
             padding: EdgeInsets.all(AppStyles.padding),
             child: Center(child: Text(state.message)),
