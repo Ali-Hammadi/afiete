@@ -13,10 +13,7 @@ class CustomEmotionsWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppStyles.padding,
-        vertical: AppStyles.padding,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: AppStyles.padding),
       child: BlocBuilder<FeelingCubit, FeelingState>(
         builder: (context, state) {
           final selectedFeeling = switch (state) {
@@ -25,10 +22,8 @@ class CustomEmotionsWidget extends StatelessWidget {
             _ => null,
           };
 
-          return Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            runSpacing: 12,
-            spacing: 10,
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: _items
                 .map((item) {
                   final isSelected = selectedFeeling == item.feeling;
@@ -39,7 +34,7 @@ class CustomEmotionsWidget extends StatelessWidget {
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
-                      width: 64,
+                      width: 58,
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected

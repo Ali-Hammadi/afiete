@@ -37,12 +37,10 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       title: 'Cozy Coffeehouse',
       artist: 'Lunar Years',
       description: 'Warm, calming background music for gentle regulation.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/cozy-coffeehouse-shiny-chill',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/cozy-coffeehouse-shiny-chill',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [
         FeelingType.neutral,
         FeelingType.anxious,
@@ -57,20 +55,18 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 180,
       tempoBpm: 72,
       noveltyScore: 8,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Lunar Years',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
     MusicEntity(
       id: 'music_02',
       title: 'Small Joys',
       artist: 'Aventure',
       description: 'Gentle uplifting music to help restore positive affect.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/small-joys-dreamy-chill',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/small-joys-dreamy-chill',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [FeelingType.happy, FeelingType.neutral],
       therapeuticGoals: [
         MusicTherapeuticGoal.uplift,
@@ -80,20 +76,18 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 165,
       tempoBpm: 88,
       noveltyScore: 9,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Aventure',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
     MusicEntity(
       id: 'music_03',
       title: 'Long Night',
       artist: 'Aventure',
       description: 'Soft piano and calm textures for down-regulation.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/long-night-calm-warm',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/long-night-calm-warm',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [
         FeelingType.sad,
         FeelingType.anxious,
@@ -107,20 +101,18 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 210,
       tempoBpm: 66,
       noveltyScore: 10,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Aventure',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
     MusicEntity(
       id: 'music_04',
       title: 'Morning Coffee',
       artist: 'Vital',
       description: 'Light positive background track for steady focus.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/morning-coffee-positive-chill',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/morning-coffee-positive-chill',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [FeelingType.happy, FeelingType.neutral],
       therapeuticGoals: [
         MusicTherapeuticGoal.focus,
@@ -130,8 +122,8 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 195,
       tempoBpm: 84,
       noveltyScore: 7,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Vital',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
     MusicEntity(
       id: 'music_05',
@@ -139,12 +131,10 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       artist: 'Sound EGO',
       description:
           'Deep chillout textures for anxiety and emotional softening.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/sunlit-depths-deep-chillout',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/sunlit-depths-deep-chillout',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [
         FeelingType.anxious,
         FeelingType.sad,
@@ -158,20 +148,18 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 200,
       tempoBpm: 70,
       noveltyScore: 8,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Sound EGO',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
     MusicEntity(
       id: 'music_06',
       title: 'Aftermath',
       artist: 'Evert Zeevalkink',
       description: 'Calm sad piano suitable for emotionally heavy moments.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/aftermath-calm-sad-piano',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/aftermath-calm-sad-piano',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [FeelingType.sad, FeelingType.neutral],
       therapeuticGoals: [
         MusicTherapeuticGoal.calmDown,
@@ -181,20 +169,18 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 240,
       tempoBpm: 60,
       noveltyScore: 9,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Evert Zeevalkink',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
     MusicEntity(
       id: 'music_07',
       title: 'Silent Waves',
       artist: 'Nick Petrov',
       description: 'Positive chill for restoring calm without heaviness.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/silent-waves-positive-chill',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/silent-waves-positive-chill',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [
         FeelingType.neutral,
         FeelingType.happy,
@@ -208,20 +194,18 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 175,
       tempoBpm: 78,
       noveltyScore: 6,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Nick Petrov',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
     MusicEntity(
       id: 'music_08',
       title: 'The Light Between Us',
       artist: 'Shaydow',
       description: 'Soft piano for controlled breathing and recovery.',
-      audioUrl:
-          'https://www.bensound.com/royalty-free-music/track/the-light-between-us-smooth-piano',
-      sourceName: 'Bensound',
-      sourceUrl:
-          'https://www.bensound.com/royalty-free-music/track/the-light-between-us-smooth-piano',
-      sourceType: MusicSourceType.bensound,
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+      sourceName: 'SoundHelix',
+      sourceUrl: 'https://www.soundhelix.com/audio-examples',
+      sourceType: MusicSourceType.custom,
       supportedFeelings: [
         FeelingType.anxious,
         FeelingType.sad,
@@ -235,8 +219,8 @@ class MusicLocalDataSourceImpl implements MusicLocalDataSource {
       durationSeconds: 230,
       tempoBpm: 64,
       noveltyScore: 10,
-      licenseText: 'Free download with attribution on Bensound free plan.',
-      attributionText: 'Music by Bensound / Shaydow',
+      licenseText: 'Streamable demo audio from SoundHelix examples.',
+      attributionText: 'Audio courtesy of SoundHelix examples',
     ),
   ];
 

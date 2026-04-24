@@ -225,7 +225,7 @@ abstract class SettingsStrings {
   static String get feelingAngryLabel => _t('Angry', 'غاضب');
   static String get feelingNeutralLabel => _t('Neutral', 'عادي');
   static String get feelingAnxiousLabel => _t('Anxious', 'قلق');
-  static String get musicTitle => _t('Music', 'الموسيقى');
+  static String get relax => _t('Relax', 'الاسترخاء');
   static String get musicSubtitle => _t(
     'Listen from your last mood or choose a new one',
     'استمع حسب آخر مزاج محفوظ أو اختر حالة جديدة',
@@ -247,6 +247,11 @@ abstract class SettingsStrings {
   static String get resumeExercise => _t('Resume', 'متابعة');
   static String get openMusicLibrary =>
       _t('Open music library', 'فتح مكتبة الموسيقى');
+  static String get podcastSessionLabel =>
+      _t('"Podcast Session"', '"جلسة بودكاست"');
+  static String get rewindTenSeconds => _t('Back 10 seconds', 'رجوع 10 ثواني');
+  static String get forwardTenSeconds =>
+      _t('Forward 10 seconds', 'تقديم 10 ثواني');
   static String get viewAllExercises =>
       _t('View all exercises', 'عرض جميع التمارين');
   static String get noTracksAvailable =>
