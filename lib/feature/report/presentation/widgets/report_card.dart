@@ -54,6 +54,8 @@ class CustomReportCard extends StatelessWidget {
     }
   }
 
+  String _getReasonLabel() => report.reason.localizedLabel;
+
   String _getFormattedDate(DateTime date) {
     return DateFormat('MMM dd, yyyy at hh:mm a').format(date);
   }
@@ -138,7 +140,7 @@ class CustomReportCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    report.reason.label,
+                    _getReasonLabel(),
                     style: AppStyles.bodySmall.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w500,

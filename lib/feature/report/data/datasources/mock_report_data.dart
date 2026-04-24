@@ -66,7 +66,7 @@ class MockReportData {
   ];
 
   // Mock submitted reports
-  static const List<Map<String, dynamic>> mockReports = [
+  static List<Map<String, dynamic>> get mockReports => [
     {
       'id': 'report_001',
       'userId': 'user_001',
@@ -75,7 +75,7 @@ class MockReportData {
       'targetName': 'Dr. Mohammed Hassan',
       'reason': 'missingAppointment',
       'description':
-          'Doctor missed the scheduled appointment on April 15 without any prior notice. This is the second time this happened.',
+          'الطبيب غاب عن الموعد المحدد في 15 أبريل دون أي إشعار مسبق. هذه هي المرة الثانية التي يحدث فيها ذلك.',
       'status': 'reviewed',
       'createdAt': '2024-04-17T10:30:00Z',
       'resolvedAt': '2024-04-18T14:00:00Z',
@@ -88,7 +88,7 @@ class MockReportData {
       'targetName': 'Dr. Omar Taha',
       'reason': 'unprofessional',
       'description':
-          'Doctor was dismissive of my concerns and made me feel uncomfortable during the session.',
+          'كان الطبيب غير متجاوب مع مخاوفي وجعلني أشعر بعدم الراحة أثناء الجلسة.',
       'status': 'pending',
       'createdAt': '2024-04-19T15:45:00Z',
       'resolvedAt': null,
@@ -101,7 +101,7 @@ class MockReportData {
       'targetName': null,
       'reason': 'appBug',
       'description':
-          'Video call feature crashes when trying to end the call. Need to force close the app.',
+          'ميزة مكالمة الفيديو تتعطل عند محاولة إنهاء المكالمة. أضطر لإغلاق التطبيق بالقوة.',
       'status': 'reviewed',
       'createdAt': '2024-04-15T11:20:00Z',
       'resolvedAt': '2024-04-16T09:00:00Z',
@@ -113,8 +113,7 @@ class MockReportData {
       'targetId': null,
       'targetName': null,
       'reason': 'paymentIssue',
-      'description':
-          'Charged twice for the same appointment. Please refund the duplicate charge.',
+      'description': 'تم الخصم مرتين لنفس الموعد. يرجى استرداد المبلغ المكرر.',
       'status': 'resolved',
       'createdAt': '2024-04-14T13:15:00Z',
       'resolvedAt': '2024-04-15T16:30:00Z',
@@ -127,7 +126,7 @@ class MockReportData {
       'targetName': 'Dr. Leila Mansour',
       'reason': 'harassment',
       'description':
-          'Doctor made inappropriate personal comments that made me feel uncomfortable.',
+          'أدلى الطبيب بتعليقات شخصية غير مناسبة جعلتني أشعر بعدم الارتياح.',
       'status': 'pending',
       'createdAt': '2024-04-19T09:00:00Z',
       'resolvedAt': null,

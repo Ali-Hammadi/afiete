@@ -1,17 +1,38 @@
 import 'package:equatable/equatable.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 
 enum ReportType { doctor, session, app }
 
 enum ReportReason {
-  unprofessional('Unprofessional behavior'),
-  harassment('Harassment'),
-  inappropriateContent('Inappropriate content'),
-  missingAppointment('Missing appointments'),
-  appBug('App bug or issue'),
-  other('Other');
+  unprofessional('unprofessional'),
+  harassment('harassment'),
+  inappropriateContent('inappropriateContent'),
+  missingAppointment('missingAppointment'),
+  appBug('appBug'),
+  paymentIssue('paymentIssue'),
+  other('other');
 
-  final String label;
-  const ReportReason(this.label);
+  final String key;
+  const ReportReason(this.key);
+
+  String get localizedLabel {
+    switch (this) {
+      case ReportReason.unprofessional:
+        return SettingsStrings.unprofessionalBehavior;
+      case ReportReason.harassment:
+        return SettingsStrings.harassment;
+      case ReportReason.inappropriateContent:
+        return SettingsStrings.inappropriateContent;
+      case ReportReason.missingAppointment:
+        return SettingsStrings.missingAppointments;
+      case ReportReason.appBug:
+        return SettingsStrings.appBugOrIssue;
+      case ReportReason.paymentIssue:
+        return SettingsStrings.paymentOrTransactionIssue;
+      case ReportReason.other:
+        return SettingsStrings.otherIssue;
+    }
+  }
 }
 
 enum ReportStatus { pending, reviewed, resolved }
