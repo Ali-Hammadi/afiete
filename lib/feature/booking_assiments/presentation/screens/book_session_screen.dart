@@ -186,6 +186,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final canBook = _availableDays.isNotEmpty;
+    final localeCode = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
       appBar: AppBar(
@@ -203,7 +204,10 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
             const SizedBox(height: 6),
             if (_step == _BookingStep.time && _selectedDate != null)
               Text(
-                DateFormat('EEE, dd MMM yyyy').format(_selectedDate!),
+                DateFormat(
+                  'EEE, dd MMM yyyy',
+                  localeCode,
+                ).format(_selectedDate!),
                 style: AppStyles.bodySmall,
               ),
             const SizedBox(height: 14),
@@ -246,9 +250,9 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
   Widget _buildStepContent() {
     switch (_step) {
       case _BookingStep.date:
-        return _buildDateStep();
+        return _buildDateStep(context);
       case _BookingStep.time:
-        return _buildTimeStep();
+        return _buildTimeStep(context);
       case _BookingStep.duration:
         return _buildDurationStep();
       case _BookingStep.type:
@@ -256,7 +260,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     }
   }
 
-  Widget _buildDateStep() {
+  Widget _buildDateStep(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode;
     return ListView.separated(
       key: const ValueKey('date-step'),
       itemCount: _availableDays.length,
@@ -266,7 +271,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         final isSelected =
             _selectedDate != null && DateUtils.isSameDay(_selectedDate, day);
         return _OptionCard(
-          title: DateFormat('EEEE, dd MMM yyyy').format(day),
+          title: DateFormat('EEEE, dd MMM yyyy', localeCode).format(day),
           subtitle: SettingsStrings.availableFromDatabase,
           isSelected: isSelected,
           onTap: () {
@@ -280,7 +285,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     );
   }
 
-  Widget _buildTimeStep() {
+  Widget _buildTimeStep(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode;
     final times = _timesForSelectedDay;
     if (times.isEmpty) {
       return Center(
@@ -302,7 +308,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         final time = times[index];
         final isSelected = _selectedTime != null && _selectedTime == time;
         return _ChipCard(
-          label: DateFormat('h:mm a').format(time).toLowerCase(),
+          label: DateFormat('h:mm a', localeCode).format(time).toLowerCase(),
           isSelected: isSelected,
           onTap: () => setState(() => _selectedTime = time),
         );

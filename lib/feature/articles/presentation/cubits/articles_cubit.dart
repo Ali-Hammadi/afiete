@@ -12,6 +12,8 @@ class ArticlesCubit extends Cubit<ArticlesState> {
   final GetArticleByIdUseCase getArticleByIdUseCase;
   final LikeArticleUseCase likeArticleUseCase;
   final DislikeArticleUseCase dislikeArticleUseCase;
+  List<ArticleEntity>? _currentArticles;
+  bool _currentIsForHome = false;
 
   ArticlesCubit({
     required this.getArticlesForHomeUseCase,
@@ -29,30 +31,39 @@ class ArticlesCubit extends Cubit<ArticlesState> {
       limit: 5,
     );
 
-    result.fold(
-      (failure) => emit(ArticlesError(failure.errorMessage)),
-      (articles) => emit(ArticlesLoaded(articles: articles, isForHome: true)),
-    );
+    result.fold((failure) => emit(ArticlesError(failure.errorMessage)), (
+      articles,
+    ) {
+      _currentArticles = articles;
+      _currentIsForHome = true;
+      emit(ArticlesLoaded(articles: articles, isForHome: true));
+    });
   }
 
   Future<void> loadArticlesByDoctor(String doctorId) async {
     emit(const ArticlesLoading());
     final result = await getArticlesByDoctorUseCase(doctorId);
 
-    result.fold(
-      (failure) => emit(ArticlesError(failure.errorMessage)),
-      (articles) => emit(ArticlesLoaded(articles: articles, isForHome: false)),
-    );
+    result.fold((failure) => emit(ArticlesError(failure.errorMessage)), (
+      articles,
+    ) {
+      _currentArticles = articles;
+      _currentIsForHome = false;
+      emit(ArticlesLoaded(articles: articles, isForHome: false));
+    });
   }
 
   Future<void> loadAllArticles({int page = 1, int pageSize = 10}) async {
     emit(const ArticlesLoading());
     final result = await getAllArticlesUseCase(page: page, pageSize: pageSize);
 
-    result.fold(
-      (failure) => emit(ArticlesError(failure.errorMessage)),
-      (articles) => emit(ArticlesLoaded(articles: articles, isForHome: false)),
-    );
+    result.fold((failure) => emit(ArticlesError(failure.errorMessage)), (
+      articles,
+    ) {
+      _currentArticles = articles;
+      _currentIsForHome = false;
+      emit(ArticlesLoaded(articles: articles, isForHome: false));
+    });
   }
 
   Future<void> loadArticleById(String articleId) async {
@@ -77,9 +88,7 @@ class ArticlesCubit extends Cubit<ArticlesState> {
       await likeArticleUseCase(article.id);
     }
 
-    emit(
-      ArticleLikeToggled(article: newArticle, liked: newArticle.isLikedByUser),
-    );
+    _emitUpdatedArticle(newArticle);
   }
 
   Future<void> toggleDislike(ArticleEntity article) async {
@@ -94,6 +103,25 @@ class ArticlesCubit extends Cubit<ArticlesState> {
       await dislikeArticleUseCase(article.id);
     }
 
-    emit(ArticleLikeToggled(article: newArticle, liked: false));
+    _emitUpdatedArticle(newArticle);
+  }
+
+  void _emitUpdatedArticle(ArticleEntity updatedArticle) {
+    final currentArticles = _currentArticles;
+    if (currentArticles != null && currentArticles.isNotEmpty) {
+      final updatedArticles = currentArticles
+          .map(
+            (article) =>
+                article.id == updatedArticle.id ? updatedArticle : article,
+          )
+          .toList(growable: false);
+      _currentArticles = updatedArticles;
+      emit(
+        ArticlesLoaded(articles: updatedArticles, isForHome: _currentIsForHome),
+      );
+      return;
+    }
+
+    emit(ArticleDetailsLoaded(updatedArticle));
   }
 }

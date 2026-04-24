@@ -37,24 +37,23 @@ class ArticlesHomeSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                height: 500,
-                child: ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                  itemCount: state.articles.length,
-                  itemBuilder: (context, index) {
-                    final article = state.articles[index];
-                    return ArticleCardWidget(
-                      article: article,
-                      onReadMore: () {},
-                      onLike: () {
-                        context.read<ArticlesCubit>().toggleLike(article);
-                      },
-                      onDislike: () {
-                        context.read<ArticlesCubit>().toggleDislike(article);
-                      },
-                    );
-                  },
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
+                itemCount: state.articles.length,
+                itemBuilder: (context, index) {
+                  final article = state.articles[index];
+                  return ArticleCardWidget(
+                    article: article,
+                    onReadMore: () {},
+                    onLike: () {
+                      context.read<ArticlesCubit>().toggleLike(article);
+                    },
+                    onDislike: () {
+                      context.read<ArticlesCubit>().toggleDislike(article);
+                    },
+                  );
                 ),
               ),
               const SizedBox(height: 12),

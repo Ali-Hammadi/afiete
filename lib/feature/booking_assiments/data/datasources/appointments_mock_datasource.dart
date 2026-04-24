@@ -6,9 +6,9 @@ class AppointmentsMockDataSourceImpl implements AppointmentsRemoteDataSource {
   final List<AppointmentModel> _appointments = [
     AppointmentModel(
       id: 'apt_1',
-      doctorId: 'doc_1',
+      doctorId: 'doc_001',
       patientId: 'pat_1',
-      doctorName: 'Dr. Ahmed Hassan',
+      doctorName: 'Dr. Ahmed Malik',
       scheduledAt: DateTime.now().add(const Duration(days: 1, hours: 2)),
       durationSlots: 2,
       consultationFee: const ConsultationFee(
@@ -22,9 +22,9 @@ class AppointmentsMockDataSourceImpl implements AppointmentsRemoteDataSource {
     ),
     AppointmentModel(
       id: 'apt_2',
-      doctorId: 'doc_2',
+      doctorId: 'doc_002',
       patientId: 'pat_1',
-      doctorName: 'Dr. Salma Ibrahim',
+      doctorName: 'Dr. Fatima Zahra',
       scheduledAt: DateTime.now().add(const Duration(days: 3, hours: 1)),
       durationSlots: 1,
       consultationFee: const ConsultationFee(

@@ -23,8 +23,21 @@ class LanguageCubit extends Cubit<Locale> {
     if (state.languageCode == normalized) return;
 
     final locale = Locale(normalized);
+    await _prefs.setString(_languageCodeKey, normalized);
     SettingsStrings.setLanguageCode(normalized);
     emit(locale);
-    await _prefs.setString(_languageCodeKey, normalized);
+  }
+
+  Future<void> reloadFromPreferences() async {
+    await _prefs.reload();
+    final storedCode = _prefs.getString(_languageCodeKey);
+    final normalized = storedCode == 'ar' ? 'ar' : 'en';
+    if (state.languageCode == normalized) {
+      SettingsStrings.setLanguageCode(normalized);
+      return;
+    }
+
+    SettingsStrings.setLanguageCode(normalized);
+    emit(Locale(normalized));
   }
 }

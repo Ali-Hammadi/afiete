@@ -247,11 +247,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
-                        onPressed: () {
-                          context.read<LanguageCubit>().setLanguageCode(
+                        onPressed: () async {
+                          await context.read<LanguageCubit>().setLanguageCode(
                             tempLanguage,
                           );
-                          Navigator.pop(context);
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
                         },
                         child: Text(
                           SettingsStrings.select,
