@@ -283,7 +283,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
   Widget _buildTimeStep() {
     final times = _timesForSelectedDay;
     if (times.isEmpty) {
-      return const Center(
+      return Center(
         key: ValueKey('time-step-empty'),
         child: Text(SettingsStrings.noAvailableTimesForThisDate),
       );

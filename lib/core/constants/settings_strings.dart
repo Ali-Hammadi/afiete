@@ -166,6 +166,10 @@ abstract class SettingsStrings {
       _t('Assessment Result', 'نتيجة التقييم');
   static String get suggestedSpecialistTitle =>
       _t('Suggested specialist', 'المتخصص المقترح');
+  static String get noSuggestedSpecialistsFoundYet => _t(
+    'No suggested specialists found yet.',
+    'لم يتم العثور على متخصصين مقترحين بعد.',
+  );
   static String get homeLabel => _t('Home', 'الرئيسية');
   static String get specialistsLabel => _t('Specialists', 'المتخصصون');
   static String get retakeAssessment =>
@@ -194,10 +198,6 @@ abstract class SettingsStrings {
       _t('No upcoming appointments.', 'لا توجد مواعيد قادمة.');
   static String get noPastAppointments =>
       _t('No past appointments.', 'لا توجد مواعيد سابقة.');
-  static String get todayLabel => _t('Today', 'اليوم');
-  static String get noDoctorsAvailable =>
-      _t('No doctors available.', 'لا يوجد أطباء متاحون.');
-
   static String get selectLanguageTitle => _t('Select language', 'اختر اللغة');
   static String get cancel => _t('Cancel', 'إلغاء');
   static String get select => _t('Select', 'اختيار');

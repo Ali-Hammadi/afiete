@@ -57,7 +57,7 @@ class _CustomTopDoctorsWidgetState extends State<CustomTopDoctorsWidget> {
               final topDoctors = state.doctors.take(8).toList();
 
               if (topDoctors.isEmpty) {
-                return const SizedBox(
+                return SizedBox(
                   height: 180,
                   child: Center(
                     child: Text(SettingsStrings.noDoctorsAvailable),
