@@ -49,6 +49,8 @@ abstract class SettingsStrings {
       _t('Booking feature coming soon', 'ميزة الحجز قريبا');
   static String get rescheduleFeatureComingSoon =>
       _t('Reschedule feature coming soon', 'ميزة إعادة الجدولة قريبا');
+  static String get sessionRescheduledSuccessfully =>
+      _t('Session rescheduled successfully', 'تمت إعادة جدولة الجلسة بنجاح');
   static String get sessionCancelled =>
       _t('Session cancelled', 'تم إلغاء الجلسة');
   static String get cancelSessionTitle => _t('Cancel Session', 'إلغاء الجلسة');
@@ -689,20 +691,26 @@ abstract class SettingsStrings {
     final normalized = option.trim().toLowerCase();
     switch (normalized) {
       case 'never':
-        return _t('Never', 'أبدًا');
+        return _t('Never / أبدًا', 'أبدًا / Never');
       case 'not at all':
-        return _t('Not at all', 'على الإطلاق');
+        return _t('Not at all / على الإطلاق', 'على الإطلاق / Not at all');
       case 'sometimes':
       case 'several days':
-        return _t('Several days', 'عدة أيام');
+        return _t('Several days / عدة أيام', 'عدة أيام / Several days');
       case 'often':
       case 'more than half the days':
-        return _t('More than half the days', 'أكثر من نصف الأيام');
+        return _t(
+          'More than half the days / أكثر من نصف الأيام',
+          'أكثر من نصف الأيام / More than half the days',
+        );
       case 'always':
       case 'nearly every day':
-        return _t('Nearly every day', 'تقريبًا كل يوم');
+        return _t(
+          'Nearly every day / تقريبًا كل يوم',
+          'تقريبًا كل يوم / Nearly every day',
+        );
       case 'extremely':
-        return _t('Extremely', 'بشكل كبير');
+        return _t('Extremely / بشكل كبير', 'بشكل كبير / Extremely');
       default:
         return option;
     }

@@ -7,6 +7,7 @@ import 'package:afiete/core/widget/error_custom_button.dart';
 import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
 import 'package:afiete/feature/articles/presentation/widgets/article_card_widget.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
+import 'package:afiete/feature/doctors/data/datasources/mock_doctors_data.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:afiete/feature/home/presentation/widgets/custom_container.dart';
 import 'package:afiete/feature/doctors/presentation/widgets/doctor_review_item.dart';
@@ -273,6 +274,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
   }
 
   Widget _buildReviewsSection({required ColorScheme colorScheme}) {
+    final reviews = MockDoctorsData.getMockDoctorReviews(
+      widget.doctor?.id ?? '',
+    );
+
     return CustomContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,11 +300,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           const Divider(),
           _buildReviewItem(
             avatarAsset: ImageLinks.man1,
-            reviewerName: 'Fadi',
-            reviewTime: 'Yesterday',
-            rating: '4.8',
-            review:
-                'Dr. John Doe is an exceptional doctor who provided me with excellent care and support throughout my treatment. He was always attentive to my needs and concerns, and his expertise and professionalism were evident in every interaction. I highly recommend Dr. John Doe to anyone seeking top-notch medical care.',
+            reviewerName: reviews[0]['reviewerName'] as String,
+            reviewTime: reviews[0]['reviewTime'] as String,
+            rating: reviews[0]['rating'] as String,
+            review: reviews[0]['review'] as String,
             isExpanded: _isFirstReviewExpanded,
             onToggle: () => setState(
               () => _isFirstReviewExpanded = !_isFirstReviewExpanded,
@@ -308,11 +312,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           const Divider(),
           _buildReviewItem(
             avatarAsset: ImageLinks.man1,
-            reviewerName: 'Samer',
-            reviewTime: 'Last month',
-            rating: '4.9',
-            review:
-                'this is a very long review that should be truncated to fit in the available space. The doctor was very professional and attentive to my needs. I highly recommend him to anyone looking for a great healthcare provider.',
+            reviewerName: reviews[1]['reviewerName'] as String,
+            reviewTime: reviews[1]['reviewTime'] as String,
+            rating: reviews[1]['rating'] as String,
+            review: reviews[1]['review'] as String,
             isExpanded: _isSecondReviewExpanded,
             onToggle: () => setState(
               () => _isSecondReviewExpanded = !_isSecondReviewExpanded,
@@ -321,11 +324,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           const Divider(),
           _buildReviewItem(
             avatarAsset: ImageLinks.woman2,
-            reviewerName: 'Maya',
-            reviewTime: 'Last week',
-            rating: '4.8',
-            review:
-                'this is a very long review that should be truncated to fit in the available space. The doctor was very professional and attentive to my needs. I highly recommend him to anyone looking for a great healthcare provider.',
+            reviewerName: reviews[2]['reviewerName'] as String,
+            reviewTime: reviews[2]['reviewTime'] as String,
+            rating: reviews[2]['rating'] as String,
+            review: reviews[2]['review'] as String,
             isExpanded: _isThirdReviewExpanded,
             onToggle: () => setState(
               () => _isThirdReviewExpanded = !_isThirdReviewExpanded,

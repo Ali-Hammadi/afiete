@@ -119,7 +119,8 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
                   );
                 }
               : null,
-          onBookAgain: () => _showSnackBar('Booking feature coming soon'),
+          onBookAgain: () =>
+              _showSnackBar(SettingsStrings.bookingFeatureComingSoon),
           onReschedule: () => _handleReschedule(session),
           onJoinSession: () => _handleJoinSession(session),
           onCancel: () => _confirmCancel(context, session.id),
@@ -212,7 +213,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
       sessionId: session.id,
       newScheduledAt: nextSlot,
     );
-    _showSnackBar('Rescheduled successfully');
+    _showSnackBar(SettingsStrings.sessionRescheduledSuccessfully);
   }
 
   void _confirmCancel(BuildContext context, String sessionId) {

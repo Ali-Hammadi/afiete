@@ -1,9 +1,17 @@
+import 'package:afiete/core/constants/settings_strings.dart';
+
 class MockAssignmentsData {
+  static String _localized(String en, String ar) =>
+      SettingsStrings.isArabic ? ar : en;
+
   // Mock psychological assessment questions (PHQ-9 style depression screening)
-  static const List<Map<String, dynamic>> mockAssignmentQuestions = [
+  static List<Map<String, dynamic>> get mockAssignmentQuestions => [
     {
       'id': 'q_001',
-      'questionText': 'Little interest or pleasure in doing things',
+      'questionText': _localized(
+        'Little interest or pleasure in doing things',
+        'قلة الاهتمام أو المتعة في القيام بالأشياء',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -16,7 +24,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_002',
-      'questionText': 'Feeling down, depressed, or hopeless',
+      'questionText': _localized(
+        'Feeling down, depressed, or hopeless',
+        'الشعور بالحزن أو الاكتئاب أو اليأس',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -29,7 +40,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_003',
-      'questionText': 'Trouble falling or staying asleep, or sleeping too much',
+      'questionText': _localized(
+        'Trouble falling or staying asleep, or sleeping too much',
+        'صعوبة في النوم أو الاستمرار فيه، أو النوم أكثر من اللازم',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -42,7 +56,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_004',
-      'questionText': 'Feeling tired or having little energy',
+      'questionText': _localized(
+        'Feeling tired or having little energy',
+        'الشعور بالتعب أو قلة الطاقة',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -55,7 +72,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_005',
-      'questionText': 'Poor appetite or overeating',
+      'questionText': _localized(
+        'Poor appetite or overeating',
+        'ضعف الشهية أو الإفراط في الأكل',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -68,7 +88,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_006',
-      'questionText': 'Feeling bad about yourself or that you are a failure',
+      'questionText': _localized(
+        'Feeling bad about yourself or that you are a failure',
+        'الشعور بالسوء تجاه نفسك أو أنك فاشل',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -81,7 +104,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_007',
-      'questionText': 'Trouble concentrating on things',
+      'questionText': _localized(
+        'Trouble concentrating on things',
+        'صعوبة في التركيز على الأمور',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -94,7 +120,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_008',
-      'questionText': 'Moving or speaking so slowly that others have noticed',
+      'questionText': _localized(
+        'Moving or speaking so slowly that others have noticed',
+        'التحرك أو الكلام ببطء لدرجة يلاحظها الآخرون',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -107,7 +136,10 @@ class MockAssignmentsData {
     },
     {
       'id': 'q_009',
-      'questionText': 'Thoughts that you would be better off dead',
+      'questionText': _localized(
+        'Thoughts that you would be better off dead',
+        'أفكار بأنك ستكون أفضل لو كنت ميتًا',
+      ),
       'options': [
         'Not at all',
         'Several days',
@@ -121,13 +153,15 @@ class MockAssignmentsData {
   ];
 
   // Mock assessment results with recommendations
-  static const List<Map<String, dynamic>> mockAssignmentResults = [
+  static List<Map<String, dynamic>> get mockAssignmentResults => [
     {
       'resultId': 'result_001',
       'score': 5,
       'severity': 'minimal',
-      'summary':
-          'Your assessment indicates minimal symptoms of depression. Continue with healthy lifestyle habits.',
+      'summary': _localized(
+        'Your assessment indicates minimal symptoms of depression. Continue with healthy lifestyle habits.',
+        'تشير نتيجتك إلى أعراض بسيطة جدًا. واصل العادات الصحية اليومية.',
+      ),
       'recommendedDoctorIds': ['doc_005'],
       'recommendedSpecialties': ['counselor'],
     },
@@ -135,8 +169,10 @@ class MockAssignmentsData {
       'resultId': 'result_002',
       'score': 12,
       'severity': 'mild',
-      'summary':
-          'Your assessment indicates mild depressive symptoms. Consider speaking with a mental health professional.',
+      'summary': _localized(
+        'Your assessment indicates mild depressive symptoms. Consider speaking with a mental health professional.',
+        'تشير نتيجتك إلى أعراض خفيفة. فكر في التحدث مع مختص نفسي.',
+      ),
       'recommendedDoctorIds': ['doc_001', 'doc_003'],
       'recommendedSpecialties': ['clinicalPsychologist', 'psychotherapist'],
     },
@@ -144,8 +180,10 @@ class MockAssignmentsData {
       'resultId': 'result_003',
       'score': 19,
       'severity': 'moderate',
-      'summary':
-          'Your assessment indicates moderate depressive symptoms. Professional support is recommended.',
+      'summary': _localized(
+        'Your assessment indicates moderate depressive symptoms. Professional support is recommended.',
+        'تشير نتيجتك إلى أعراض متوسطة. يُنصح بدعم مهني متخصص.',
+      ),
       'recommendedDoctorIds': ['doc_001', 'doc_002', 'doc_004'],
       'recommendedSpecialties': ['psychiatrist', 'clinicalPsychologist'],
     },
@@ -153,8 +191,10 @@ class MockAssignmentsData {
       'resultId': 'result_004',
       'score': 27,
       'severity': 'moderately_severe',
-      'summary':
-          'Your assessment indicates moderately severe depressive symptoms. Professional psychological or psychiatric care is strongly recommended.',
+      'summary': _localized(
+        'Your assessment indicates moderately severe depressive symptoms. Professional psychological or psychiatric care is strongly recommended.',
+        'تشير نتيجتك إلى أعراض متوسطة إلى شديدة. يُنصح بقوة بالرعاية النفسية أو النفسية-الطبية المتخصصة.',
+      ),
       'recommendedDoctorIds': ['doc_001', 'doc_002'],
       'recommendedSpecialties': ['psychiatrist', 'cbtTherapist'],
     },
@@ -162,8 +202,10 @@ class MockAssignmentsData {
       'resultId': 'result_005',
       'score': 30,
       'severity': 'severe',
-      'summary':
-          'Your assessment indicates severe depressive symptoms. Immediate professional help is recommended. Please reach out to a mental health professional.',
+      'summary': _localized(
+        'Your assessment indicates severe depressive symptoms. Immediate professional help is recommended. Please reach out to a mental health professional.',
+        'تشير نتيجتك إلى أعراض شديدة. يُنصح بطلب المساعدة المهنية فورًا. يرجى التواصل مع مختص نفسي.',
+      ),
       'recommendedDoctorIds': ['doc_001', 'doc_002'],
       'recommendedSpecialties': ['psychiatrist', 'traumaTherapist'],
     },
