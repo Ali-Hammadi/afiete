@@ -329,6 +329,7 @@ abstract class SettingsStrings {
       _t('Choose session duration', 'اختر مدة الجلسة');
   static String get chooseSessionTypeTitle =>
       _t('Choose session type', 'اختر نوع الجلسة');
+  static String get minuteAbbreviation => _t('min', 'د');
   static String get continueToPayment =>
       _t('Continue to payment', 'المتابعة إلى الدفع');
   static String get continueTextShort => _t('Continue', 'متابعة');
@@ -352,7 +353,7 @@ abstract class SettingsStrings {
   static String get definedByProviderAvailability =>
       _t('Defined by provider availability', 'يتم تحديده حسب توفر المزود');
   static String minutesLabel(int minutes) =>
-      _t('$minutes min', '$minutes دقيقة');
+      _t('$minutes ${minuteAbbreviation}', '$minutes ${minuteAbbreviation}');
   static String get noInternetConnectionPleaseReconnectAndTryAgain => _t(
     'No internet connection. Please reconnect and try again.',
     'لا يوجد اتصال بالإنترنت. يرجى إعادة الاتصال والمحاولة مرة أخرى.',
@@ -363,8 +364,10 @@ abstract class SettingsStrings {
   static String get noPastAppointments =>
       _t('No past appointments.', 'لا توجد مواعيد سابقة.');
   static String get specialistLabelInAppointment => _t('Specialist', 'المتخصص');
-  static String durationMinutesLabel(int minutes) =>
-      _t('Duration: $minutes minutes', 'المدة: $minutes دقيقة');
+  static String durationMinutesLabel(int minutes) => _t(
+    'Duration: $minutes ${minuteAbbreviation}',
+    'المدة: $minutes ${minuteAbbreviation}',
+  );
   static String get selectLanguageTitle => _t('Select language', 'اختر اللغة');
   static String get cancel => _t('Cancel', 'إلغاء');
   static String get select => _t('Select', 'اختيار');

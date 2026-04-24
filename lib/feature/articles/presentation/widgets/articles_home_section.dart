@@ -26,55 +26,51 @@ class ArticlesHomeSection extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      SettingsStrings.bestArticlesForYou,
-                      style: AppStyles.headingMedium,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                child: Column(
-                  children: state.articles
-                      .map(
-                        (article) => ArticleCardWidget(
-                          article: article,
-                          onReadMore: () {},
-                          onLike: () {
-                            context.read<ArticlesCubit>().toggleLike(article);
-                          },
-                          onDislike: () {
-                            context.read<ArticlesCubit>().toggleDislike(
-                              article,
-                            );
-                          },
-                        ),
-                      )
-                      .toList(growable: false),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppStyles.padding),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        MyRoutes.articlesListScreen,
-                        arguments: {'userDiagnosis': userDiagnosis},
-                      );
-                    },
-                    child: Text(SettingsStrings.seeAll),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    SettingsStrings.bestArticlesForYou,
+                    style: AppStyles.headingMedium,
                   ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Column(
+                children: state.articles
+                    .map(
+                      (article) => ArticleCardWidget(
+                        article: article,
+                        onDoctorTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutes.doctorInfoScreen,
+                            arguments: article.doctor,
+                          );
+                        },
+                        onReadMore: () {},
+                        onLike: () {
+                          context.read<ArticlesCubit>().toggleLike(article);
+                        },
+                        onDislike: () {
+                          context.read<ArticlesCubit>().toggleDislike(article);
+                        },
+                      ),
+                    )
+                    .toList(growable: false),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutes.articlesListScreen,
+                      arguments: {'userDiagnosis': userDiagnosis},
+                    );
+                  },
+                  child: Text(SettingsStrings.seeAll),
                 ),
               ),
               const SizedBox(height: 20),

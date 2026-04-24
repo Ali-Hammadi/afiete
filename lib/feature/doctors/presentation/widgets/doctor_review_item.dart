@@ -91,7 +91,7 @@ class CustomDoctorReviewItem extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.star, color: Colors.yellow),
+                      Icon(Icons.star_outline, color: colorScheme.primary),
                       Text(
                         rating,
                         style: AppStyles.bodySmall.copyWith(

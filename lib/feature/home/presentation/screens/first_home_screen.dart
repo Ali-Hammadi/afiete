@@ -37,6 +37,7 @@ class FirstHomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppStyles.padding),
         child: SingleChildScrollView(
+          key: const PageStorageKey('first_home_scroll'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

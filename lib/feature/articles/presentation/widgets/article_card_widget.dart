@@ -9,7 +9,10 @@ class ArticleCardWidget extends StatefulWidget {
   final VoidCallback onReadMore;
   final VoidCallback onLike;
   final VoidCallback onDislike;
+  final VoidCallback? onDoctorTap;
   final bool isExpanded;
+  final bool compactMode;
+  final bool flatMode;
 
   const ArticleCardWidget({
     super.key,
@@ -17,7 +20,10 @@ class ArticleCardWidget extends StatefulWidget {
     required this.onReadMore,
     required this.onLike,
     required this.onDislike,
+    this.onDoctorTap,
     this.isExpanded = false,
+    this.compactMode = false,
+    this.flatMode = false,
   });
 
   @override
@@ -38,107 +44,58 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
     final colorScheme = Theme.of(context).colorScheme;
     final formattedDate = DateFormat(
       'd MMM yyyy',
-      'en_US',
+      Localizations.localeOf(context).toLanguageTag(),
     ).format(widget.article.createdAt);
     final doctorImage = widget.article.doctor.imageUrl;
     final isNetworkImage = doctorImage.startsWith('http');
+    final cardPadding = widget.compactMode
+        ? AppStyles.padding * 0.8
+        : AppStyles.padding;
+    final avatarSize = widget.compactMode ? 44.0 : 50.0;
+    final titleStyle = widget.compactMode
+        ? AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)
+        : AppStyles.headingMedium;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppStyles.borderRadius * 1.5),
+    final content = Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: widget.flatMode ? 10 : cardPadding,
+        horizontal: widget.flatMode ? 0 : cardPadding,
       ),
-      elevation: 2,
-      child: Padding(
-        padding: EdgeInsets.all(AppStyles.padding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Doctor Info Header
-            Row(
-              children: [
-                // Doctor Image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    color: colorScheme.primary.withValues(alpha: 0.2),
-                    child: doctorImage.isNotEmpty
-                        ? (isNetworkImage
-                              ? Image.network(
-                                  doctorImage,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.person,
-                                      color: colorScheme.primary,
-                                    );
-                                  },
-                                )
-                              : Image.asset(
-                                  doctorImage,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.person,
-                                      color: colorScheme.primary,
-                                    );
-                                  },
-                                ))
-                        : Icon(Icons.person, color: colorScheme.primary),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // Doctor Name & Specialty
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.article.doctor.name,
-                        style: AppStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        SettingsStrings.specialtyLabel(
-                          widget.article.doctor.specialization,
-                        ),
-                        style: AppStyles.bodySmall.copyWith(
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDoctorHeader(
+            colorScheme: colorScheme,
+            doctorImage: doctorImage,
+            isNetworkImage: isNetworkImage,
+            formattedDate: formattedDate,
+            avatarSize: avatarSize,
+          ),
+          const SizedBox(height: 12),
+
+          Text(widget.article.title, style: titleStyle),
+          const SizedBox(height: 12),
+
+          Text(
+            widget.compactMode
+                ? widget.article.summary
+                : _isExpanded
+                ? widget.article.content
+                : widget.article.summary,
+            style: widget.compactMode
+                ? AppStyles.bodySmall
+                : AppStyles.bodyMedium,
+            maxLines: widget.compactMode
+                ? 3
+                : _isExpanded
+                ? null
+                : 3,
+            overflow: _isExpanded
+                ? TextOverflow.visible
+                : TextOverflow.ellipsis,
+          ),
+          if (!widget.compactMode) ...[
             const SizedBox(height: 12),
-
-            // Date
-            Text(
-              '${SettingsStrings.dateLabel}: $formattedDate',
-              style: AppStyles.bodySmall.copyWith(color: colorScheme.outline),
-            ),
-            const SizedBox(height: 8),
-
-            // Title
-            Text(widget.article.title, style: AppStyles.headingMedium),
-            const SizedBox(height: 12),
-
-            // Content / Summary
-            Text(
-              _isExpanded ? widget.article.content : widget.article.summary,
-              style: AppStyles.bodyMedium,
-              maxLines: _isExpanded ? null : 3,
-              overflow: _isExpanded
-                  ? TextOverflow.visible
-                  : TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 12),
-
-            // Read More / Read Less Button
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -156,41 +113,50 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Like / Dislike Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Like Button
-                _buildReactionButton(
-                  icon: Icons.thumb_up,
-                  label: SettingsStrings.likesLabel(widget.article.likesCount),
-                  isActive: widget.article.isLikedByUser,
-                  onTap: widget.onLike,
-                  colorScheme: colorScheme,
-                ),
-                // Divider
-                Container(
-                  height: 24,
-                  width: 1,
-                  color: colorScheme.outline.withValues(alpha: 0.3),
-                ),
-                // Dislike Button
-                _buildReactionButton(
-                  icon: Icons.thumb_down,
-                  label: SettingsStrings.dislikesLabel(
-                    widget.article.dislikesCount,
-                  ),
-                  isActive: widget.article.isDislikedByUser,
-                  onTap: widget.onDislike,
-                  colorScheme: colorScheme,
-                ),
-              ],
-            ),
           ],
-        ),
+          const SizedBox(height: 16),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildReactionButton(
+                icon: Icons.thumb_up_alt_outlined,
+                label: SettingsStrings.likesLabel(widget.article.likesCount),
+                isActive: widget.article.isLikedByUser,
+                onTap: widget.onLike,
+                colorScheme: colorScheme,
+              ),
+              Container(
+                height: 24,
+                width: 1,
+                color: colorScheme.outline.withValues(alpha: 0.3),
+              ),
+              _buildReactionButton(
+                icon: Icons.thumb_down_alt_outlined,
+                label: SettingsStrings.dislikesLabel(
+                  widget.article.dislikesCount,
+                ),
+                isActive: widget.article.isDislikedByUser,
+                onTap: widget.onDislike,
+                colorScheme: colorScheme,
+              ),
+            ],
+          ),
+        ],
       ),
+    );
+
+    if (widget.flatMode) {
+      return content;
+    }
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppStyles.borderRadius * 1.5),
+      ),
+      elevation: 2,
+      child: content,
     );
   }
 
@@ -226,6 +192,101 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDoctorHeader({
+    required ColorScheme colorScheme,
+    required String doctorImage,
+    required bool isNetworkImage,
+    required String formattedDate,
+    required double avatarSize,
+  }) {
+    final avatar = ClipRRect(
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        width: avatarSize,
+        height: avatarSize,
+        color: colorScheme.primary.withValues(alpha: 0.14),
+        child: doctorImage.isNotEmpty
+            ? (isNetworkImage
+                  ? Image.network(
+                      doctorImage,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          Icons.person_outline,
+                          color: colorScheme.primary,
+                        );
+                      },
+                    )
+                  : Image.asset(
+                      doctorImage,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          Icons.person_outline,
+                          color: colorScheme.primary,
+                        );
+                      },
+                    ))
+            : Icon(Icons.person_outline, color: colorScheme.primary),
+      ),
+    );
+
+    final nameWidget = Text(
+      widget.article.doctor.name,
+      style: AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+    );
+
+    final metaWidget = Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: SettingsStrings.specialtyLabel(
+              widget.article.doctor.specialization,
+            ),
+            style: AppStyles.bodySmall.copyWith(
+              color: colorScheme.outlineVariant,
+            ),
+          ),
+          TextSpan(
+            text: ' · ',
+            style: AppStyles.bodySmall.copyWith(
+              color: colorScheme.outlineVariant,
+            ),
+          ),
+          TextSpan(
+            text: formattedDate,
+            style: AppStyles.bodySmall.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return Row(
+      children: [
+        if (widget.onDoctorTap != null)
+          GestureDetector(onTap: widget.onDoctorTap, child: avatar)
+        else
+          avatar,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.onDoctorTap != null)
+                GestureDetector(onTap: widget.onDoctorTap, child: nameWidget)
+              else
+                nameWidget,
+              const SizedBox(height: 4),
+              metaWidget,
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

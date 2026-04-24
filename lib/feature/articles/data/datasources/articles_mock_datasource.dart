@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:afiete/feature/articles/data/models/article_model.dart';
 import 'package:afiete/feature/booking_assiments/domain/values/consultation_fee.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
@@ -92,7 +94,9 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
   );
 
-  List<ArticleModel> get _mockArticles => _buildMockArticles();
+  late final List<ArticleModel> _articlesStore = _buildMockArticles();
+
+  List<ArticleModel> get _mockArticles => _articlesStore;
 
   List<ArticleModel> get _linkedArticles => _mockArticles
       .where(
@@ -101,6 +105,29 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
             article.doctor.name.trim().isNotEmpty,
       )
       .toList(growable: false);
+
+  List<ArticleModel> _sortedByLikes(List<ArticleModel> articles) {
+    final sorted = List<ArticleModel>.from(articles);
+    sorted.sort((a, b) {
+      final likesComparison = b.likesCount.compareTo(a.likesCount);
+      if (likesComparison != 0) {
+        return likesComparison;
+      }
+      return b.createdAt.compareTo(a.createdAt);
+    });
+    return sorted;
+  }
+
+  int _articleIndex(String articleId) =>
+      _articlesStore.indexWhere((article) => article.id == articleId);
+
+  void _replaceArticle(ArticleModel updatedArticle) {
+    final index = _articleIndex(updatedArticle.id);
+    if (index == -1) {
+      return;
+    }
+    _articlesStore[index] = updatedArticle;
+  }
 
   List<ArticleModel> _buildMockArticles() => [
     ArticleModel(
@@ -236,7 +263,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
-    final source = _linkedArticles;
+    final source = _sortedByLikes(_linkedArticles);
 
     final normalizedDiagnosis = (userDiagnosis ?? '').trim().toLowerCase();
     if (normalizedDiagnosis.isNotEmpty) {
@@ -247,7 +274,11 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
           if (aScore != bScore) {
             return bScore.compareTo(aScore);
           }
-          return b.likesCount.compareTo(a.likesCount);
+          final likesComparison = b.likesCount.compareTo(a.likesCount);
+          if (likesComparison != 0) {
+            return likesComparison;
+          }
+          return b.createdAt.compareTo(a.createdAt);
         });
 
       final hasRelevant = ranked.any(
@@ -259,9 +290,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
       }
     }
 
-    final sorted = List<ArticleModel>.from(source);
-    sorted.sort((a, b) => b.likesCount.compareTo(a.likesCount));
-    return sorted.take(limit).toList();
+    return source.take(limit).toList();
   }
 
   int _matchScore(List<String> conditions, String diagnosis) {
@@ -297,9 +326,9 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   Future<List<ArticleModel>> getArticlesByDoctor(String doctorId) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
-    return _linkedArticles
-        .where((article) => article.doctor.id == doctorId)
-        .toList();
+    return _sortedByLikes(
+      _linkedArticles,
+    ).where((article) => article.doctor.id == doctorId).toList();
   }
 
   @override
@@ -309,7 +338,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
-    final source = _linkedArticles;
+    final source = _sortedByLikes(_linkedArticles);
 
     final startIndex = (page - 1) * pageSize;
     final endIndex = startIndex + pageSize;
@@ -328,7 +357,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   Future<ArticleModel> getArticleById(String articleId) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
-    final article = _linkedArticles.firstWhere(
+    final article = _articlesStore.firstWhere(
       (article) => article.id == articleId,
     );
     return article;
@@ -337,10 +366,54 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
   @override
   Future<void> likeArticle(String articleId) async {
     await Future.delayed(const Duration(milliseconds: 300));
+
+    final index = _articleIndex(articleId);
+    if (index == -1) {
+      return;
+    }
+
+    final article = _articlesStore[index];
+    final updatedArticle = article.isLikedByUser
+        ? article.copyWith(
+            isLikedByUser: false,
+            likesCount: max(0, article.likesCount - 1),
+          )
+        : article.copyWith(
+            isLikedByUser: true,
+            isDislikedByUser: false,
+            likesCount: article.likesCount + 1,
+            dislikesCount: article.isDislikedByUser
+                ? max(0, article.dislikesCount - 1)
+                : article.dislikesCount,
+          );
+
+    _replaceArticle(updatedArticle);
   }
 
   @override
   Future<void> dislikeArticle(String articleId) async {
     await Future.delayed(const Duration(milliseconds: 300));
+
+    final index = _articleIndex(articleId);
+    if (index == -1) {
+      return;
+    }
+
+    final article = _articlesStore[index];
+    final updatedArticle = article.isDislikedByUser
+        ? article.copyWith(
+            isDislikedByUser: false,
+            dislikesCount: max(0, article.dislikesCount - 1),
+          )
+        : article.copyWith(
+            isDislikedByUser: true,
+            isLikedByUser: false,
+            dislikesCount: article.dislikesCount + 1,
+            likesCount: article.isLikedByUser
+                ? max(0, article.likesCount - 1)
+                : article.likesCount,
+          );
+
+    _replaceArticle(updatedArticle);
   }
 }

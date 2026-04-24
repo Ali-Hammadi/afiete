@@ -1,5 +1,6 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
 import 'package:afiete/feature/articles/presentation/widgets/article_card_widget.dart';
@@ -87,6 +88,13 @@ class _ArticlesListScreenState extends State<ArticlesListScreen> {
                 final article = state.articles[index];
                 return ArticleCardWidget(
                   article: article,
+                  onDoctorTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutes.doctorInfoScreen,
+                      arguments: article.doctor,
+                    );
+                  },
                   onReadMore: () {},
                   onLike: () {
                     context.read<ArticlesCubit>().toggleLike(article);

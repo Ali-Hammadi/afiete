@@ -99,20 +99,20 @@ class _DoctorInfoState extends State<DoctorInfo> {
                 children: [
                   _buildPriceServiceTile(
                     title: SettingsStrings.chatTitle,
-                    price: '10\$ / min',
-                    icon: Icons.chat,
+                    price: '10\$ / ${SettingsStrings.minuteAbbreviation}',
+                    icon: Icons.chat_bubble_outline,
                     colorScheme: colorScheme,
                   ),
                   _buildPriceServiceTile(
                     title: SettingsStrings.videoCallTitle,
-                    price: '20\$ / min',
-                    icon: Icons.videocam_sharp,
+                    price: '20\$ / ${SettingsStrings.minuteAbbreviation}',
+                    icon: Icons.videocam_outlined,
                     colorScheme: colorScheme,
                   ),
                   _buildPriceServiceTile(
                     title: SettingsStrings.voiceCallTitle,
-                    price: '15\$ / min',
-                    icon: Icons.keyboard_voice_sharp,
+                    price: '15\$ / ${SettingsStrings.minuteAbbreviation}',
+                    icon: Icons.keyboard_voice_outlined,
                     colorScheme: colorScheme,
                   ),
                 ],
@@ -397,6 +397,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                       .map(
                         (article) => ArticleCardWidget(
                           article: article,
+                          flatMode: true,
                           onReadMore: () {},
                           onLike: () {
                             context.read<ArticlesCubit>().toggleLike(article);

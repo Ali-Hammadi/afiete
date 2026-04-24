@@ -44,7 +44,7 @@ class CustomSessionCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: colorScheme.primaryContainer,
-                  child: Icon(Icons.person, color: colorScheme.primary),
+                  child: Icon(Icons.person_outline, color: colorScheme.primary),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
