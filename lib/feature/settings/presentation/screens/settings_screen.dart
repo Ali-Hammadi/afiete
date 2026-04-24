@@ -233,7 +233,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: () => setModalState(() => tempLanguage = 'ar'),
                       ),
                     ],
-                    ),
                   ),
                   const SizedBox(height: 16),
                   Row(
