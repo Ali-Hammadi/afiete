@@ -15,8 +15,9 @@ class CustomChatMessageBubble extends StatelessWidget {
     final timeText = DateFormat('h:mm a').format(message.sentAt);
 
     return Align(
-      alignment:
-          message.isMine ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
+      alignment: message.isMine
+          ? AlignmentDirectional.centerEnd
+          : AlignmentDirectional.centerStart,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         constraints: const BoxConstraints(maxWidth: 290),

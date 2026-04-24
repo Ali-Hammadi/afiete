@@ -1,3 +1,4 @@
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:afiete/core/constants/styles.dart';
@@ -60,19 +61,19 @@ class _ReportScreenState extends State<ReportScreen> {
     if (widget.reportType == ReportType.doctor) {
       return 'Report Doctor';
     } else if (widget.reportType == ReportType.session) {
-      return 'Report Session';
+      return SettingsStrings.reportSessionTitle;
     } else {
-      return 'Report Issue';
+      return SettingsStrings.reportIssueTitle;
     }
   }
 
   String _getHeaderDescription() {
     if (widget.reportType == ReportType.doctor) {
-      return 'Help us maintain a safe environment by reporting any inappropriate behavior from your doctor.';
+      return SettingsStrings.reportDoctorDescription;
     } else if (widget.reportType == ReportType.session) {
-      return 'Report any issues you experienced during your session.';
+      return SettingsStrings.reportSessionDescription;
     } else {
-      return 'Let us know about any technical issues or problems with the app.';
+      return SettingsStrings.reportIssueDescription;
     }
   }
 
@@ -85,7 +86,7 @@ class _ReportScreenState extends State<ReportScreen> {
     if (!_isFormValid()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please select a reason and provide details'),
+          content: Text(SettingsStrings.pleaseSelectReasonAndProvideDetails),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -122,7 +123,7 @@ class _ReportScreenState extends State<ReportScreen> {
           if (state is ReportSubmitted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Report submitted successfully'),
+                content: Text(SettingsStrings.reportSubmittedSuccessfully),
                 backgroundColor: colorScheme.primary,
               ),
             );
@@ -160,7 +161,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _buildHeaderSection() {
     return CustomReportHeaderWidget(
-      title: 'Your Report is Confidential',
+      title: SettingsStrings.reportConfidentialTitle,
       description: _getHeaderDescription(),
       icon: const Icon(Icons.info),
     );
@@ -170,7 +171,7 @@ class _ReportScreenState extends State<ReportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Select Reason', style: AppStyles.headingSmall),
+        Text(SettingsStrings.selectReason, style: AppStyles.headingSmall),
         const SizedBox(height: 12),
         ListView.separated(
           shrinkWrap: true,
@@ -203,9 +204,8 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _buildDescriptionSection() {
     return CustomReportFormWidget(
-      label: 'Additional Details',
-      hintText:
-          'Please provide more information about your report. Be as specific as possible.',
+      label: SettingsStrings.additionalDetails,
+      hintText: SettingsStrings.reportDescriptionHint,
       controller: _descriptionController,
       maxLines: 6,
       maxLength: 500,

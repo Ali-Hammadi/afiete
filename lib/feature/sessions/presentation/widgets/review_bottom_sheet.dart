@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,9 +33,9 @@ class _CustomReviewBottomSheetState extends State<CustomReviewBottomSheet> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+        borderRadius: BorderRadiusDirectional.only(
+          topStart: Radius.circular(20),
+          topEnd: Radius.circular(20),
         ),
       ),
       child: SingleChildScrollView(
@@ -52,7 +53,7 @@ class _CustomReviewBottomSheetState extends State<CustomReviewBottomSheet> {
               ),
             ),
             const SizedBox(height: 20),
-            Text('Add Review', style: AppStyles.headingMedium),
+            Text(SettingsStrings.addReview, style: AppStyles.headingMedium),
             const SizedBox(height: 20),
             Center(
               child: _StarRating(
@@ -63,13 +64,13 @@ class _CustomReviewBottomSheetState extends State<CustomReviewBottomSheet> {
               ),
             ),
             const SizedBox(height: 24),
-            Text('Write comment', style: AppStyles.headingSmall),
+            Text(SettingsStrings.writeComment, style: AppStyles.headingSmall),
             const SizedBox(height: 12),
             TextField(
               controller: _commentController,
               maxLines: 6,
               decoration: InputDecoration(
-                hintText: 'write your comment here',
+                hintText: SettingsStrings.writeCommentHint,
                 hintStyle: AppStyles.bodySmall,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -93,7 +94,7 @@ class _CustomReviewBottomSheetState extends State<CustomReviewBottomSheet> {
                         Navigator.pop(context);
                       }
                     : null,
-                child: const Text('Submit'),
+                child: Text(SettingsStrings.submit),
               ),
             ),
           ],

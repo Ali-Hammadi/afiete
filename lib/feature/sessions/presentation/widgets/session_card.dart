@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
 import 'package:flutter/material.dart';
@@ -87,14 +88,14 @@ class CustomSessionCard extends StatelessWidget {
           Expanded(
             child: OutlinedButton(
               onPressed: onAddReview,
-              child: const Text('Add Review'),
+              child: Text(SettingsStrings.addReview),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: FilledButton(
               onPressed: onBookAgain,
-              child: const Text('Book Again'),
+              child: Text(SettingsStrings.bookAgain),
             ),
           ),
         ],
@@ -109,14 +110,14 @@ class CustomSessionCard extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: onReschedule,
-                  child: const Text('Reschedule'),
+                  child: Text(SettingsStrings.reschedule),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: FilledButton(
                   onPressed: onJoinSession,
-                  child: const Text('Join Session'),
+                  child: Text(SettingsStrings.joinSession),
                 ),
               ),
             ],
@@ -130,7 +131,7 @@ class CustomSessionCard extends StatelessWidget {
                 foregroundColor: colorScheme.onError,
               ),
               onPressed: onCancel,
-              child: const Text('Cancel'),
+              child: Text(SettingsStrings.cancelAction),
             ),
           ),
         ],

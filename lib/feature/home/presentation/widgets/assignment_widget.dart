@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:flutter/material.dart';
 
@@ -20,12 +21,12 @@ class CustomAssignmentWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Not sure where to start ?\n ",
+            SettingsStrings.takeAssignmentTitle,
             style: AppStyles.bodyMedium.copyWith(color: colorScheme.onPrimary),
-            textAlign: TextAlign.left,
+            textAlign: TextAlign.start,
           ),
           Text(
-            "Take a short mental health assignment so we can understand your state and suggest the best doctors for you",
+            SettingsStrings.takeAssignmentDescription,
             style: AppStyles.bodyMedium.copyWith(color: colorScheme.onPrimary),
             overflow: TextOverflow.visible,
           ),
@@ -42,7 +43,7 @@ class CustomAssignmentWidget extends StatelessWidget {
                 ),
               ),
               child: Text(
-                " Take an assignment ",
+                SettingsStrings.takeAssignmentButton,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.primary,
                 ),

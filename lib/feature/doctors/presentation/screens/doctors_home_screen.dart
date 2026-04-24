@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/psychology_specialties.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/doctors/presentation/cubits/doctors_cubit.dart';
 import 'package:afiete/feature/doctors/presentation/widgets/doctor_card.dart';
@@ -86,7 +87,7 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
           });
         },
         decoration: InputDecoration(
-          hintText: 'Search experts or specialist',
+          hintText: SettingsStrings.searchExpertsHint,
           prefixIcon: const Icon(Icons.search),
           suffixIcon: searchQuery.isNotEmpty
               ? IconButton(
@@ -143,8 +144,8 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
         return Center(
           child: Text(
             searchQuery.isNotEmpty
-                ? 'No doctors match your search.'
-                : 'No doctors found.',
+                ? SettingsStrings.noDoctorsMatchSearch
+                : SettingsStrings.noDoctorsFound,
           ),
         );
       }

@@ -21,6 +21,138 @@ abstract class SettingsStrings {
       _t('Terms & Privacy', 'الشروط والخصوصية');
   static String get contactUsTitle => _t('Contact us', 'تواصل معنا');
   static String get reportsTitle => _t('Reports', 'التقارير');
+  static String get homeNavLabel => _t('Home', 'الرئيسية');
+  static String get doctorsNavLabel => _t('Doctors', 'الأطباء');
+  static String get appointmentsNavLabel => _t('Appointments', 'المواعيد');
+  static String get profileNavLabel => _t('Profile', 'الملف الشخصي');
+  static String get homeTitle => _t('Home', 'الرئيسية');
+  static String get appointmentsTitle => _t('Appointments', 'المواعيد');
+  static String get noDoctorsAvailable =>
+      _t('No doctors available.', 'لا يوجد أطباء متاحون.');
+  static String get searchExpertsHint =>
+      _t('Search experts or specialist', 'ابحث عن خبير أو متخصص');
+  static String get noDoctorsMatchSearch =>
+      _t('No doctors match your search.', 'لا يوجد أطباء يطابقون بحثك.');
+  static String get noDoctorsFound =>
+      _t('No doctors found.', 'لم يتم العثور على أطباء.');
+  static String get mySessionsTitle => _t('My Sessions', 'جلساتي');
+  static String get upcoming => _t('Upcoming', 'القادمة');
+  static String get past => _t('Past', 'السابقة');
+  static String get noUpcomingSessions =>
+      _t('No upcoming sessions', 'لا توجد جلسات قادمة');
+  static String get noPastSessions =>
+      _t('No past sessions', 'لا توجد جلسات سابقة');
+  static String get bookingFeatureComingSoon =>
+      _t('Booking feature coming soon', 'ميزة الحجز قريبا');
+  static String get rescheduleFeatureComingSoon =>
+      _t('Reschedule feature coming soon', 'ميزة إعادة الجدولة قريبا');
+  static String get sessionCancelled =>
+      _t('Session cancelled', 'تم إلغاء الجلسة');
+  static String get cancelSessionTitle => _t('Cancel Session', 'إلغاء الجلسة');
+  static String get cancelSessionQuestion => _t(
+    'Are you sure you want to cancel this session?',
+    'هل أنت متأكد أنك تريد إلغاء هذه الجلسة؟',
+  );
+  static String get no => _t('No', 'لا');
+  static String get yesCancel => _t('Yes, Cancel', 'نعم، إلغاء');
+  static String get addReview => _t('Add Review', 'إضافة تقييم');
+  static String get bookAgain => _t('Book Again', 'احجز مرة أخرى');
+  static String get reschedule => _t('Reschedule', 'إعادة الجدولة');
+  static String get joinSession => _t('Join Session', 'انضم إلى الجلسة');
+  static String get cancelAction => _t('Cancel', 'إلغاء');
+  static String get writeComment => _t('Write comment', 'اكتب تعليقًا');
+  static String get writeCommentHint =>
+      _t('write your comment here', 'اكتب تعليقك هنا');
+  static String get submit => _t('Submit', 'إرسال');
+  static String get sessionLabel => _t('Session', 'الجلسة');
+  static String get specialistLabel => _t('Specialist', 'المتخصص');
+  static String get dateLabel => _t('Date', 'التاريخ');
+  static String get totalAmountLabel => _t('Total Amount', 'المبلغ الإجمالي');
+  static String get paymentTitle => _t('Payment', 'الدفع');
+  static String get paymentMethodTitle => _t('Payment Method', 'طريقة الدفع');
+  static String get creditDebitCard =>
+      _t('Credit / Debit Card', 'بطاقة ائتمان / خصم');
+  static String get applePay => _t('Apple Pay', 'أبل باي');
+  static String get cardInformationTitle =>
+      _t('Card Information', 'معلومات البطاقة');
+  static String get expiryDateLabel => _t('Expiry Date', 'تاريخ الانتهاء');
+  static String get cvvLabel => _t('CVV', 'CVV');
+  static String get cardholderNameLabel =>
+      _t('Cardholder Name', 'اسم حامل البطاقة');
+  static String get nameOnCardHint => _t('Name on card', 'الاسم على البطاقة');
+  static String payAmount(String amount) =>
+      _t('Pay $amount \$', 'ادفع $amount \$');
+  static String paymentSuccessfulWith(String reference) =>
+      _t('Payment successful: $reference', 'تم الدفع بنجاح: $reference');
+  static String get reportDoctorTitle =>
+      _t('Report Doctor', 'الإبلاغ عن الطبيب');
+  static String get reportSessionTitle =>
+      _t('Report Session', 'الإبلاغ عن الجلسة');
+  static String get reportIssueTitle => _t('Report Issue', 'الإبلاغ عن مشكلة');
+  static String get reportDoctorDescription => _t(
+    'Help us maintain a safe environment by reporting any inappropriate behavior from your doctor.',
+    'ساعدنا في الحفاظ على بيئة آمنة بالإبلاغ عن أي سلوك غير مناسب من الطبيب.',
+  );
+  static String get reportSessionDescription => _t(
+    'Report any issues you experienced during your session.',
+    'أبلغ عن أي مشاكل واجهتها أثناء الجلسة.',
+  );
+  static String get reportIssueDescription => _t(
+    'Let us know about any technical issues or problems with the app.',
+    'أخبرنا عن أي مشاكل تقنية أو أعطال في التطبيق.',
+  );
+  static String get pleaseSelectReasonAndProvideDetails => _t(
+    'Please select a reason and provide details',
+    'يرجى اختيار سبب وتقديم التفاصيل',
+  );
+  static String get reportSubmittedSuccessfully =>
+      _t('Report submitted successfully', 'تم إرسال البلاغ بنجاح');
+  static String get reportConfidentialTitle =>
+      _t('Your Report is Confidential', 'بلاغك سري');
+  static String get selectReason => _t('Select Reason', 'اختر السبب');
+  static String get additionalDetails =>
+      _t('Additional Details', 'تفاصيل إضافية');
+  static String get reportDescriptionHint => _t(
+    'Please provide more information about your report. Be as specific as possible.',
+    'يرجى تقديم المزيد من المعلومات حول البلاغ. كن محددًا قدر الإمكان.',
+  );
+  static String get doctorDefaultName => _t('Dr. John Doe', 'د. جون دو');
+  static String get doctorSpecialist => _t('Specialist', 'متخصص');
+  static String get doctorAboutTitle => _t('About Doctor', 'عن الطبيب');
+  static String get doctorPriceContactTitle =>
+      _t('Price Contact Doctor details', 'تفاصيل الأسعار والتواصل مع الطبيب');
+  static String get chatTitle => _t('Chat', 'الدردشة');
+  static String get videoCallTitle => _t('Video Call', 'مكالمة فيديو');
+  static String get voiceCallTitle => _t('Voice Call', 'مكالمة صوتية');
+  static String get bookSessionNow =>
+      _t('Book a session now', 'احجز جلسة الآن');
+  static String get reportDoctorButton =>
+      _t('Report Doctor', 'الإبلاغ عن الطبيب');
+  static String get doctorProfileUnavailable => _t(
+    'Doctor profile details are not available right now.',
+    'تفاصيل ملف الطبيب غير متاحة حاليًا.',
+  );
+  static String get reviewsLabel => _t('Reviews', 'التقييمات');
+  static String get experienceLabel => _t('Experience', 'الخبرة');
+  static String get patientsLabel => _t('Patients', 'المرضى');
+  static String get pleaseSignInToReportDoctor => _t(
+    'Please sign in to report a doctor.',
+    'يرجى تسجيل الدخول للإبلاغ عن الطبيب.',
+  );
+  static String get topDoctorsTitle => _t('Top Doctors', 'أفضل الأطباء');
+  static String get howAreYouFeelingToday =>
+      _t('How are you feeling today?', 'كيف تشعر اليوم؟');
+  static String get takeAssignmentTitle =>
+      _t('Not sure where to start?', 'لست متأكدًا من أين تبدأ؟');
+  static String get takeAssignmentDescription => _t(
+    'Take a short mental health assignment so we can understand your state and suggest the best doctors for you',
+    'أكمل تقييمًا قصيرًا للصحة النفسية حتى نفهم حالتك ونقترح أفضل الأطباء لك',
+  );
+  static String get takeAssignmentButton =>
+      _t('Take an assignment', 'ابدأ التقييم');
+  static String get todayLabel => _t('Today', 'اليوم');
+  static String get viewProfile => _t('View Profile', 'عرض الملف الشخصي');
+  static String get typeMessageHint => _t('Type a message...', 'اكتب رسالة...');
 
   static String get selectLanguageTitle => _t('Select language', 'اختر اللغة');
   static String get cancel => _t('Cancel', 'إلغاء');
@@ -77,8 +209,13 @@ abstract class SettingsStrings {
   static String get totalNotesLabel => _t('Total notes:', 'إجمالي الملاحظات:');
   static String get editNote => _t('Edit', 'تعديل');
   static String get shareNote => _t('Share', 'مشاركة');
-  static String assignmentProgressLabel(int questionIndex, int totalQuestions) =>
-      _t('Question $questionIndex of $totalQuestions', 'السؤال $questionIndex من $totalQuestions');
+  static String assignmentProgressLabel(
+    int questionIndex,
+    int totalQuestions,
+  ) => _t(
+    'Question $questionIndex of $totalQuestions',
+    'السؤال $questionIndex من $totalQuestions',
+  );
   static String get editMedicalNoteTitle =>
       _t('Edit Medical Note', 'تعديل الملاحظة الطبية');
   static String get noteTitleLabel => _t('Note title', 'عنوان الملاحظة');

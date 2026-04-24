@@ -1,4 +1,5 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -40,11 +41,12 @@ class _DoctorInfoState extends State<DoctorInfo> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final doctor = widget.doctor;
-    final doctorName = doctor?.name ?? 'Dr. John Doe';
-    final doctorSpecialization = doctor?.specialization ?? 'Specialist';
+    final doctorName = doctor?.name ?? SettingsStrings.doctorDefaultName;
+    final doctorSpecialization =
+        doctor?.specialization ?? SettingsStrings.doctorSpecialist;
     final doctorDescription = doctor?.description.isNotEmpty == true
         ? doctor!.description
-        : 'Doctor profile details are not available right now.';
+        : SettingsStrings.doctorProfileUnavailable;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,14 +74,14 @@ class _DoctorInfoState extends State<DoctorInfo> {
             ),
             _buildStatsCard(colorScheme: colorScheme, doctor: doctor),
             _buildSection(
-              title: 'About Doctor',
+              title: SettingsStrings.doctorAboutTitle,
               child: SizedBox(
                 width: double.infinity,
                 child: Text(doctorDescription, style: AppStyles.bodyMedium),
               ),
             ),
             _buildSection(
-              title: 'Specialist',
+              title: SettingsStrings.doctorSpecialist,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -91,23 +93,23 @@ class _DoctorInfoState extends State<DoctorInfo> {
               ),
             ),
             _buildSection(
-              title: 'Price Contact Doctor details',
+              title: SettingsStrings.doctorPriceContactTitle,
               child: Column(
                 children: [
                   _buildPriceServiceTile(
-                    title: 'Chat',
+                    title: SettingsStrings.chatTitle,
                     price: '10\$ / min',
                     icon: Icons.chat,
                     colorScheme: colorScheme,
                   ),
                   _buildPriceServiceTile(
-                    title: 'Video Call',
+                    title: SettingsStrings.videoCallTitle,
                     price: '20\$ / min',
                     icon: Icons.videocam_sharp,
                     colorScheme: colorScheme,
                   ),
                   _buildPriceServiceTile(
-                    title: 'Voice Call',
+                    title: SettingsStrings.voiceCallTitle,
                     price: '15\$ / min',
                     icon: Icons.keyboard_voice_sharp,
                     colorScheme: colorScheme,
@@ -387,7 +389,9 @@ class _DoctorInfoState extends State<DoctorInfo> {
                             context.read<ArticlesCubit>().toggleLike(article);
                           },
                           onDislike: () {
-                            context.read<ArticlesCubit>().toggleDislike(article);
+                            context.read<ArticlesCubit>().toggleDislike(
+                              article,
+                            );
                           },
                         ),
                       )

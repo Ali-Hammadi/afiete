@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
@@ -33,7 +34,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Sessions'),
+        title: Text(SettingsStrings.mySessionsTitle),
         centerTitle: true,
         elevation: 0,
       ),
@@ -69,7 +70,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     if (state is UpcomingSessionsLoaded) {
       return _buildLoadedState(
         sessions: state.sessions,
-        emptyMessage: 'No upcoming sessions',
+        emptyMessage: SettingsStrings.noUpcomingSessions,
         isPast: false,
       );
     }
@@ -77,7 +78,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     if (state is PastSessionsLoaded) {
       return _buildLoadedState(
         sessions: state.sessions,
-        emptyMessage: 'No past sessions',
+        emptyMessage: SettingsStrings.noPastSessions,
         isPast: true,
       );
     }
@@ -119,7 +120,8 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
                 }
               : null,
           onBookAgain: () => _showSnackBar('Booking feature coming soon'),
-          onReschedule: () => _showSnackBar('Reschedule feature coming soon'),
+          onReschedule: () =>
+              _showSnackBar(SettingsStrings.rescheduleFeatureComingSoon),
           onJoinSession: () => _handleJoinSession(session),
           onCancel: () => _confirmCancel(context, session.id),
         );
@@ -143,7 +145,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
             child: _buildTabItem(
               theme: theme,
               colorScheme: colorScheme,
-              title: 'Upcoming',
+              title: SettingsStrings.upcoming,
               isSelected: _selectedTab == 0,
               onTap: () {
                 setState(() => _selectedTab = 0);
@@ -155,7 +157,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
             child: _buildTabItem(
               theme: theme,
               colorScheme: colorScheme,
-              title: 'Past',
+              title: SettingsStrings.past,
               isSelected: _selectedTab == 1,
               onTap: () {
                 setState(() => _selectedTab = 1);
@@ -209,20 +211,20 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Cancel Session'),
-        content: const Text('Are you sure you want to cancel this session?'),
+        title: Text(SettingsStrings.cancelSessionTitle),
+        content: Text(SettingsStrings.cancelSessionQuestion),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('No'),
+            child: Text(SettingsStrings.no),
           ),
           FilledButton(
             onPressed: () {
               _cubit.cancelSession(sessionId);
               Navigator.pop(context);
-              _showSnackBar('Session cancelled');
+              _showSnackBar(SettingsStrings.sessionCancelled);
             },
-            child: const Text('Yes, Cancel'),
+            child: Text(SettingsStrings.yesCancel),
           ),
         ],
       ),

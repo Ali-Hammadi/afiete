@@ -1,4 +1,5 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/feature/chat/presentation/widgets/chat_message_bubble.dart';
 import 'package:afiete/feature/chat/presentation/widgets/chat_message_item.dart';
@@ -178,7 +179,10 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
           ),
           const SizedBox(height: 10),
           Text(widget.args.doctorName, style: AppStyles.headingMedium),
-          TextButton(onPressed: () {}, child: const Text('View Profile')),
+          TextButton(
+            onPressed: () {},
+            child: Text(SettingsStrings.viewProfile),
+          ),
           const SizedBox(height: 8),
           Expanded(
             child: ListView.builder(
@@ -191,7 +195,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Center(
                       child: Text(
-                        'Today',
+                        SettingsStrings.todayLabel,
                         style: AppStyles.bodySmall.copyWith(fontSize: 22),
                       ),
                     ),
@@ -221,8 +225,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                       child: TextField(
                         controller: _messageController,
                         style: AppStyles.bodyMedium,
-                        decoration: const InputDecoration(
-                          hintText: 'Type a message...',
+                        decoration: InputDecoration(
+                          hintText: SettingsStrings.typeMessageHint,
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 18,

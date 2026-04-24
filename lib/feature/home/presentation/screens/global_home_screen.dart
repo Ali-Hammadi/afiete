@@ -1,4 +1,5 @@
 import 'package:afiete/core/di/injection_container.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/appointments_screen.dart';
 import 'package:afiete/feature/doctors/presentation/cubits/doctors_cubit.dart';
@@ -42,19 +43,19 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
-            label: "Home",
+            label: SettingsStrings.homeNavLabel,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_alt_outlined),
-            label: "Doctors",
+            label: SettingsStrings.doctorsNavLabel,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.date_range_outlined),
-            label: "Appointments",
+            label: SettingsStrings.appointmentsNavLabel,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline_outlined),
-            label: "Profile",
+            label: SettingsStrings.profileNavLabel,
           ),
         ],
       ),
@@ -68,10 +69,16 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
       case 1:
         return const CustomFindDoctorsAppBar();
       case 2:
-        return AppBar(title: const Text('Appointments'), centerTitle: true);
+        return AppBar(
+          title: Text(SettingsStrings.appointmentsTitle),
+          centerTitle: true,
+        );
       case 3:
       default:
-        return AppBar(title: const Text('Settings'), centerTitle: true);
+        return AppBar(
+          title: Text(SettingsStrings.settingsTitle),
+          centerTitle: true,
+        );
     }
   }
 
