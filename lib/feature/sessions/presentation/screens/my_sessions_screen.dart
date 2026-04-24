@@ -120,8 +120,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
                 }
               : null,
           onBookAgain: () => _showSnackBar('Booking feature coming soon'),
-          onReschedule: () =>
-              _showSnackBar(SettingsStrings.rescheduleFeatureComingSoon),
+          onReschedule: () => _handleReschedule(session),
           onJoinSession: () => _handleJoinSession(session),
           onCancel: () => _confirmCancel(context, session.id),
         );
@@ -205,6 +204,15 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
       session,
       patientId: 'current_patient',
     );
+  }
+
+  Future<void> _handleReschedule(SessionEntity session) async {
+    final nextSlot = session.scheduledAt.add(const Duration(days: 7));
+    await _cubit.rescheduleSession(
+      sessionId: session.id,
+      newScheduledAt: nextSlot,
+    );
+    _showSnackBar('Rescheduled successfully');
   }
 
   void _confirmCancel(BuildContext context, String sessionId) {

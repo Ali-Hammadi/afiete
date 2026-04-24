@@ -47,6 +47,7 @@ import 'package:afiete/feature/sessions/domain/usecase/add_review_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/cancel_session_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/get_past_sessions_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/get_upcoming_sessions_usecase.dart';
+import 'package:afiete/feature/sessions/domain/usecase/reschedule_session_usecase.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:afiete/feature/settings/data/data_source/settings_remote_data_source.dart';
 import 'package:afiete/feature/settings/data/data_source/settings_mock_data_source.dart';
@@ -296,6 +297,9 @@ Future<void> init() async {
   sl.registerLazySingleton<CancelSessionUseCase>(
     () => CancelSessionUseCase(sl<SessionsRepository>()),
   );
+  sl.registerLazySingleton<RescheduleSessionUseCase>(
+    () => RescheduleSessionUseCase(sl<SessionsRepository>()),
+  );
   sl.registerLazySingleton<AddReviewUseCase>(
     () => AddReviewUseCase(sl<SessionsRepository>()),
   );
@@ -306,6 +310,7 @@ Future<void> init() async {
       sl<GetUpcomingSessionsUseCase>(),
       sl<GetPastSessionsUseCase>(),
       sl<CancelSessionUseCase>(),
+      sl<RescheduleSessionUseCase>(),
       sl<AddReviewUseCase>(),
     ),
   );
