@@ -27,6 +27,7 @@ class CustomLanguageOption extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
+            width: 0.85,
             color: isSelected
                 ? colorScheme.primary
                 : colorScheme.outline.withValues(alpha: 0.35),

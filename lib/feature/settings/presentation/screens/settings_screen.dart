@@ -99,22 +99,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 12),
               CustomSettingTile(
-                icon: Icons.support_agent,
-                title: SettingsStrings.supportTitle,
-                subtitle: SettingsStrings.supportSubtitle,
-                onTap: () =>
-                    _showInfoSnackBar(SettingsStrings.supportComingSoon),
-              ),
-              const SizedBox(height: 12),
-              CustomSettingTile(
                 icon: Icons.dark_mode_outlined,
                 title: SettingsStrings.themeTitle,
-                trailing: Transform.scale(
-                  scale: 0.88,
-                  child: Switch(
-                    value: isDarkMode,
-                    onChanged: (value) =>
-                        context.read<ThemeCubit>().toggleTheme(value),
+                trailing: SwitchTheme(
+                  data: SwitchTheme.of(context).copyWith(
+                    trackOutlineWidth: const MaterialStatePropertyAll(0.8),
+                  ),
+                  child: Transform.scale(
+                    scale: 0.88,
+                    child: Switch(
+                      value: isDarkMode,
+                      onChanged: (value) =>
+                          context.read<ThemeCubit>().toggleTheme(value),
+                    ),
                   ),
                 ),
               ),
@@ -186,7 +183,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-          Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.outline),
         ],
       ),
     );
@@ -272,12 +268,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       },
     );
-  }
-
-  void _showInfoSnackBar(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   UserSettingsProfileEntity _resolveProfile(AuthState authState) {

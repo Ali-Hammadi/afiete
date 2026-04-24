@@ -19,6 +19,15 @@ abstract class SettingsStrings {
   static String get supportSubtitle => _t('24/7 Support', 'دعم 24/7');
   static String get supportComingSoon =>
       _t('Support center is coming soon.', 'مركز الدعم قريبا.');
+  static String get supportHelpTitle =>
+      _t('How can we help?', 'كيف يمكننا مساعدتك؟');
+  static String get supportHelpDescription => _t(
+    'Choose one of the quick support options below.',
+    'اختر أحد خيارات الدعم السريع أدناه.',
+  );
+  static String get contactSupport => _t('Contact support', 'تواصل مع الدعم');
+  static String get reportIssue => _t('Report an issue', 'الإبلاغ عن مشكلة');
+  static String get supportFAQ => _t('FAQ', 'الأسئلة الشائعة');
   static String get themeTitle => _t('Theme', 'المظهر');
   static String get termsPrivacyTitle =>
       _t('Terms & Privacy', 'الشروط والخصوصية');
@@ -490,18 +499,32 @@ abstract class SettingsStrings {
 
   static String get changePasswordTitle =>
       _t('Change Password', 'تغيير كلمة المرور');
+  static String get changePasswordDescription => _t(
+    'Change your password to keep your account secure.',
+    'غيّر كلمة المرور للحفاظ على أمان حسابك.',
+  );
   static String get oldPasswordLabel =>
       _t('Old Password', 'كلمة المرور القديمة');
   static String get oldPasswordHint =>
       _t('Enter your current password', 'أدخل كلمة المرور الحالية');
+  static String get currentPasswordRequired =>
+      _t('Current password is required', 'كلمة المرور الحالية مطلوبة');
   static String get newPasswordLabel =>
       _t('New Password', 'كلمة المرور الجديدة');
   static String get newPasswordHint =>
       _t('Enter your new password', 'أدخل كلمة المرور الجديدة');
+  static String get newPasswordRequired =>
+      _t('New password is required', 'كلمة المرور الجديدة مطلوبة');
+  static String get passwordAtLeastSixChars => _t(
+    'Password must be at least 6 characters',
+    'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل',
+  );
   static String get confirmPasswordLabel =>
       _t('Confirm Password', 'تأكيد كلمة المرور');
   static String get confirmPasswordHint =>
       _t('Confirm your new password', 'أكد كلمة المرور الجديدة');
+  static String get confirmPasswordRequired =>
+      _t('Confirm your password', 'أكد كلمة المرور');
   static String get passwordChanged =>
       _t('Password changed successfully.', 'تم تغيير كلمة المرور بنجاح.');
   static String get passwordMismatch =>

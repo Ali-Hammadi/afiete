@@ -11,6 +11,7 @@ class CustomFindDoctorsAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       title: Text(
         SettingsStrings.findSpecialistTitle,
         style: AppStyles.headingMedium,

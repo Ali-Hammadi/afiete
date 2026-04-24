@@ -41,7 +41,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         currentIndex: selectedItemIndex,
         elevation: 0,
         selectedItemColor: colorScheme.primary,
-        unselectedItemColor: colorScheme.outline,
+        unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.64),
         onTap: (value) {
           setState(() {
             selectedItemIndex = value;
@@ -51,19 +51,31 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         backgroundColor: Theme.of(context).cardColor,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
+            icon: Icon(
+              Icons.home_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
             label: SettingsStrings.homeNavLabel,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_alt_outlined),
+            icon: Icon(
+              Icons.people_alt_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
             label: SettingsStrings.doctorsNavLabel,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.date_range_outlined),
+            icon: Icon(
+              Icons.date_range_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
             label: SettingsStrings.appointmentsNavLabel,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_outlined),
+            icon: Icon(
+              Icons.person_outline_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
             label: SettingsStrings.profileNavLabel,
           ),
         ],
@@ -79,12 +91,14 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         return const CustomFindDoctorsAppBar();
       case 2:
         return AppBar(
+          automaticallyImplyLeading: false,
           title: Text(SettingsStrings.appointmentsTitle),
           centerTitle: true,
         );
       case 3:
       default:
         return AppBar(
+          automaticallyImplyLeading: false,
           title: Text(SettingsStrings.settingsTitle),
           centerTitle: true,
         );

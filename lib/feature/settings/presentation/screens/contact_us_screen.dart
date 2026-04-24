@@ -33,6 +33,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
         elevation: 0,
         title: Text(
           SettingsStrings.contactScreenTitle,

@@ -71,6 +71,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
         elevation: 0,
         title: Text(
           SettingsStrings.profileTitle,

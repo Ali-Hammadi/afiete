@@ -69,6 +69,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(
             backgroundColor: theme.scaffoldBackgroundColor,
+            automaticallyImplyLeading: false,
             elevation: 0,
             title: Text(
               SettingsStrings.reportIssueTitle,
