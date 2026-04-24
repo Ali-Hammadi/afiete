@@ -17,13 +17,14 @@ class ReportIssueScreen extends StatefulWidget {
 
 class _ReportIssueScreenState extends State<ReportIssueScreen> {
   final TextEditingController detailsController = TextEditingController();
-  final List<ReportReason> reasons = const [
+  ReportReason? selectedReason;
+
+  List<ReportReason> get reasons => const [
     ReportReason.appBug,
     ReportReason.crashOrFreeze,
     ReportReason.paymentIssue,
     ReportReason.other,
   ];
-  ReportReason? selectedReason;
 
   @override
   void dispose() {
