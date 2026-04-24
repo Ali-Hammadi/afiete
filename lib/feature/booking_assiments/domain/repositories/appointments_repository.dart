@@ -15,4 +15,11 @@ abstract class AppointmentsRepository {
     required ConsultationFee consultationFee,
     required String sessionType,
   });
+
+  Future<Either<Failure, void>> cancelAppointment(String appointmentId);
+
+  Future<Either<Failure, AppointmentEntity>> rescheduleAppointment({
+    required String appointmentId,
+    required DateTime newScheduledAt,
+  });
 }

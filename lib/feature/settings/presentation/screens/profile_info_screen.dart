@@ -15,12 +15,16 @@ class ProfileInfoScreen extends StatefulWidget {
 }
 
 class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
+  static const String _genderMale = 'Male';
+  static const String _genderFemale = 'Female';
+  static const String _genderOther = 'Other';
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
   DateTime _selectedBirthDate = DateTime.now();
-  String _selectedGender = 'Male';
+  String _selectedGender = _genderMale;
   bool _isInitialized = false;
   bool _isSaving = false;
 
@@ -32,8 +36,20 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     _nameController.text = user?.name ?? '';
     _emailController.text = user?.email ?? '';
     _selectedBirthDate = user?.birthDate ?? DateTime.now();
-    _selectedGender = user?.gender ?? 'Male';
+    _selectedGender = _normalizeGenderValue(user?.gender);
     _isInitialized = true;
+  }
+
+  String _normalizeGenderValue(String? raw) {
+    final value = (raw ?? '').trim().toLowerCase();
+    if (value == 'male' || value == 'ذكر') return _genderMale;
+    if (value == 'female' || value == 'أنثى' || value == 'انثى') {
+      return _genderFemale;
+    }
+    if (value == 'other' || value == 'آخر' || value == 'اخر') {
+      return _genderOther;
+    }
+    return _genderMale;
   }
 
   @override
@@ -55,8 +71,9 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.profileTitle,
           style: AppStyles.headingSmall,
         ),
@@ -186,10 +203,19 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                   ),
                   prefixIcon: const Icon(Icons.transgender),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'Male', child: Text('Male')),
-                  DropdownMenuItem(value: 'Female', child: Text('Female')),
-                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                items: [
+                  DropdownMenuItem(
+                    value: _genderMale,
+                    child: Text(SettingsStrings.male),
+                  ),
+                  DropdownMenuItem(
+                    value: _genderFemale,
+                    child: Text(SettingsStrings.female),
+                  ),
+                  DropdownMenuItem(
+                    value: _genderOther,
+                    child: Text(SettingsStrings.other),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) {
@@ -208,7 +234,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                     size: 30,
                   ),
                   const SizedBox(width: 8),
-                  Text('$displayAge Years old', style: AppStyles.bodyMedium),
+                  Text(
+                    SettingsStrings.yearsOld(displayAge),
+                    style: AppStyles.bodyMedium,
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -319,16 +348,16 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text(SettingsStrings.editProfileTitle),
-          content: const Text('Save these profile changes?'),
+          title: Text(SettingsStrings.editProfileTitle),
+          content: Text(SettingsStrings.saveProfileChangesConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text(SettingsStrings.cancel),
+              child: Text(SettingsStrings.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text(SettingsStrings.select),
+              child: Text(SettingsStrings.select),
             ),
           ],
         );
@@ -352,7 +381,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       if (!mounted || !saved) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(SettingsStrings.profileUpdatedSuccess)),
+        SnackBar(content: Text(SettingsStrings.profileUpdatedSuccess)),
       );
     } finally {
       if (mounted) {

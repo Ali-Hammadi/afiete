@@ -15,18 +15,20 @@ class CustomChatMessageBubble extends StatelessWidget {
     final timeText = DateFormat('h:mm a').format(message.sentAt);
 
     return Align(
-      alignment: message.isMine ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: message.isMine
+          ? AlignmentDirectional.centerEnd
+          : AlignmentDirectional.centerStart,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         constraints: const BoxConstraints(maxWidth: 290),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: message.isMine ? colorScheme.primary : theme.cardColor,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(20),
-            topRight: const Radius.circular(20),
-            bottomLeft: Radius.circular(message.isMine ? 20 : 4),
-            bottomRight: Radius.circular(message.isMine ? 4 : 20),
+          borderRadius: BorderRadiusDirectional.only(
+            topStart: const Radius.circular(20),
+            topEnd: const Radius.circular(20),
+            bottomStart: Radius.circular(message.isMine ? 20 : 4),
+            bottomEnd: Radius.circular(message.isMine ? 4 : 20),
           ),
           border: message.isMine
               ? null

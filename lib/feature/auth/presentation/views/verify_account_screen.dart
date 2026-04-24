@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:afiete/core/assets/icon_image_links.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -21,9 +22,9 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
   bool get isFormValid => _pinPutController.text.length == 4;
 
   void _verifyOTP(String pin) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('OTP Verified: $pin')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(SettingsStrings.otpVerifiedWith(pin))),
+    );
   }
 
   @override
@@ -54,10 +55,13 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   height: 200,
                 ),
                 const SizedBox(height: 30),
-                Text("Verify your account", style: AppStyles.headingLarge),
+                Text(
+                  SettingsStrings.verifyAccountTitle,
+                  style: AppStyles.headingLarge,
+                ),
                 const SizedBox(height: 10),
                 Text(
-                  "We have sent 4-digit code to your Email\nEnter the code below to verify your account.",
+                  SettingsStrings.verifyAccountDescription,
                   style: AppStyles.bodyLarge.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.75),
                     height: 1.5,
@@ -72,7 +76,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                 const SizedBox(height: 30),
                 CustomButton(
                   widget: Text(
-                    "Verify",
+                    SettingsStrings.verify,
                     style: TextStyle(
                       color: colorScheme.onPrimary,
                       fontSize: 18,
@@ -92,13 +96,13 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   onPressed: () {
                     _pinPutController.clear();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Code resent to your email'),
+                      SnackBar(
+                        content: Text(SettingsStrings.codeResentToEmail),
                       ),
                     );
                   },
                   child: Text(
-                    "Didn't receive the code? Resend",
+                    SettingsStrings.didntReceiveCodeResend,
                     style: AppStyles.bodyMedium.copyWith(
                       color: colorScheme.primary,
                       decoration: TextDecoration.underline,

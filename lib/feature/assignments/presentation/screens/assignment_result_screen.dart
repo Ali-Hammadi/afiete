@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
@@ -22,23 +23,31 @@ class AssignmentResultScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
-            child: Text('Assessment Result', style: AppStyles.headingMedium),
+            child: Text(
+              SettingsStrings.assessmentResultTitle,
+              style: AppStyles.headingMedium,
+            ),
           ),
           const SizedBox(height: 14),
           CustomAssignmentResultSummaryCard(result: state.result),
           const SizedBox(height: 14),
-          Text('Suggested specialist', style: AppStyles.headingSmall),
+          Text(
+            SettingsStrings.suggestedSpecialistTitle,
+            style: AppStyles.headingSmall,
+          ),
           const SizedBox(height: 10),
           if (state.doctors.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
-              child: Text('No suggested specialists found yet.'),
+              child: Text(SettingsStrings.noSuggestedSpecialistsFoundYet),
             )
           else
             Column(
               children: state.doctors
                   .take(3)
-                  .map((doctor) => CustomDoctorCard(doctor: doctor))
+                  .map(
+                    (doctor) => CustomDoctorCard(doctor: doctor, dense: true),
+                  )
                   .toList(),
             ),
           const SizedBox(height: 20),
@@ -47,7 +56,7 @@ class AssignmentResultScreen extends StatelessWidget {
               Expanded(
                 child: CustomButton(
                   widget: Text(
-                    'Home',
+                    SettingsStrings.homeLabel,
                     style: AppStyles.bodyMedium.copyWith(
                       color: colorScheme.onPrimary,
                     ),
@@ -57,6 +66,7 @@ class AssignmentResultScreen extends StatelessWidget {
                       context,
                       MyRoutes.homeScreen,
                       (route) => false,
+                      arguments: 1,
                     );
                   },
                 ),
@@ -65,7 +75,7 @@ class AssignmentResultScreen extends StatelessWidget {
               Expanded(
                 child: CustomButton(
                   widget: Text(
-                    'Specialists',
+                    SettingsStrings.specialistsLabel,
                     style: AppStyles.bodyMedium.copyWith(
                       color: colorScheme.onPrimary,
                     ),
@@ -73,8 +83,9 @@ class AssignmentResultScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
-                      MyRoutes.doctorsHomeScreen,
+                      MyRoutes.homeScreen,
                       (route) => false,
+                      arguments: 1,
                     );
                   },
                 ),
@@ -86,7 +97,7 @@ class AssignmentResultScreen extends StatelessWidget {
             child: TextButton(
               onPressed: () =>
                   context.read<AssignmentsCubit>().retakeAssignment(),
-              child: const Text('Retake Assessment'),
+              child: Text(SettingsStrings.retakeAssessment),
             ),
           ),
         ],

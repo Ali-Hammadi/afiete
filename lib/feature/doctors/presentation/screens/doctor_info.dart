@@ -1,4 +1,5 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
@@ -6,6 +7,7 @@ import 'package:afiete/core/widget/error_custom_button.dart';
 import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
 import 'package:afiete/feature/articles/presentation/widgets/article_card_widget.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
+import 'package:afiete/feature/doctors/data/datasources/mock_doctors_data.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
 import 'package:afiete/feature/home/presentation/widgets/custom_container.dart';
 import 'package:afiete/feature/doctors/presentation/widgets/doctor_review_item.dart';
@@ -39,12 +41,14 @@ class _DoctorInfoState extends State<DoctorInfo> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final doctor = widget.doctor;
-    final doctorName = doctor?.name ?? 'Dr. John Doe';
-    final doctorSpecialization = doctor?.specialization ?? 'Specialist';
+    final doctor = _resolveDoctor(widget.doctor);
+    final doctorName = doctor?.name ?? SettingsStrings.doctorDefaultName;
+    final doctorSpecialization = doctor == null
+        ? SettingsStrings.doctorSpecialist
+        : SettingsStrings.specialtyLabel(doctor.specialization);
     final doctorDescription = doctor?.description.isNotEmpty == true
         ? doctor!.description
-        : 'Doctor profile details are not available right now.';
+        : SettingsStrings.doctorProfileUnavailable;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,44 +76,44 @@ class _DoctorInfoState extends State<DoctorInfo> {
             ),
             _buildStatsCard(colorScheme: colorScheme, doctor: doctor),
             _buildSection(
-              title: 'About Doctor',
+              title: SettingsStrings.doctorAboutTitle,
               child: SizedBox(
                 width: double.infinity,
                 child: Text(doctorDescription, style: AppStyles.bodyMedium),
               ),
             ),
             _buildSection(
-              title: 'Specialist',
+              title: SettingsStrings.medicalSpecialtiesLabel,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(doctorSpecialization, style: AppStyles.bodySmall),
-                  Text('Cardiology'),
-                  Text('CBT'),
-                  Text('Depression'),
+                  Text(SettingsStrings.cardiology),
+                  Text(SettingsStrings.specialtyLabel('cbtTherapist')),
+                  Text(SettingsStrings.depression),
                 ],
               ),
             ),
             _buildSection(
-              title: 'Price Contact Doctor details',
+              title: SettingsStrings.doctorPriceContactTitle,
               child: Column(
                 children: [
                   _buildPriceServiceTile(
-                    title: 'Chat',
-                    price: '10\$ / min',
-                    icon: Icons.chat,
+                    title: SettingsStrings.chatTitle,
+                    price: '10\$ / ${SettingsStrings.minuteAbbreviation}',
+                    icon: Icons.chat_bubble_outline,
                     colorScheme: colorScheme,
                   ),
                   _buildPriceServiceTile(
-                    title: 'Video Call',
-                    price: '20\$ / min',
-                    icon: Icons.videocam_sharp,
+                    title: SettingsStrings.videoCallTitle,
+                    price: '20\$ / ${SettingsStrings.minuteAbbreviation}',
+                    icon: Icons.videocam_outlined,
                     colorScheme: colorScheme,
                   ),
                   _buildPriceServiceTile(
-                    title: 'Voice Call',
-                    price: '15\$ / min',
-                    icon: Icons.keyboard_voice_sharp,
+                    title: SettingsStrings.voiceCallTitle,
+                    price: '15\$ / ${SettingsStrings.minuteAbbreviation}',
+                    icon: Icons.keyboard_voice_outlined,
                     colorScheme: colorScheme,
                   ),
                 ],
@@ -120,7 +124,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
             SizedBox(height: 20),
             CustomButton(
               widget: Text(
-                "Book a session now",
+                SettingsStrings.bookSessionNow,
                 style: AppStyles.headingSmall.copyWith(
                   color: colorScheme.onPrimary,
                 ),
@@ -145,7 +149,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
             SizedBox(height: 20),
             ErrorCustomButton(
               widget: Text(
-                "Report Doctor",
+                SettingsStrings.reportDoctorButton,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onError,
                 ),
@@ -160,8 +164,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
 
                 if (userId.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please sign in to report a doctor.'),
+                    SnackBar(
+                      content: Text(
+                        SettingsStrings.pleaseSignInToReportADoctor,
+                      ),
                     ),
                   );
                   return;
@@ -182,6 +188,40 @@ class _DoctorInfoState extends State<DoctorInfo> {
           ],
         ),
       ),
+    );
+  }
+
+  DoctorEntity? _resolveDoctor(DoctorEntity? doctor) {
+    if (doctor == null) {
+      return null;
+    }
+
+    final currentDoctorData = MockDoctorsData.getMockDoctorById(doctor.id);
+    if (currentDoctorData == null) {
+      return doctor;
+    }
+
+    return DoctorEntity(
+      id: doctor.id,
+      name: currentDoctorData['name'] as String? ?? doctor.name,
+      specialization:
+          currentDoctorData['specialization'] as String? ??
+          doctor.specialization,
+      experience:
+          currentDoctorData['experience'] as String? ?? doctor.experience,
+      rating: currentDoctorData['rating'] as String? ?? doctor.rating,
+      imageUrl: currentDoctorData['imageUrl'] as String? ?? doctor.imageUrl,
+      description:
+          currentDoctorData['description'] as String? ?? doctor.description,
+      isOnline: currentDoctorData['isOnline'] as bool? ?? doctor.isOnline,
+      ratingValue:
+          (currentDoctorData['ratingValue'] as num?)?.toDouble() ??
+          doctor.ratingValue,
+      createdAt: doctor.createdAt,
+      availableTimes: doctor.availableTimes,
+      availableDurations: doctor.availableDurations,
+      availableSessionTypes: doctor.availableSessionTypes,
+      consultationFee: doctor.consultationFee,
     );
   }
 
@@ -207,7 +247,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                     ),
                   ],
                 ),
-                Text(' Reviews', style: AppStyles.bodySmall),
+                Text(SettingsStrings.reviewsLabel, style: AppStyles.bodySmall),
               ],
             ),
           ),
@@ -216,7 +256,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(doctor?.experience ?? '+ 5 years'),
-                Text('Experience', style: AppStyles.bodySmall),
+                Text(
+                  SettingsStrings.experienceLabel,
+                  style: AppStyles.bodySmall,
+                ),
               ],
             ),
           ),
@@ -225,7 +268,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('+1.2K'),
-                Text('Patients', style: AppStyles.bodySmall),
+                Text(SettingsStrings.patientsLabel, style: AppStyles.bodySmall),
               ],
             ),
           ),
@@ -261,6 +304,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
   }
 
   Widget _buildReviewsSection({required ColorScheme colorScheme}) {
+    final reviews = MockDoctorsData.getMockDoctorReviews(
+      widget.doctor?.id ?? '',
+    );
+
     return CustomContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,11 +315,11 @@ class _DoctorInfoState extends State<DoctorInfo> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Reviews', style: AppStyles.headingSmall),
+              Text(SettingsStrings.reviewsLabel, style: AppStyles.headingSmall),
               TextButton(
                 onPressed: () {},
                 child: Text(
-                  'See all',
+                  SettingsStrings.seeAll,
                   style: AppStyles.bodySmall.copyWith(
                     color: colorScheme.primary,
                   ),
@@ -283,11 +330,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           const Divider(),
           _buildReviewItem(
             avatarAsset: ImageLinks.man1,
-            reviewerName: 'Fadi',
-            reviewTime: 'Yesterday',
-            rating: '4.8',
-            review:
-                'Dr. John Doe is an exceptional doctor who provided me with excellent care and support throughout my treatment. He was always attentive to my needs and concerns, and his expertise and professionalism were evident in every interaction. I highly recommend Dr. John Doe to anyone seeking top-notch medical care.',
+            reviewerName: reviews[0]['reviewerName'] as String,
+            reviewTime: reviews[0]['reviewTime'] as String,
+            rating: reviews[0]['rating'] as String,
+            review: reviews[0]['review'] as String,
             isExpanded: _isFirstReviewExpanded,
             onToggle: () => setState(
               () => _isFirstReviewExpanded = !_isFirstReviewExpanded,
@@ -296,11 +342,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           const Divider(),
           _buildReviewItem(
             avatarAsset: ImageLinks.man1,
-            reviewerName: 'Samer',
-            reviewTime: 'Last month',
-            rating: '4.9',
-            review:
-                'this is a very long review that should be truncated to fit in the available space. The doctor was very professional and attentive to my needs. I highly recommend him to anyone looking for a great healthcare provider.',
+            reviewerName: reviews[1]['reviewerName'] as String,
+            reviewTime: reviews[1]['reviewTime'] as String,
+            rating: reviews[1]['rating'] as String,
+            review: reviews[1]['review'] as String,
             isExpanded: _isSecondReviewExpanded,
             onToggle: () => setState(
               () => _isSecondReviewExpanded = !_isSecondReviewExpanded,
@@ -309,11 +354,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           const Divider(),
           _buildReviewItem(
             avatarAsset: ImageLinks.woman2,
-            reviewerName: 'Maya',
-            reviewTime: 'Last week',
-            rating: '4.8',
-            review:
-                'this is a very long review that should be truncated to fit in the available space. The doctor was very professional and attentive to my needs. I highly recommend him to anyone looking for a great healthcare provider.',
+            reviewerName: reviews[2]['reviewerName'] as String,
+            reviewTime: reviews[2]['reviewTime'] as String,
+            rating: reviews[2]['rating'] as String,
+            review: reviews[2]['review'] as String,
             isExpanded: _isThirdReviewExpanded,
             onToggle: () => setState(
               () => _isThirdReviewExpanded = !_isThirdReviewExpanded,
@@ -332,7 +376,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Articles', style: AppStyles.headingSmall),
+              Text(
+                SettingsStrings.articlesLabel,
+                style: AppStyles.headingSmall,
+              ),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(
@@ -345,7 +392,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                   );
                 },
                 child: Text(
-                  'Read all',
+                  SettingsStrings.seeAll,
                   style: AppStyles.bodySmall.copyWith(
                     color: colorScheme.primary,
                   ),
@@ -369,7 +416,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
-                      'No articles available for this doctor yet.',
+                      SettingsStrings.noArticlesAvailableForThisDoctorYet,
                       style: AppStyles.bodySmall.copyWith(
                         color: colorScheme.outline,
                       ),
@@ -382,12 +429,15 @@ class _DoctorInfoState extends State<DoctorInfo> {
                       .map(
                         (article) => ArticleCardWidget(
                           article: article,
+                          flatMode: true,
                           onReadMore: () {},
                           onLike: () {
                             context.read<ArticlesCubit>().toggleLike(article);
                           },
                           onDislike: () {
-                            context.read<ArticlesCubit>().toggleDislike(article);
+                            context.read<ArticlesCubit>().toggleDislike(
+                              article,
+                            );
                           },
                         ),
                       )

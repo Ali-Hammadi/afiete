@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class CustomSessionCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: colorScheme.primaryContainer,
-                  child: Icon(Icons.person, color: colorScheme.primary),
+                  child: Icon(Icons.person_outline, color: colorScheme.primary),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -52,12 +53,20 @@ class CustomSessionCard extends StatelessWidget {
                     children: [
                       Text(session.doctorName, style: AppStyles.headingSmall),
                       Text(
-                        session.doctorSpecialization,
+                        SettingsStrings.specialtyLabel(
+                          session.doctorSpecialization,
+                        ),
                         style: AppStyles.bodySmall,
                       ),
                     ],
                   ),
                 ),
+                if (!isPast && onCancel != null)
+                  IconButton(
+                    onPressed: onCancel,
+                    icon: Icon(Icons.close, color: colorScheme.error),
+                    tooltip: SettingsStrings.cancelAction,
+                  ),
               ],
             ),
             const SizedBox(height: 12),
@@ -78,8 +87,6 @@ class CustomSessionCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, bool isPast) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     if (isPast) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -87,14 +94,14 @@ class CustomSessionCard extends StatelessWidget {
           Expanded(
             child: OutlinedButton(
               onPressed: onAddReview,
-              child: const Text('Add Review'),
+              child: Text(SettingsStrings.addReview),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: FilledButton(
               onPressed: onBookAgain,
-              child: const Text('Book Again'),
+              child: Text(SettingsStrings.bookAgain),
             ),
           ),
         ],
@@ -109,29 +116,17 @@ class CustomSessionCard extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: onReschedule,
-                  child: const Text('Reschedule'),
+                  child: Text(SettingsStrings.reschedule),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: FilledButton(
                   onPressed: onJoinSession,
-                  child: const Text('Join Session'),
+                  child: Text(SettingsStrings.joinSession),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.error,
-                foregroundColor: colorScheme.onError,
-              ),
-              onPressed: onCancel,
-              child: const Text('Cancel'),
-            ),
           ),
         ],
       );

@@ -12,7 +12,10 @@ abstract class SessionsRepository {
 
   Future<Either<Failure, SessionEntity>> joinSession(String sessionId);
 
-  Future<Either<Failure, void>> cancelSession(String sessionId);
+  Future<Either<Failure, void>> cancelSession({
+    required String sessionId,
+    required String doctorId,
+  });
 
   Future<Either<Failure, SessionEntity>> rescheduleSession({
     required String sessionId,

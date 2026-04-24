@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/report/domain/entities/report_entity.dart';
 
 class CustomReportCard extends StatelessWidget {
@@ -34,24 +35,26 @@ class CustomReportCard extends StatelessWidget {
   String _getStatusLabel() {
     switch (report.status) {
       case ReportStatus.pending:
-        return 'Pending';
+        return SettingsStrings.pendingStatus;
       case ReportStatus.reviewed:
-        return 'Under Review';
+        return SettingsStrings.underReviewStatus;
       case ReportStatus.resolved:
-        return 'Resolved';
+        return SettingsStrings.resolvedStatus;
     }
   }
 
   String _getReportTypeLabel() {
     switch (report.reportType) {
       case ReportType.doctor:
-        return 'Doctor Report';
+        return SettingsStrings.doctorReportType;
       case ReportType.session:
-        return 'Session Report';
+        return SettingsStrings.sessionReportType;
       case ReportType.app:
-        return 'App Report';
+        return SettingsStrings.appReportType;
     }
   }
+
+  String _getReasonLabel() => report.reason.localizedLabel;
 
   String _getFormattedDate(DateTime date) {
     return DateFormat('MMM dd, yyyy at hh:mm a').format(date);
@@ -128,7 +131,7 @@ class CustomReportCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Reason:',
+                  SettingsStrings.reasonLabel,
                   style: AppStyles.bodySmall.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.75),
                     fontWeight: FontWeight.w500,
@@ -137,7 +140,7 @@ class CustomReportCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    report.reason.label,
+                    _getReasonLabel(),
                     style: AppStyles.bodySmall.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
@@ -169,14 +172,14 @@ class CustomReportCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Submitted: ${_getFormattedDate(report.createdAt)}',
+                  '${SettingsStrings.submittedLabel}: ${_getFormattedDate(report.createdAt)}',
                   style: AppStyles.bodySmall.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.75),
                   ),
                 ),
                 if (report.resolvedAt != null)
                   Text(
-                    'Resolved: ${_getFormattedDate(report.resolvedAt!)}',
+                    '${SettingsStrings.resolvedLabel}: ${_getFormattedDate(report.resolvedAt!)}',
                     style: AppStyles.bodySmall.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w500,

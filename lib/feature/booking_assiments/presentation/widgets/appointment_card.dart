@@ -1,4 +1,5 @@
 import 'package:afiete/core/assets/icon_image_links.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/booking_assiments/domain/constants/session_type.dart';
@@ -11,11 +12,23 @@ import 'package:intl/intl.dart';
 class CustomAppointmentCard extends StatelessWidget {
   final AppointmentEntity appointment;
   final DoctorEntity? doctor;
+  final bool isPast;
+  final VoidCallback? onAddReview;
+  final VoidCallback? onBookAgain;
+  final VoidCallback? onReschedule;
+  final VoidCallback? onCancel;
+  final VoidCallback? onJoinSession;
 
   const CustomAppointmentCard({
     super.key,
     required this.appointment,
+    required this.isPast,
     this.doctor,
+    this.onAddReview,
+    this.onBookAgain,
+    this.onReschedule,
+    this.onCancel,
+    this.onJoinSession,
   });
 
   @override
@@ -56,12 +69,21 @@ class CustomAppointmentCard extends StatelessWidget {
                       style: AppStyles.headingSmall,
                     ),
                     subtitle: Text(
-                      doctor?.specialization ?? 'Specialist',
+                      doctor?.specialization == null
+                          ? SettingsStrings.specialistLabelInAppointment
+                          : SettingsStrings.specialtyLabel(
+                              doctor!.specialization,
+                            ),
                       style: AppStyles.bodyMedium,
                     ),
                   ),
                 ),
-                IconButton(onPressed: () {}, icon: Icon(Icons.close_sharp)),
+                if (!isPast && onCancel != null)
+                  IconButton(
+                    onPressed: onCancel,
+                    icon: const Icon(Icons.close_sharp),
+                    tooltip: SettingsStrings.cancelAction,
+                  ),
               ],
             ), //01142611737
             const SizedBox(height: 8),
@@ -78,7 +100,9 @@ class CustomAppointmentCard extends StatelessWidget {
                   Text(dateText, style: AppStyles.bodyMedium),
                   const SizedBox(height: 6),
                   Text(
-                    'Duration: ${appointment.durationSlots * 30} minutes',
+                    SettingsStrings.durationMinutesLabel(
+                      appointment.durationSlots * 30,
+                    ),
                     style: AppStyles.bodyMedium,
                   ),
                   const SizedBox(height: 6),
@@ -97,26 +121,48 @@ class CustomAppointmentCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                 children: [
-                  CustomButton(
-                    widget: Text(
-                      "Join Session",
-                      style: AppStyles.bodySmall.copyWith(
-                        color: colorScheme.onPrimary,
+                  if (isPast) ...[
+                    CustomButton(
+                      widget: Text(
+                        SettingsStrings.addReview,
+                        style: AppStyles.bodySmall.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
                       ),
+                      onPressed: onAddReview,
                     ),
-                    onPressed: () => _handleJoinSession(context),
-                  ),
-                  CustomButton(
-                    widget: Text(
-                      "Reschedule",
-                      style: AppStyles.bodySmall.copyWith(
-                        color: colorScheme.onPrimary,
+                    const SizedBox(width: 12),
+                    CustomButton(
+                      widget: Text(
+                        SettingsStrings.bookAgain,
+                        style: AppStyles.bodySmall.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
                       ),
+                      onPressed: onBookAgain,
                     ),
-                    onPressed: () {
-                      // Handle cancel action
-                    },
-                  ),
+                  ] else ...[
+                    CustomButton(
+                      widget: Text(
+                        SettingsStrings.joinSession,
+                        style: AppStyles.bodySmall.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                      onPressed:
+                          onJoinSession ?? () => _handleJoinSession(context),
+                    ),
+                    const SizedBox(width: 12),
+                    CustomButton(
+                      widget: Text(
+                        SettingsStrings.reschedule,
+                        style: AppStyles.bodySmall.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                      onPressed: onReschedule,
+                    ),
+                  ],
                 ],
               ),
             ),

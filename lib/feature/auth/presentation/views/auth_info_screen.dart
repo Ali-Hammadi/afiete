@@ -1,3 +1,4 @@
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/auth/presentation/widgets/custom_text_form_field.dart';
@@ -63,13 +64,13 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
               Column(
                 children: [
                   Text(
-                    "Let's get to know you",
+                    SettingsStrings.letsGetToKnowYou,
                     textAlign: TextAlign.center,
                     style: AppStyles.headingLarge,
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "The following information will help us to personalize your experience",
+                    SettingsStrings.personalizeExperienceHint,
                     textAlign: TextAlign.center,
                     style: AppStyles.bodyLarge.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.75),
@@ -80,7 +81,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                     onTap: _selectDate,
                     child: AbsorbPointer(
                       child: CustomTextFormFiled(
-                        label: 'Birthdate',
+                        label: SettingsStrings.birthdateLabel,
                         controller: birthdateController,
                         obscureText: false,
                         keyboardType: TextInputType.text,
@@ -92,7 +93,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                   DropdownButtonFormField<String>(
                     initialValue: selectedGender,
                     decoration: InputDecoration(
-                      labelText: 'Gender',
+                      labelText: SettingsStrings.genderTitle,
                       labelStyle: AppStyles.bodyMedium,
                       prefixIcon: Icon(
                         Icons.person,
@@ -119,9 +120,15 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                         ),
                       ),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'Male', child: Text('Male')),
-                      DropdownMenuItem(value: 'Female', child: Text('Female')),
+                    items: [
+                      DropdownMenuItem(
+                        value: SettingsStrings.male,
+                        child: Text(SettingsStrings.male),
+                      ),
+                      DropdownMenuItem(
+                        value: SettingsStrings.female,
+                        child: Text(SettingsStrings.female),
+                      ),
                     ],
                     onChanged: (String? newValue) {
                       setState(() {
@@ -134,7 +141,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
               SizedBox(height: 20),
               CustomButton(
                 widget: Text(
-                  'Next',
+                  SettingsStrings.next,
                   style: TextStyle(
                     color: colorScheme.onPrimary,
                     fontSize: 18,
@@ -144,10 +151,8 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                 onPressed: () async {
                   if (selectedDate == null || selectedGender == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Please enter your birthdate and gender.',
-                        ),
+                      SnackBar(
+                        content: Text(SettingsStrings.enterBirthdateAndGender),
                       ),
                     );
                     return;

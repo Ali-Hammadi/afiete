@@ -15,6 +15,13 @@ abstract class AppointmentsRemoteDataSource {
     required ConsultationFee consultationFee,
     required String sessionType,
   });
+
+  Future<void> cancelAppointment(String appointmentId);
+
+  Future<AppointmentModel> rescheduleAppointment({
+    required String appointmentId,
+    required DateTime newScheduledAt,
+  });
 }
 
 class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
@@ -113,6 +120,74 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
     } catch (e) {
       throw DioException(
         requestOptions: RequestOptions(path: ApiEndpoints.appointmentsCreate),
+        error: e,
+        type: DioExceptionType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<void> cancelAppointment(String appointmentId) async {
+    try {
+      final response = await _dio.post(
+        '${ApiEndpoints.appointments}/cancel',
+        data: {'appointmentId': appointmentId},
+      );
+      if (response.statusCode != 200) {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+        );
+      }
+    } on DioException {
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(
+          path: '${ApiEndpoints.appointments}/cancel',
+        ),
+        error: e,
+        type: DioExceptionType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<AppointmentModel> rescheduleAppointment({
+    required String appointmentId,
+    required DateTime newScheduledAt,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '${ApiEndpoints.appointments}/reschedule',
+        data: {
+          'appointmentId': appointmentId,
+          'newScheduledAt': newScheduledAt.toIso8601String(),
+        },
+      );
+      if (response.statusCode == 200) {
+        final body = response.data;
+        if (body is Map<String, dynamic>) {
+          final nested = body['appointment'];
+          if (nested is Map<String, dynamic>) {
+            return AppointmentModel.fromJson(nested);
+          }
+          return AppointmentModel.fromJson(body);
+        }
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        type: DioExceptionType.badResponse,
+      );
+    } on DioException {
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(
+          path: '${ApiEndpoints.appointments}/reschedule',
+        ),
         error: e,
         type: DioExceptionType.unknown,
       );

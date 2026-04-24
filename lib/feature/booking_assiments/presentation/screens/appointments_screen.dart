@@ -1,7 +1,14 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
+import 'package:afiete/core/di/injection_container.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/widgets/appointment_card.dart';
+import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
+import 'package:afiete/feature/booking_assiments/domain/entities/appointment_entity.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
+import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
+import 'package:afiete/feature/sessions/presentation/widgets/review_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -67,7 +74,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         children: [
           Expanded(
             child: _buildTabItem(
-              title: 'Upcoming',
+              title: SettingsStrings.upcoming,
               isSelected: isUpcoming,
               colorScheme: colorScheme,
               onTap: () {
@@ -80,7 +87,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: _buildTabItem(
-              title: 'Past',
+              title: SettingsStrings.past,
               isSelected: !isUpcoming,
               colorScheme: colorScheme,
               onTap: () {
@@ -172,7 +179,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             const SizedBox(height: 10),
             Text(
               isConnectionIssue
-                  ? 'No internet connection. Please reconnect and try again.'
+                  ? SettingsStrings
+                        .noInternetConnectionPleaseReconnectAndTryAgain
                   : message,
               style: AppStyles.bodyMedium,
               textAlign: TextAlign.center,
@@ -183,7 +191,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 context.read<AppointmentsCubit>().loadAppointments();
               },
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
+              label: Text(SettingsStrings.retry),
             ),
           ],
         ),
@@ -212,8 +220,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             Center(
               child: Text(
                 isUpcoming
-                    ? 'No upcoming appointments.'
-                    : 'No past appointments.',
+                    ? SettingsStrings.noUpcomingAppointments
+                    : SettingsStrings.noPastAppointments,
               ),
             ),
           ],
@@ -237,6 +245,25 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           return CustomAppointmentCard(
             doctor: matchedDoctor,
             appointment: appointment,
+            isPast: !isUpcoming,
+            onAddReview: matchedDoctor == null
+                ? null
+                : () => _showReviewSheet(
+                    appointmentId: appointment.id,
+                    doctorId: matchedDoctor.id,
+                  ),
+            onBookAgain: matchedDoctor == null
+                ? null
+                : () => _handleBookAgain(doctor: matchedDoctor),
+            onReschedule: matchedDoctor == null
+                ? null
+                : () => _handleReschedule(
+                    appointmentId: appointment.id,
+                    doctor: matchedDoctor,
+                  ),
+            onCancel: () =>
+                _confirmCancel(context, appointmentId: appointment.id),
+            onJoinSession: () => _handleJoinSession(appointment),
           );
         },
       ),
@@ -256,5 +283,96 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     }
 
     return null;
+  }
+
+  Future<void> _handleReschedule({
+    required String appointmentId,
+    required DoctorEntity doctor,
+  }) async {
+    final selectedTime = await Navigator.pushNamed<DateTime?>(
+      context,
+      MyRoutes.bookSessionScreen,
+      arguments: {'doctor': doctor, 'rescheduleMode': true},
+    );
+
+    if (selectedTime == null || !mounted) {
+      return;
+    }
+
+    final success = await context
+        .read<AppointmentsCubit>()
+        .rescheduleAppointment(
+          appointmentId: appointmentId,
+          newScheduledAt: selectedTime,
+        );
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.sessionRescheduledSuccessfully)),
+      );
+    }
+  }
+
+  void _handleJoinSession(AppointmentEntity appointment) {
+    ChatSessionNavigator.openFromAppointment(
+      context,
+      appointment,
+      doctorName: appointment.doctorName,
+    );
+  }
+
+  Future<void> _handleBookAgain({required DoctorEntity doctor}) async {
+    await Navigator.pushNamed(
+      context,
+      MyRoutes.bookSessionScreen,
+      arguments: doctor,
+    );
+  }
+
+  void _showReviewSheet({
+    required String appointmentId,
+    required String doctorId,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BlocProvider<SessionsCubit>(
+        create: (_) => sl<SessionsCubit>(),
+        child: CustomReviewBottomSheet(
+          sessionId: appointmentId,
+          doctorId: doctorId,
+        ),
+      ),
+    );
+  }
+
+  void _confirmCancel(BuildContext context, {required String appointmentId}) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(SettingsStrings.cancelSessionTitle),
+        content: Text(SettingsStrings.cancelSessionQuestion),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(SettingsStrings.no),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final success = await context
+                  .read<AppointmentsCubit>()
+                  .cancelAppointment(appointmentId);
+              if (context.mounted && success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(SettingsStrings.sessionCancelled)),
+                );
+              }
+            },
+            child: Text(SettingsStrings.yesCancel),
+          ),
+        ],
+      ),
+    );
   }
 }

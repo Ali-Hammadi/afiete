@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/payment/domain/entities/payment_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,14 +25,17 @@ class CustomPaymentSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SummaryRow(
-            label: 'Session',
+            label: SettingsStrings.sessionLabel,
             value: _prettySessionType(request.sessionType),
           ),
           const SizedBox(height: 6),
-          _SummaryRow(label: 'Specialist', value: request.doctorName),
+          _SummaryRow(
+            label: SettingsStrings.specialistLabel,
+            value: request.doctorName,
+          ),
           const SizedBox(height: 6),
           _SummaryRow(
-            label: 'Date',
+            label: SettingsStrings.dateLabel,
             value: DateFormat(
               'MMM dd, yyyy • h:mm a',
             ).format(request.scheduledAt),
@@ -43,7 +47,10 @@ class CustomPaymentSummaryCard extends StatelessWidget {
           ),
           Row(
             children: [
-              Text('Total Amount', style: AppStyles.bodyMedium),
+              Text(
+                SettingsStrings.totalAmountLabel,
+                style: AppStyles.bodyMedium,
+              ),
               const Spacer(),
               Text(
                 '${_formatAmount(request.amount)} \$',
@@ -102,7 +109,7 @@ class _SummaryRow extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.end,
             style: AppStyles.headingSmall.copyWith(fontWeight: FontWeight.w500),
           ),
         ),

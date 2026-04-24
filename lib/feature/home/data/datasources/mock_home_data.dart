@@ -55,7 +55,7 @@ class MockHomeData {
       'id': 'apt_001',
       'doctorName': 'Dr. Ahmed Malik',
       'doctorSpecialization': 'psychiatrist',
-      'scheduledAt': '2024-04-20T10:00:00Z',
+      'scheduledAt': '2026-04-25T10:00:00Z',
       'sessionType': 'video_call',
       'status': 'confirmed',
     },
@@ -63,7 +63,7 @@ class MockHomeData {
       'id': 'apt_005',
       'doctorName': 'Dr. Ahmed Malik',
       'doctorSpecialization': 'psychiatrist',
-      'scheduledAt': '2024-04-24T11:00:00Z',
+      'scheduledAt': '2026-04-26T11:00:00Z',
       'sessionType': 'video_call',
       'status': 'confirmed',
     },
@@ -71,7 +71,7 @@ class MockHomeData {
       'id': 'apt_002',
       'doctorName': 'Dr. Fatima Zahra',
       'doctorSpecialization': 'clinicalPsychologist',
-      'scheduledAt': '2024-04-21T14:00:00Z',
+      'scheduledAt': '2026-04-25T14:00:00Z',
       'sessionType': 'text_chat',
       'status': 'pending',
     },
@@ -82,7 +82,8 @@ class MockHomeData {
     {
       'id': 'rec_001',
       'title': 'Meditation for Anxiety Relief',
-      'description': 'Try a 10-minute daily meditation to reduce anxiety symptoms.',
+      'description':
+          'Try a 10-minute daily meditation to reduce anxiety symptoms.',
       'category': 'self_care',
       'icon': 'meditation',
       'color': 'blue',
@@ -98,7 +99,8 @@ class MockHomeData {
     {
       'id': 'rec_003',
       'title': 'Exercise & Mood',
-      'description': '30 minutes of physical activity can boost your mood significantly.',
+      'description':
+          '30 minutes of physical activity can boost your mood significantly.',
       'category': 'exercise',
       'icon': 'fitness',
       'color': 'green',
@@ -110,13 +112,15 @@ class MockHomeData {
     {
       'id': 'tip_001',
       'title': 'Daily Affirmations',
-      'description': 'Start each day with positive affirmations to boost mental health.',
+      'description':
+          'Start each day with positive affirmations to boost mental health.',
       'tip': 'I am capable and strong.',
     },
     {
       'id': 'tip_002',
       'title': 'Breathing Exercises',
-      'description': 'Practice the 4-7-8 breathing technique for stress relief.',
+      'description':
+          'Practice the 4-7-8 breathing technique for stress relief.',
       'tip': 'Inhale for 4, hold for 7, exhale for 8.',
     },
     {
@@ -164,11 +168,14 @@ class MockHomeData {
 
   static Map<String, dynamic> getMockStats() => mockStats;
 
-  static List<Map<String, dynamic>> getMockFeaturedDoctors() => mockFeaturedDoctors;
+  static List<Map<String, dynamic>> getMockFeaturedDoctors() =>
+      mockFeaturedDoctors;
 
-  static List<Map<String, dynamic>> getMockUpcomingAppointments() => mockUpcomingAppointments;
+  static List<Map<String, dynamic>> getMockUpcomingAppointments() =>
+      mockUpcomingAppointments;
 
-  static List<Map<String, dynamic>> getMockRecommendations() => mockRecommendations;
+  static List<Map<String, dynamic>> getMockRecommendations() =>
+      mockRecommendations;
 
   static List<Map<String, dynamic>> getMockWellnessTips() => mockWellnessTips;
 

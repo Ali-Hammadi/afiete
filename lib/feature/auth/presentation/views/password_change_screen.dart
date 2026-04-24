@@ -40,7 +40,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.changePasswordTitle,
           style: AppStyles.headingMedium,
         ),
@@ -54,7 +54,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
             children: [
               const SizedBox(height: 24),
               Text(
-                'Change your password to keep your account secure.',
+                SettingsStrings.changePasswordDescription,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -65,7 +65,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
                 obscureText: !_showOldPassword,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Current password is required';
+                    return SettingsStrings.currentPasswordRequired;
                   }
                   return null;
                 },
@@ -96,10 +96,10 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
                 obscureText: !_showNewPassword,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'New password is required';
+                    return SettingsStrings.newPasswordRequired;
                   }
                   if (value.length < 6) {
-                    return 'Password must be at least 6 characters';
+                    return SettingsStrings.passwordAtLeastSixChars;
                   }
                   return null;
                 },
@@ -130,7 +130,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
                 obscureText: !_showConfirmPassword,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Confirm your password';
+                    return SettingsStrings.confirmPasswordRequired;
                   }
                   if (value != _newPasswordController.text) {
                     return SettingsStrings.passwordMismatch;
@@ -198,11 +198,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
     try {
       // Show message that feature is being prepared
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Password change feature is being prepared. Please check back soon.',
-          ),
-        ),
+        SnackBar(content: Text(SettingsStrings.passwordChangePreparing)),
       );
 
       if (mounted) {
@@ -215,9 +211,9 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
     }
   }
 }

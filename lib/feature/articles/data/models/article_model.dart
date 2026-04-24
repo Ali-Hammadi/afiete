@@ -47,6 +47,34 @@ class ArticleModel {
     );
   }
 
+  ArticleModel copyWith({
+    String? id,
+    String? title,
+    String? content,
+    String? summary,
+    DoctorEntity? doctor,
+    DateTime? createdAt,
+    int? likesCount,
+    int? dislikesCount,
+    bool? isLikedByUser,
+    bool? isDislikedByUser,
+    List<String>? relatedConditions,
+  }) {
+    return ArticleModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      summary: summary ?? this.summary,
+      doctor: doctor ?? this.doctor,
+      createdAt: createdAt ?? this.createdAt,
+      likesCount: likesCount ?? this.likesCount,
+      dislikesCount: dislikesCount ?? this.dislikesCount,
+      isLikedByUser: isLikedByUser ?? this.isLikedByUser,
+      isDislikedByUser: isDislikedByUser ?? this.isDislikedByUser,
+      relatedConditions: relatedConditions ?? this.relatedConditions,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

@@ -1,3 +1,4 @@
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:afiete/core/constants/styles.dart';
@@ -58,22 +59,26 @@ class _ReportScreenState extends State<ReportScreen> {
 
   String _getScreenTitle() {
     if (widget.reportType == ReportType.doctor) {
-      return 'Report Doctor';
+      return SettingsStrings.reportDoctorTitle;
     } else if (widget.reportType == ReportType.session) {
-      return 'Report Session';
+      return SettingsStrings.reportSessionTitle;
     } else {
-      return 'Report Issue';
+      return SettingsStrings.reportIssueTitle;
     }
   }
 
   String _getHeaderDescription() {
     if (widget.reportType == ReportType.doctor) {
-      return 'Help us maintain a safe environment by reporting any inappropriate behavior from your doctor.';
+      return SettingsStrings.reportDoctorDescription;
     } else if (widget.reportType == ReportType.session) {
-      return 'Report any issues you experienced during your session.';
+      return SettingsStrings.reportSessionDescription;
     } else {
-      return 'Let us know about any technical issues or problems with the app.';
+      return SettingsStrings.reportIssueDescription;
     }
+  }
+
+  String _getReasonLabel(ReportReason reason) {
+    return reason.localizedLabel;
   }
 
   bool _isFormValid() {
@@ -85,7 +90,7 @@ class _ReportScreenState extends State<ReportScreen> {
     if (!_isFormValid()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please select a reason and provide details'),
+          content: Text(SettingsStrings.pleaseSelectReasonAndProvideDetails),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -111,10 +116,7 @@ class _ReportScreenState extends State<ReportScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: theme.scaffoldBackgroundColor,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: true,
         title: Text(_getScreenTitle(), style: AppStyles.headingMedium),
       ),
       body: BlocListener<ReportCubit, ReportState>(
@@ -122,7 +124,7 @@ class _ReportScreenState extends State<ReportScreen> {
           if (state is ReportSubmitted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Report submitted successfully'),
+                content: Text(SettingsStrings.reportSubmittedSuccessfully),
                 backgroundColor: colorScheme.primary,
               ),
             );
@@ -160,7 +162,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _buildHeaderSection() {
     return CustomReportHeaderWidget(
-      title: 'Your Report is Confidential',
+      title: SettingsStrings.reportConfidentialTitle,
       description: _getHeaderDescription(),
       icon: const Icon(Icons.info),
     );
@@ -170,7 +172,7 @@ class _ReportScreenState extends State<ReportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Select Reason', style: AppStyles.headingSmall),
+        Text(SettingsStrings.selectReason, style: AppStyles.headingSmall),
         const SizedBox(height: 12),
         ListView.separated(
           shrinkWrap: true,
@@ -185,7 +187,7 @@ class _ReportScreenState extends State<ReportScreen> {
             );
 
             return CustomReportReasonCard(
-              label: reason['label'],
+              label: _getReasonLabel(reportReason),
               icon: reason['icon'],
               color: reason['color'],
               isSelected: _selectedReason == reportReason,
@@ -203,9 +205,8 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _buildDescriptionSection() {
     return CustomReportFormWidget(
-      label: 'Additional Details',
-      hintText:
-          'Please provide more information about your report. Be as specific as possible.',
+      label: SettingsStrings.additionalDetails,
+      hintText: SettingsStrings.reportDescriptionHint,
       controller: _descriptionController,
       maxLines: 6,
       maxLength: 500,
@@ -222,7 +223,9 @@ class _ReportScreenState extends State<ReportScreen> {
 
         return CustomButton(
           widget: Text(
-            isLoading ? 'Submitting...' : 'Submit Report',
+            isLoading
+                ? SettingsStrings.submitting
+                : SettingsStrings.submitReport,
             style: AppStyles.bodyLarge.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w600,
@@ -251,8 +254,9 @@ class _ReportScreenState extends State<ReportScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Your report will be reviewed by our team. We will take appropriate action.',
+              SettingsStrings.reportWillBeReviewed,
               style: AppStyles.bodySmall.copyWith(color: colorScheme.onSurface),
+              textAlign: TextAlign.start,
             ),
           ),
         ],

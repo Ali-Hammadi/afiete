@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:flutter/material.dart';
 
 class CustomFindDoctorsAppBar extends StatelessWidget
@@ -10,7 +11,11 @@ class CustomFindDoctorsAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text("Find specialist", style: AppStyles.headingMedium),
+      automaticallyImplyLeading: false,
+      title: Text(
+        SettingsStrings.findSpecialistTitle,
+        style: AppStyles.headingMedium,
+      ),
       centerTitle: true,
     );
   }

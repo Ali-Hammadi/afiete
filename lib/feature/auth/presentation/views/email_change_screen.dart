@@ -50,7 +50,7 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.changeEmailTitle,
           style: AppStyles.headingMedium,
         ),
@@ -62,12 +62,12 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
             if (_currentStep == 'email_input') ...[
               const SizedBox(height: 24),
               Text(
-                'Enter your new email address',
+                SettingsStrings.enterNewEmailAddress,
                 style: AppStyles.headingSmall,
               ),
               const SizedBox(height: 8),
               Text(
-                'Current email: $_currentUserEmail',
+                SettingsStrings.currentEmailLabel(_currentUserEmail ?? ''),
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -79,7 +79,7 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
                   controller: _newEmailController,
                   decoration: InputDecoration(
                     labelText: SettingsStrings.emailAddressLabel,
-                    hintText: 'new@example.com',
+                    hintText: SettingsStrings.newEmailHint,
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -88,7 +88,7 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Email is required';
+                      return SettingsStrings.emailRequired;
                     }
                     if (!value.contains('@')) {
                       return SettingsStrings.invalidEmailError;
@@ -112,7 +112,7 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
                         ),
                       )
                     : Text(
-                        'Continue',
+                        SettingsStrings.continueText,
                         style: AppStyles.headingSmall.copyWith(
                           color: colorScheme.onPrimary,
                         ),
@@ -120,10 +120,15 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
               ),
             ] else if (_currentStep == 'otp_verification') ...[
               const SizedBox(height: 24),
-              Text('Verify your new email', style: AppStyles.headingSmall),
+              Text(
+                SettingsStrings.verifyYourNewEmail,
+                style: AppStyles.headingSmall,
+              ),
               const SizedBox(height: 16),
               Text(
-                'We sent a verification code to:\n${_newEmailController.text}',
+                SettingsStrings.verificationCodeSentTo(
+                  _newEmailController.text,
+                ),
                 textAlign: TextAlign.center,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
@@ -197,31 +202,31 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP sent to your new email address.')),
+          SnackBar(content: Text(SettingsStrings.otpSentToNewEmail)),
         );
       } else {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $message')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(SettingsStrings.errorWith(message))),
+        );
       }
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
     }
   }
 
   Future<void> _handleVerifyOtp() async {
     if (_otpController.text.length != 4) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid 4-digit code.')),
+        SnackBar(content: Text(SettingsStrings.invalidFourDigitCode)),
       );
       return;
     }
@@ -244,12 +249,12 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(SettingsStrings.emailUpdatedSuccess)),
+          SnackBar(content: Text(SettingsStrings.emailUpdatedSuccess)),
         );
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Incorrect OTP. Please try again.')),
+          SnackBar(content: Text(SettingsStrings.incorrectOtpTryAgain)),
         );
       }
     } catch (e) {
@@ -257,9 +262,9 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
     }
   }
 
@@ -280,16 +285,16 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message ?? 'OTP resent to your email.')),
+        SnackBar(content: Text(message ?? SettingsStrings.otpResentToEmail)),
       );
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
     }
   }
 }

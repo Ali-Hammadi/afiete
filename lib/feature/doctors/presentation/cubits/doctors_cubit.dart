@@ -10,6 +10,7 @@ class DoctorsCubit extends Cubit<DoctorsState> {
   final GetAllDoctorsUseCase getAllDoctorsUseCase;
   final GetDoctorsBySpecialtyUseCase getDoctorsBySpecialtyUseCase;
   final GetDoctorByIdUseCase getDoctorByIdUseCase;
+  String? _lastSpecialty;
 
   DoctorsCubit(
     this.getAllDoctorsUseCase,
@@ -19,6 +20,7 @@ class DoctorsCubit extends Cubit<DoctorsState> {
 
   Future<void> loadAllDoctors() async {
     emit(const DoctorsLoading());
+    _lastSpecialty = null;
     final result = await getAllDoctorsUseCase(NoParams());
     result.fold(
       (failure) => emit(DoctorsError(failure.errorMessage)),
@@ -28,6 +30,7 @@ class DoctorsCubit extends Cubit<DoctorsState> {
 
   Future<void> loadDoctorsBySpecialty(String specialty) async {
     emit(const DoctorsLoading());
+    _lastSpecialty = specialty;
     final result = await getDoctorsBySpecialtyUseCase(
       GetDoctorsBySpecialtyParams(specialty: specialty),
     );
@@ -46,5 +49,14 @@ class DoctorsCubit extends Cubit<DoctorsState> {
       (failure) => emit(DoctorError(failure.errorMessage)),
       (doctor) => emit(DoctorLoaded(doctor)),
     );
+  }
+
+  Future<void> reloadCurrent() async {
+    if (_lastSpecialty == null) {
+      await loadAllDoctors();
+      return;
+    }
+
+    await loadDoctorsBySpecialty(_lastSpecialty!);
   }
 }

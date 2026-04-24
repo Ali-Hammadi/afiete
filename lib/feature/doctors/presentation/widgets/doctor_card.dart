@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
@@ -7,8 +8,9 @@ import 'package:flutter/material.dart';
 
 class CustomDoctorCard extends StatelessWidget {
   final DoctorEntity doctor;
+  final bool dense;
 
-  const CustomDoctorCard({super.key, required this.doctor});
+  const CustomDoctorCard({super.key, required this.doctor, this.dense = false});
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +19,9 @@ class CustomDoctorCard extends StatelessWidget {
     final cardBackground = colorScheme.primaryContainer.withValues(alpha: 0.45);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppStyles.padding,
-        vertical: AppStyles.padding / 2,
+      padding: EdgeInsets.symmetric(
+        horizontal: dense ? 0 : AppStyles.padding,
+        vertical: dense ? 6 : AppStyles.padding / 2,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -37,13 +39,15 @@ class CustomDoctorCard extends StatelessWidget {
                 Expanded(
                   child: ListTile(
                     title: Text(doctor.name),
-                    subtitle: Text(doctor.specialization),
+                    subtitle: Text(
+                      SettingsStrings.specialtyLabel(doctor.specialization),
+                    ),
                     trailing: SizedBox(
                       width: 56,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star, color: Colors.yellow),
+                          Icon(Icons.star_outline, color: colorScheme.primary),
                           Text(
                             doctor.ratingValue.toString(),
                             style: AppStyles.bodySmall,
@@ -64,7 +68,10 @@ class CustomDoctorCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Experience", textAlign: TextAlign.center),
+                      Text(
+                        SettingsStrings.experienceLabel,
+                        textAlign: TextAlign.center,
+                      ),
                       Text(doctor.experience, textAlign: TextAlign.center),
                     ],
                   ),
@@ -75,7 +82,10 @@ class CustomDoctorCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Consultation", textAlign: TextAlign.center),
+                      Text(
+                        SettingsStrings.consultationLabel,
+                        textAlign: TextAlign.center,
+                      ),
                       Text(doctor.rating, textAlign: TextAlign.center),
                     ],
                   ),
@@ -86,9 +96,14 @@ class CustomDoctorCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Online", textAlign: TextAlign.center),
                       Text(
-                        doctor.isOnline ? "Available" : "Offline",
+                        SettingsStrings.onlineLabel,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        doctor.isOnline
+                            ? SettingsStrings.availableLabel
+                            : SettingsStrings.offlineLabel,
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -99,7 +114,7 @@ class CustomDoctorCard extends StatelessWidget {
             Divider(),
             CustomButton(
               widget: Text(
-                "View details",
+                SettingsStrings.viewDetails,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onPrimary,
                 ),

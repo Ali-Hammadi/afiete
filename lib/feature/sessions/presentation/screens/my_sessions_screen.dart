@@ -1,6 +1,9 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
+import 'package:afiete/feature/doctors/domain/usecase/get_doctors_usecase.dart';
 import 'package:afiete/feature/sessions/domain/entities/session_entity.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:afiete/feature/sessions/presentation/widgets/review_bottom_sheet.dart';
@@ -33,7 +36,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Sessions'),
+        title: Text(SettingsStrings.mySessionsTitle),
         centerTitle: true,
         elevation: 0,
       ),
@@ -69,7 +72,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     if (state is UpcomingSessionsLoaded) {
       return _buildLoadedState(
         sessions: state.sessions,
-        emptyMessage: 'No upcoming sessions',
+        emptyMessage: SettingsStrings.noUpcomingSessions,
         isPast: false,
       );
     }
@@ -77,7 +80,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     if (state is PastSessionsLoaded) {
       return _buildLoadedState(
         sessions: state.sessions,
-        emptyMessage: 'No past sessions',
+        emptyMessage: SettingsStrings.noPastSessions,
         isPast: true,
       );
     }
@@ -113,15 +116,18 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
                   showModalBottomSheet<void>(
                     context: context,
                     isScrollControlled: true,
-                    builder: (_) =>
-                        CustomReviewBottomSheet(sessionId: session.id),
+                    builder: (_) => CustomReviewBottomSheet(
+                      sessionId: session.id,
+                      doctorId: session.doctorId,
+                    ),
                   );
                 }
               : null,
-          onBookAgain: () => _showSnackBar('Booking feature coming soon'),
-          onReschedule: () => _showSnackBar('Reschedule feature coming soon'),
+          onBookAgain: () =>
+              _showSnackBar(SettingsStrings.bookingFeatureComingSoon),
+          onReschedule: () => _handleReschedule(session),
           onJoinSession: () => _handleJoinSession(session),
-          onCancel: () => _confirmCancel(context, session.id),
+          onCancel: () => _confirmCancel(context, session),
         );
       },
     );
@@ -143,7 +149,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
             child: _buildTabItem(
               theme: theme,
               colorScheme: colorScheme,
-              title: 'Upcoming',
+              title: SettingsStrings.upcoming,
               isSelected: _selectedTab == 0,
               onTap: () {
                 setState(() => _selectedTab = 0);
@@ -155,7 +161,7 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
             child: _buildTabItem(
               theme: theme,
               colorScheme: colorScheme,
-              title: 'Past',
+              title: SettingsStrings.past,
               isSelected: _selectedTab == 1,
               onTap: () {
                 setState(() => _selectedTab = 1);
@@ -205,24 +211,62 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     );
   }
 
-  void _confirmCancel(BuildContext context, String sessionId) {
+  Future<void> _handleReschedule(SessionEntity session) async {
+    final doctorResult = await sl<GetDoctorByIdUseCase>()(
+      GetDoctorByIdParams(id: session.doctorId),
+    );
+
+    await doctorResult.fold(
+      (failure) async {
+        if (mounted) {
+          _showSnackBar(failure.errorMessage);
+        }
+      },
+      (doctor) async {
+        final selectedTime = await Navigator.pushNamed<DateTime?>(
+          context,
+          MyRoutes.bookSessionScreen,
+          arguments: {'doctor': doctor, 'rescheduleMode': true},
+        );
+
+        if (selectedTime == null) {
+          return;
+        }
+
+        final success = await _cubit.rescheduleSession(
+          sessionId: session.id,
+          newScheduledAt: selectedTime,
+        );
+        if (success && mounted) {
+          _showSnackBar(SettingsStrings.sessionRescheduledSuccessfully);
+        }
+      },
+    );
+  }
+
+  void _confirmCancel(BuildContext context, SessionEntity session) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Cancel Session'),
-        content: const Text('Are you sure you want to cancel this session?'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(SettingsStrings.cancelSessionTitle),
+        content: Text(SettingsStrings.cancelSessionQuestion),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('No'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(SettingsStrings.no),
           ),
           FilledButton(
-            onPressed: () {
-              _cubit.cancelSession(sessionId);
-              Navigator.pop(context);
-              _showSnackBar('Session cancelled');
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final success = await _cubit.cancelSession(
+                sessionId: session.id,
+                doctorId: session.doctorId,
+              );
+              if (success && mounted) {
+                _showSnackBar(SettingsStrings.sessionCancelled);
+              }
             },
-            child: const Text('Yes, Cancel'),
+            child: Text(SettingsStrings.yesCancel),
           ),
         ],
       ),

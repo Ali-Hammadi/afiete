@@ -1,4 +1,5 @@
 import 'package:afiete/core/di/injection_container.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/appointments_screen.dart';
 import 'package:afiete/feature/doctors/presentation/cubits/doctors_cubit.dart';
@@ -11,14 +12,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GlobalHomeScreen extends StatefulWidget {
-  const GlobalHomeScreen({super.key});
+  const GlobalHomeScreen({super.key, this.initialIndex = 0});
+
+  final int initialIndex;
 
   @override
   State<GlobalHomeScreen> createState() => _GlobalHomeScreenState();
 }
 
 class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
-  int selectedItemIndex = 0;
+  late int selectedItemIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedItemIndex = widget.initialIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -31,7 +41,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         currentIndex: selectedItemIndex,
         elevation: 0,
         selectedItemColor: colorScheme.primary,
-        unselectedItemColor: colorScheme.outline,
+        unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.64),
         onTap: (value) {
           setState(() {
             selectedItemIndex = value;
@@ -41,20 +51,32 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         backgroundColor: Theme.of(context).cardColor,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: "Home",
+            icon: Icon(
+              Icons.home_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
+            label: SettingsStrings.homeNavLabel,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_alt_outlined),
-            label: "Doctors",
+            icon: Icon(
+              Icons.people_alt_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
+            label: SettingsStrings.doctorsNavLabel,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.date_range_outlined),
-            label: "Appointments",
+            icon: Icon(
+              Icons.date_range_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
+            label: SettingsStrings.appointmentsNavLabel,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_outlined),
-            label: "Profile",
+            icon: Icon(
+              Icons.person_outline_outlined,
+              color: colorScheme.onSurface.withValues(alpha: 0.64),
+            ),
+            label: SettingsStrings.profileNavLabel,
           ),
         ],
       ),
@@ -68,10 +90,18 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
       case 1:
         return const CustomFindDoctorsAppBar();
       case 2:
-        return AppBar(title: const Text('Appointments'), centerTitle: true);
+        return AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(SettingsStrings.appointmentsTitle),
+          centerTitle: true,
+        );
       case 3:
       default:
-        return AppBar(title: const Text('Settings'), centerTitle: true);
+        return AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(SettingsStrings.settingsTitle),
+          centerTitle: true,
+        );
     }
   }
 

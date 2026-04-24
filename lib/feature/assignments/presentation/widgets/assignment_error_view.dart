@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +27,7 @@ class CustomAssignmentErrorView extends StatelessWidget {
             const SizedBox(height: 12),
             CustomButton(
               widget: Text(
-                'Retry',
+                SettingsStrings.retryButton,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onPrimary,
                 ),

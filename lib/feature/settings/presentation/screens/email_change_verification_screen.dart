@@ -74,8 +74,9 @@ class _EmailChangeVerificationScreenState
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.verifyNewEmailTitle,
           style: AppStyles.headingMedium,
         ),

@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'package:afiete/feature/assignments/presentation/screens/assignment_result_screen.dart';
@@ -22,7 +23,10 @@ class AssignmentTestScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text('Assessment', style: AppStyles.headingMedium),
+        title: Text(
+          SettingsStrings.assessmentTitle,
+          style: AppStyles.headingMedium,
+        ),
         centerTitle: true,
       ),
       body: BlocBuilder<AssignmentsCubit, AssignmentsState>(
@@ -77,7 +81,7 @@ class AssignmentTestScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Select the option that best represents your current state of mind.',
+                        SettingsStrings.assessmentPrompt,
                         style: AppStyles.bodyMedium.copyWith(
                           color:
                               (theme.textTheme.bodyMedium?.color ??
@@ -137,7 +141,7 @@ class AssignmentTestScreen extends StatelessWidget {
     return options
         .map(
           (option) => CustomAssignmentOptionTile(
-            option: option,
+            option: SettingsStrings.assignmentOptionLabel(option),
             isSelected: selectedAnswer == option,
             onTap: () => context.read<AssignmentsCubit>().selectAnswer(
               questionId: questionId,

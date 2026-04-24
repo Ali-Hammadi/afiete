@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
@@ -14,8 +15,13 @@ enum _BookingStep { date, time, duration, type }
 
 class BookSessionScreen extends StatefulWidget {
   final DoctorEntity doctor;
+  final bool rescheduleMode;
 
-  const BookSessionScreen({super.key, required this.doctor});
+  const BookSessionScreen({
+    super.key,
+    required this.doctor,
+    this.rescheduleMode = false,
+  });
 
   @override
   State<BookSessionScreen> createState() => _BookSessionScreenState();
@@ -124,6 +130,16 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
 
     setState(() => _isSubmitting = true);
 
+    if (widget.rescheduleMode) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _isSubmitting = false);
+      Navigator.pop(context, _selectedTime!);
+      return;
+    }
+
     final authState = context.read<AuthCubit>().state;
     String patientId = 'unknown-patient';
     if (authState is AuthLoaded) {
@@ -158,7 +174,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Booking draft created successfully.')),
+      SnackBar(content: Text(SettingsStrings.bookingDraftCreatedSuccessfully)),
     );
     final amount = widget.doctor.consultationFee.getFeeBySType(
       _selectedSessionType!,
@@ -185,10 +201,16 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final canBook = _availableDays.isNotEmpty;
+    final localeCode = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book Your Session', style: AppStyles.headingMedium),
+        title: Text(
+          widget.rescheduleMode
+              ? SettingsStrings.reschedule
+              : SettingsStrings.bookYourSessionTitle,
+          style: AppStyles.headingMedium,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(AppStyles.padding),
@@ -199,7 +221,10 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
             const SizedBox(height: 6),
             if (_step == _BookingStep.time && _selectedDate != null)
               Text(
-                DateFormat('EEE, dd MMM yyyy').format(_selectedDate!),
+                DateFormat(
+                  'EEE, dd MMM yyyy',
+                  localeCode,
+                ).format(_selectedDate!),
                 style: AppStyles.bodySmall,
               ),
             const SizedBox(height: 14),
@@ -224,8 +249,10 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
                     )
                   : Text(
                       _step == _BookingStep.type
-                          ? 'Continue to payment'
-                          : 'Continue',
+                          ? (widget.rescheduleMode
+                                ? SettingsStrings.reschedule
+                                : SettingsStrings.continueToPayment)
+                          : SettingsStrings.continueTextShort,
                       style: AppStyles.headingSmall.copyWith(
                         color: colorScheme.onPrimary,
                       ),
@@ -242,9 +269,9 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
   Widget _buildStepContent() {
     switch (_step) {
       case _BookingStep.date:
-        return _buildDateStep();
+        return _buildDateStep(context);
       case _BookingStep.time:
-        return _buildTimeStep();
+        return _buildTimeStep(context);
       case _BookingStep.duration:
         return _buildDurationStep();
       case _BookingStep.type:
@@ -252,7 +279,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     }
   }
 
-  Widget _buildDateStep() {
+  Widget _buildDateStep(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode;
     return ListView.separated(
       key: const ValueKey('date-step'),
       itemCount: _availableDays.length,
@@ -262,8 +290,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         final isSelected =
             _selectedDate != null && DateUtils.isSameDay(_selectedDate, day);
         return _OptionCard(
-          title: DateFormat('EEEE, dd MMM yyyy').format(day),
-          subtitle: 'Available from database',
+          title: DateFormat('EEEE, dd MMM yyyy', localeCode).format(day),
+          subtitle: SettingsStrings.availableFromDatabase,
           isSelected: isSelected,
           onTap: () {
             setState(() {
@@ -276,12 +304,13 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     );
   }
 
-  Widget _buildTimeStep() {
+  Widget _buildTimeStep(BuildContext context) {
+    final localeCode = Localizations.localeOf(context).languageCode;
     final times = _timesForSelectedDay;
     if (times.isEmpty) {
-      return const Center(
+      return Center(
         key: ValueKey('time-step-empty'),
-        child: Text('No available times for this date.'),
+        child: Text(SettingsStrings.noAvailableTimesForThisDate),
       );
     }
 
@@ -298,7 +327,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         final time = times[index];
         final isSelected = _selectedTime != null && _selectedTime == time;
         return _ChipCard(
-          label: DateFormat('h:mm a').format(time).toLowerCase(),
+          label: DateFormat('h:mm a', localeCode).format(time).toLowerCase(),
           isSelected: isSelected,
           onTap: () => setState(() => _selectedTime = time),
         );
@@ -316,8 +345,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         final minutes = slots * 30;
         final isSelected = _selectedDurationSlots == slots;
         return _OptionCard(
-          title: '$minutes min',
-          subtitle: 'Defined by provider availability',
+          title: SettingsStrings.minutesLabel(minutes),
+          subtitle: SettingsStrings.definedByProviderAvailability,
           isSelected: isSelected,
           onTap: () => setState(() => _selectedDurationSlots = slots),
           leading: Icons.schedule,
@@ -338,8 +367,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         return _OptionCard(
           title: SessionType.displayName(type),
           subtitle: fee > 0
-              ? '\$${fee.toStringAsFixed(2)} per session'
-              : 'Available',
+              ? SettingsStrings.bookingFeePerSession(fee.toDouble())
+              : SettingsStrings.sessionAvailableLabel,
           isSelected: isSelected,
           onTap: () => setState(() => _selectedSessionType = type),
           leading: SessionType.icon(type),
@@ -362,7 +391,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              'This doctor has no available schedule loaded from the database yet.',
+              SettingsStrings.noAvailableScheduleLoadedYet,
               textAlign: TextAlign.center,
               style: AppStyles.bodyMedium,
             ),
@@ -375,13 +404,13 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
   String _titleForStep(_BookingStep step) {
     switch (step) {
       case _BookingStep.date:
-        return 'Choose day';
+        return SettingsStrings.chooseDayTitle;
       case _BookingStep.time:
-        return 'Choose time';
+        return SettingsStrings.chooseTimeTitle;
       case _BookingStep.duration:
-        return 'Choose session duration';
+        return SettingsStrings.chooseSessionDurationTitle;
       case _BookingStep.type:
-        return 'Choose session type';
+        return SettingsStrings.chooseSessionTypeTitle;
     }
   }
 }

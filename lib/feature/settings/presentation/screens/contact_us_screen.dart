@@ -33,8 +33,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.contactScreenTitle,
           style: AppStyles.headingMedium,
         ),
@@ -240,14 +241,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         emailController.text.isEmpty ||
         messageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(SettingsStrings.fillAllFieldsError)),
+        SnackBar(content: Text(SettingsStrings.fillAllFieldsError)),
       );
       return;
     }
 
     if (!emailController.text.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(SettingsStrings.invalidEmailError)),
+        SnackBar(content: Text(SettingsStrings.invalidEmailError)),
       );
       return;
     }
@@ -265,7 +266,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(SettingsStrings.messageSentSuccess),
+            content: Text(SettingsStrings.messageSentSuccess),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );

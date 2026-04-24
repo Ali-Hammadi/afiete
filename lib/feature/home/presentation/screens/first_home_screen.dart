@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/assignments/domain/entity/assignment_entity.dart';
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
@@ -36,19 +37,23 @@ class FirstHomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppStyles.padding),
         child: SingleChildScrollView(
+          key: const PageStorageKey('first_home_scroll'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "How are you felling today ?",
+                SettingsStrings.howAreYouFeelingToday,
                 style: AppStyles.headingSmall,
-                textAlign: TextAlign.left,
+                textAlign: TextAlign.start,
               ),
 
               CustomEmotionsWidget(),
               CustomAssignmentWidget(),
               CustomMusicWidget(),
-              Text("Top Doctors", style: AppStyles.headingMedium),
+              Text(
+                SettingsStrings.topDoctorsTitle,
+                style: AppStyles.headingMedium,
+              ),
               CustomTopDoctorsWidget(),
               const SizedBox(height: 20),
               BlocBuilder<AssignmentsCubit, AssignmentsState>(
@@ -57,11 +62,15 @@ class FirstHomeScreen extends StatelessWidget {
                     builder: (context, articlesState) {
                       if (articlesState is ArticlesInitial) {
                         context.read<ArticlesCubit>().loadArticlesForHome(
-                          userDiagnosis: _resolveClosestDiagnosis(assignmentsState),
+                          userDiagnosis: _resolveClosestDiagnosis(
+                            assignmentsState,
+                          ),
                         );
                       }
                       return ArticlesHomeSection(
-                        userDiagnosis: _resolveClosestDiagnosis(assignmentsState),
+                        userDiagnosis: _resolveClosestDiagnosis(
+                          assignmentsState,
+                        ),
                       );
                     },
                   );

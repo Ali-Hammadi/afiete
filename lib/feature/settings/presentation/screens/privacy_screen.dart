@@ -14,8 +14,9 @@ class PrivacyScreen extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
         elevation: 0,
-        title: const Text(
+        title: Text(
           SettingsStrings.privacyTermsTitle,
           style: AppStyles.headingMedium,
         ),
@@ -27,63 +28,19 @@ class PrivacyScreen extends StatelessWidget {
           children: [
             _buildSection(
               title: SettingsStrings.privacyPolicyTitle,
-              content:
-                  'We are committed to protecting your privacy and ensuring you have a positive experience on our platform. This privacy policy explains how we collect, use, and protect your personal information.\n\n'
-                  'Data Collection:\n'
-                  '• We collect information you provide directly, such as your name, email, and medical history.\n'
-                  '• We automatically collect certain information about your device and usage patterns.\n\n'
-                  'Data Usage:\n'
-                  '• Your information is used to provide and improve our services.\n'
-                  '• We use your data to communicate with you about appointments and updates.\n'
-                  '• We may use aggregated data for research and analytics.\n\n'
-                  'Data Protection:\n'
-                  '• We implement industry-standard security measures to protect your data.\n'
-                  '• Your data is encrypted both in transit and at rest.\n'
-                  '• We comply with all relevant data protection regulations.\n\n'
-                  'Third-Party Sharing:\n'
-                  '• We do not sell your personal information to third parties.\n'
-                  '• We only share your information with healthcare providers as needed for your care.\n'
-                  '• Third parties are bound by confidentiality agreements.',
+              content: SettingsStrings.privacyPolicyBody,
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 24),
             _buildSection(
               title: SettingsStrings.termsOfServiceTitle,
-              content:
-                  'By using our platform, you agree to these terms and conditions. Please read them carefully.\n\n'
-                  'Acceptable Use:\n'
-                  '• You must be at least 18 years old or have parental consent.\n'
-                  '• You agree not to use the platform for illegal activities.\n'
-                  '• You must provide accurate and truthful information.\n\n'
-                  'User Responsibilities:\n'
-                  '• You are responsible for maintaining your account security.\n'
-                  '• You must not share your login credentials with others.\n'
-                  '• You agree to use the platform only for legitimate healthcare purposes.\n\n'
-                  'Platform Limitations:\n'
-                  '• Our platform is not a substitute for emergency medical care.\n'
-                  '• In case of emergency, please contact local emergency services.\n'
-                  '• We are not liable for interruptions or unavailability of service.\n\n'
-                  'Intellectual Property:\n'
-                  '• All content on our platform is protected by copyright.\n'
-                  '• You may not reproduce, distribute, or transmit any content without permission.\n\n'
-                  'Disclaimer:\n'
-                  '• We provide medical information for educational purposes only.\n'
-                  '• Consult with healthcare professionals before making medical decisions.\n'
-                  '• We are not liable for any health outcomes resulting from the use of our platform.',
+              content: SettingsStrings.termsBody,
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 24),
             _buildSection(
               title: SettingsStrings.cookiePolicyTitle,
-              content:
-                  'We use cookies to enhance your experience on our platform.\n\n'
-                  'Types of Cookies:\n'
-                  '• Essential cookies are necessary for the platform to function.\n'
-                  '• Analytical cookies help us understand how you use our platform.\n'
-                  '• Preference cookies remember your settings and preferences.\n\n'
-                  'Cookie Management:\n'
-                  '• You can control cookies through your browser settings.\n'
-                  '• Disabling cookies may affect platform functionality.',
+              content: SettingsStrings.cookieBody,
               colorScheme: colorScheme,
             ),
             const SizedBox(height: 24),

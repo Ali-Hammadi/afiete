@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/payment/domain/entities/payment_entity.dart';
@@ -24,7 +25,10 @@ class PaymentScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text('Payment', style: AppStyles.headingMedium),
+        title: Text(
+          SettingsStrings.paymentTitle,
+          style: AppStyles.headingMedium,
+        ),
       ),
       body: BlocConsumer<PaymentCubit, PaymentState>(
         listener: (context, state) {
@@ -32,7 +36,9 @@ class PaymentScreen extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Payment successful: ${state.payment.transactionRef}',
+                  SettingsStrings.paymentSuccessfulWith(
+                    state.payment.transactionRef,
+                  ),
                 ),
               ),
             );
@@ -68,12 +74,12 @@ class PaymentScreen extends StatelessWidget {
                           CustomPaymentSummaryCard(request: request),
                           const SizedBox(height: 28),
                           Text(
-                            'Payment Method',
+                            SettingsStrings.paymentMethodTitle,
                             style: AppStyles.headingMedium,
                           ),
                           const SizedBox(height: 12),
                           CustomPaymentMethodTile(
-                            title: 'Credit / Debit Card',
+                            title: SettingsStrings.creditDebitCard,
                             icon: Icons.credit_card_outlined,
                             selected: selectedMethod == PaymentMethod.card,
                             onTap: isProcessing
@@ -82,7 +88,7 @@ class PaymentScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           CustomPaymentMethodTile(
-                            title: 'Apple Pay',
+                            title: SettingsStrings.applePay,
                             icon: Icons.apple,
                             selected: selectedMethod == PaymentMethod.wallet,
                             onTap: isProcessing
@@ -92,7 +98,7 @@ class PaymentScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 18),
                           Text(
-                            'Card Information',
+                            SettingsStrings.cardInformationTitle,
                             style: AppStyles.headingSmall,
                           ),
                           const SizedBox(height: 8),
@@ -102,26 +108,26 @@ class PaymentScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 14),
                           Row(
-                            children: const [
+                            children: [
                               Expanded(
                                 child: CustomPaymentInputField(
-                                  label: 'Expiry Date',
+                                  label: SettingsStrings.expiryDateLabel,
                                   hint: 'MM/YY',
                                 ),
                               ),
                               SizedBox(width: 14),
                               Expanded(
                                 child: CustomPaymentInputField(
-                                  label: 'CVV',
+                                  label: SettingsStrings.cvvLabel,
                                   hint: '123',
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 14),
-                          const CustomPaymentInputField(
-                            label: 'Cardholder Name',
-                            hint: 'Name on card',
+                          CustomPaymentInputField(
+                            label: SettingsStrings.cardholderNameLabel,
+                            hint: SettingsStrings.nameOnCardHint,
                           ),
                         ],
                       ),
@@ -142,7 +148,9 @@ class PaymentScreen extends StatelessWidget {
                                 ),
                               )
                             : Text(
-                                'Pay ${_formatAmount(request.amount)} \$',
+                                SettingsStrings.payAmount(
+                                  _formatAmount(request.amount),
+                                ),
                                 style: AppStyles.headingSmall.copyWith(
                                   color: colorScheme.onPrimary,
                                 ),

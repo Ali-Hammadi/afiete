@@ -17,8 +17,10 @@ import 'package:afiete/feature/booking_assiments/data/datasources/appointments_m
 import 'package:afiete/feature/booking_assiments/data/datasources/appointments_remote_datasource.dart';
 import 'package:afiete/feature/booking_assiments/data/repositories/appointments_repository_impl.dart';
 import 'package:afiete/feature/booking_assiments/domain/repositories/appointments_repository.dart';
+import 'package:afiete/feature/booking_assiments/domain/usecase/cancel_appointment_usecase.dart';
 import 'package:afiete/feature/booking_assiments/domain/usecase/create_appointment_usecase.dart';
 import 'package:afiete/feature/booking_assiments/domain/usecase/get_appointments_usecase.dart';
+import 'package:afiete/feature/booking_assiments/domain/usecase/reschedule_appointment_usecase.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/chat/data/datasources/chat_mock_datasource.dart';
 import 'package:afiete/feature/chat/data/datasources/chat_remote_datasource.dart';
@@ -47,6 +49,7 @@ import 'package:afiete/feature/sessions/domain/usecase/add_review_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/cancel_session_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/get_past_sessions_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/get_upcoming_sessions_usecase.dart';
+import 'package:afiete/feature/sessions/domain/usecase/reschedule_session_usecase.dart';
 import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
 import 'package:afiete/feature/settings/data/data_source/settings_remote_data_source.dart';
 import 'package:afiete/feature/settings/data/data_source/settings_mock_data_source.dart';
@@ -242,6 +245,12 @@ Future<void> init() async {
   sl.registerLazySingleton<CreateAppointmentUseCase>(
     () => CreateAppointmentUseCase(sl<AppointmentsRepository>()),
   );
+  sl.registerLazySingleton<CancelAppointmentUseCase>(
+    () => CancelAppointmentUseCase(sl<AppointmentsRepository>()),
+  );
+  sl.registerLazySingleton<RescheduleAppointmentUseCase>(
+    () => RescheduleAppointmentUseCase(sl<AppointmentsRepository>()),
+  );
 
   // Booking assignments cubits
   sl.registerFactory<AppointmentsCubit>(
@@ -249,6 +258,8 @@ Future<void> init() async {
       sl<GetAppointmentsUseCase>(),
       sl<CreateAppointmentUseCase>(),
       sl<GetAllDoctorsUseCase>(),
+      sl<CancelAppointmentUseCase>(),
+      sl<RescheduleAppointmentUseCase>(),
     ),
   );
 
@@ -296,6 +307,9 @@ Future<void> init() async {
   sl.registerLazySingleton<CancelSessionUseCase>(
     () => CancelSessionUseCase(sl<SessionsRepository>()),
   );
+  sl.registerLazySingleton<RescheduleSessionUseCase>(
+    () => RescheduleSessionUseCase(sl<SessionsRepository>()),
+  );
   sl.registerLazySingleton<AddReviewUseCase>(
     () => AddReviewUseCase(sl<SessionsRepository>()),
   );
@@ -306,6 +320,7 @@ Future<void> init() async {
       sl<GetUpcomingSessionsUseCase>(),
       sl<GetPastSessionsUseCase>(),
       sl<CancelSessionUseCase>(),
+      sl<RescheduleSessionUseCase>(),
       sl<AddReviewUseCase>(),
     ),
   );
