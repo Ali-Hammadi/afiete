@@ -1,7 +1,9 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
+import 'package:afiete/feature/report/domain/entities/report_entity.dart';
 import 'package:afiete/feature/settings/presentation/cubits/settings_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,13 +17,13 @@ class ReportIssueScreen extends StatefulWidget {
 
 class _ReportIssueScreenState extends State<ReportIssueScreen> {
   final TextEditingController detailsController = TextEditingController();
-  final List<String> reasons = const [
-    'Unprofessional behavior',
-    'Harassment',
-    'Inappropriate content',
-    'Missing appointments',
+  final List<ReportReason> reasons = const [
+    ReportReason.appBug,
+    ReportReason.crashOrFreeze,
+    ReportReason.paymentIssue,
+    ReportReason.other,
   ];
-  String? selectedReason;
+  ReportReason? selectedReason;
 
   @override
   void dispose() {
@@ -67,7 +69,10 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
           appBar: AppBar(
             backgroundColor: theme.scaffoldBackgroundColor,
             elevation: 0,
-            title: const Text('Report Issue', style: AppStyles.headingMedium),
+            title: Text(
+              SettingsStrings.reportIssueTitle,
+              style: AppStyles.headingMedium,
+            ),
           ),
           body: Padding(
             padding: const EdgeInsets.all(AppStyles.padding),
@@ -98,7 +103,8 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Your report is confidential and helps us maintain a safe environment.',
+                                  SettingsStrings
+                                      .reportIssueConfidentialMessage,
                                   style: AppStyles.bodyMedium,
                                 ),
                               ),
@@ -106,12 +112,15 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        Text('Select Reason', style: AppStyles.headingMedium),
+                        Text(
+                          SettingsStrings.selectReason,
+                          style: AppStyles.headingMedium,
+                        ),
                         const SizedBox(height: 12),
                         ...reasons.map(_buildReasonTile),
                         const SizedBox(height: 18),
                         Text(
-                          'Additional Details',
+                          SettingsStrings.additionalDetails,
                           style: AppStyles.headingMedium,
                         ),
                         const SizedBox(height: 10),
@@ -155,9 +164,10 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                           : () {
                               if (selectedReason == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
-                                      'Please select a reason before submitting.',
+                                      SettingsStrings
+                                          .pleaseSelectReasonAndProvideDetails,
                                     ),
                                   ),
                                 );
@@ -166,7 +176,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
 
                               context.read<SettingsCubit>().submitReportIssue(
                                 userId: userId,
-                                reason: selectedReason!,
+                                reason: selectedReason!.name,
                                 details: detailsController.text.trim(),
                               );
                             },
@@ -182,7 +192,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                               ),
                             )
                           : Text(
-                              'Submit Report',
+                              SettingsStrings.submitReport,
                               style: AppStyles.headingSmall.copyWith(
                                 color: colorScheme.onPrimary,
                               ),
@@ -198,7 +208,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
     );
   }
 
-  Widget _buildReasonTile(String reason) {
+  Widget _buildReasonTile(ReportReason reason) {
     final isSelected = selectedReason == reason;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -223,7 +233,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
           ),
           child: Row(
             children: [
-              Expanded(child: Text(reason, style: AppStyles.bodyMedium)),
+              Expanded(
+                child: Text(reason.localizedLabel, style: AppStyles.bodyMedium),
+              ),
               Container(
                 width: 24,
                 height: 24,

@@ -109,6 +109,10 @@ abstract class SettingsStrings {
   );
   static String get reportSubmittedSuccessfully =>
       _t('Report submitted successfully', 'تم إرسال البلاغ بنجاح');
+  static String get reportIssueConfidentialMessage => _t(
+    'Your report is confidential and helps us maintain a safe environment.',
+    'بلاغك سري ويساعدنا في الحفاظ على بيئة آمنة.',
+  );
   static String get reportConfidentialTitle =>
       _t('Your Report is Confidential', 'بلاغك سري');
   static String get selectReason => _t('Select Reason', 'اختر السبب');
@@ -161,6 +165,8 @@ abstract class SettingsStrings {
   static String get paymentOrTransactionIssue =>
       _t('Payment or transaction issue', 'مشكلة في الدفع أو المعاملة');
   static String get otherIssue => _t('Other issue', 'مشكلة أخرى');
+  static String get missingUserInformation =>
+      _t('Missing user information.', 'معلومات المستخدم مفقودة.');
   static String get doctorDefaultName => _t('Dr. John Doe', 'د. جون دو');
   static String get doctorSpecialist => _t('Specialist', 'متخصص');
   static String get doctorAboutTitle => _t('About Doctor', 'عن الطبيب');
