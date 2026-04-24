@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
@@ -158,7 +159,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Booking draft created successfully.')),
+      SnackBar(content: Text(SettingsStrings.bookingDraftCreatedSuccessfully)),
     );
     final amount = widget.doctor.consultationFee.getFeeBySType(
       _selectedSessionType!,
@@ -188,7 +189,10 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book Your Session', style: AppStyles.headingMedium),
+        title: Text(
+          SettingsStrings.bookYourSessionTitle,
+          style: AppStyles.headingMedium,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(AppStyles.padding),
@@ -224,8 +228,8 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
                     )
                   : Text(
                       _step == _BookingStep.type
-                          ? 'Continue to payment'
-                          : 'Continue',
+                          ? SettingsStrings.continueToPayment
+                          : SettingsStrings.continueTextShort,
                       style: AppStyles.headingSmall.copyWith(
                         color: colorScheme.onPrimary,
                       ),
@@ -263,7 +267,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
             _selectedDate != null && DateUtils.isSameDay(_selectedDate, day);
         return _OptionCard(
           title: DateFormat('EEEE, dd MMM yyyy').format(day),
-          subtitle: 'Available from database',
+          subtitle: SettingsStrings.availableFromDatabase,
           isSelected: isSelected,
           onTap: () {
             setState(() {
@@ -281,7 +285,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     if (times.isEmpty) {
       return const Center(
         key: ValueKey('time-step-empty'),
-        child: Text('No available times for this date.'),
+        child: Text(SettingsStrings.noAvailableTimesForThisDate),
       );
     }
 
@@ -317,7 +321,7 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
         final isSelected = _selectedDurationSlots == slots;
         return _OptionCard(
           title: '$minutes min',
-          subtitle: 'Defined by provider availability',
+          subtitle: SettingsStrings.definedByProviderAvailability,
           isSelected: isSelected,
           onTap: () => setState(() => _selectedDurationSlots = slots),
           leading: Icons.schedule,

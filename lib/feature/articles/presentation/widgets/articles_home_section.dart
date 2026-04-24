@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/articles/presentation/cubits/articles_cubit.dart';
 import 'package:afiete/feature/articles/presentation/widgets/article_card_widget.dart';
@@ -29,7 +30,7 @@ class ArticlesHomeSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Best articles for you',
+                      SettingsStrings.bestArticlesForYou,
                       style: AppStyles.headingMedium,
                     ),
                   ],
@@ -69,7 +70,7 @@ class ArticlesHomeSection extends StatelessWidget {
                         arguments: {'userDiagnosis': userDiagnosis},
                       );
                     },
-                    child: const Text('See All'),
+                    child: Text(SettingsStrings.seeAll),
                   ),
                 ),
               ),

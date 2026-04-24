@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const CustomAuthHeader(title: 'Enter your account'),
+                    CustomAuthHeader(title: SettingsStrings.enterYourAccount),
                     const SizedBox(height: 20),
                     Form(
                       key: formKey,
@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           const SizedBox(height: 10),
                           CustomTextFormFiled(
-                            label: "Email",
+                            label: SettingsStrings.emailLabel,
                             controller: emailController,
                             obscureText: false,
                             keyboardType: TextInputType.emailAddress,

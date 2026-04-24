@@ -139,6 +139,12 @@ abstract class SettingsStrings {
     'Please sign in to report a doctor.',
     'يرجى تسجيل الدخول للإبلاغ عن الطبيب.',
   );
+  static String get doctorDataNotLoadedYet =>
+      _t('Doctor data not loaded yet.', 'لم يتم تحميل بيانات الطبيب بعد.');
+  static String get pleaseSignInToReportADoctor => _t(
+    'Please sign in to report a doctor.',
+    'يرجى تسجيل الدخول للإبلاغ عن طبيب.',
+  );
   static String get topDoctorsTitle => _t('Top Doctors', 'أفضل الأطباء');
   static String get howAreYouFeelingToday =>
       _t('How are you feeling today?', 'كيف تشعر اليوم؟');
@@ -153,6 +159,44 @@ abstract class SettingsStrings {
   static String get todayLabel => _t('Today', 'اليوم');
   static String get viewProfile => _t('View Profile', 'عرض الملف الشخصي');
   static String get typeMessageHint => _t('Type a message...', 'اكتب رسالة...');
+  static String get bestArticlesForYou =>
+      _t('Best articles for you', 'أفضل المقالات لك');
+  static String get seeAll => _t('See All', 'عرض الكل');
+  static String get assessmentResultTitle =>
+      _t('Assessment Result', 'نتيجة التقييم');
+  static String get suggestedSpecialistTitle =>
+      _t('Suggested specialist', 'المتخصص المقترح');
+  static String get homeLabel => _t('Home', 'الرئيسية');
+  static String get specialistsLabel => _t('Specialists', 'المتخصصون');
+  static String get retakeAssessment =>
+      _t('Retake Assessment', 'إعادة التقييم');
+  static String get bookYourSessionTitle =>
+      _t('Book Your Session', 'احجز جلستك');
+  static String get continueToPayment =>
+      _t('Continue to payment', 'المتابعة إلى الدفع');
+  static String get continueTextShort => _t('Continue', 'متابعة');
+  static String get bookingDraftCreatedSuccessfully =>
+      _t('Booking draft created successfully.', 'تم إنشاء مسودة الحجز بنجاح.');
+  static String get availableFromDatabase =>
+      _t('Available from database', 'متاح من قاعدة البيانات');
+  static String get noAvailableTimesForThisDate => _t(
+    'No available times for this date.',
+    'لا توجد أوقات متاحة لهذا التاريخ.',
+  );
+  static String get definedByProviderAvailability =>
+      _t('Defined by provider availability', 'يتم تحديده حسب توفر المزود');
+  static String get noInternetConnectionPleaseReconnectAndTryAgain => _t(
+    'No internet connection. Please reconnect and try again.',
+    'لا يوجد اتصال بالإنترنت. يرجى إعادة الاتصال والمحاولة مرة أخرى.',
+  );
+  static String get retry => _t('Retry', 'إعادة المحاولة');
+  static String get noUpcomingAppointments =>
+      _t('No upcoming appointments.', 'لا توجد مواعيد قادمة.');
+  static String get noPastAppointments =>
+      _t('No past appointments.', 'لا توجد مواعيد سابقة.');
+  static String get todayLabel => _t('Today', 'اليوم');
+  static String get noDoctorsAvailable =>
+      _t('No doctors available.', 'لا يوجد أطباء متاحون.');
 
   static String get selectLanguageTitle => _t('Select language', 'اختر اللغة');
   static String get cancel => _t('Cancel', 'إلغاء');
@@ -471,6 +515,8 @@ abstract class SettingsStrings {
     'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
   );
   static String get login => _t('Login', 'تسجيل الدخول');
+  static String get enterYourAccount => _t('Enter your account', 'أدخل حسابك');
+  static String get emailLabel => _t('Email', 'البريد الإلكتروني');
 
   static String get letsGetToKnowYou =>
       _t("Let's get to know you", 'دعنا نتعرف عليك');

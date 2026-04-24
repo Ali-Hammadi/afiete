@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
@@ -58,7 +59,9 @@ class _CustomTopDoctorsWidgetState extends State<CustomTopDoctorsWidget> {
               if (topDoctors.isEmpty) {
                 return const SizedBox(
                   height: 180,
-                  child: Center(child: Text('No doctors available.')),
+                  child: Center(
+                    child: Text(SettingsStrings.noDoctorsAvailable),
+                  ),
                 );
               }
 

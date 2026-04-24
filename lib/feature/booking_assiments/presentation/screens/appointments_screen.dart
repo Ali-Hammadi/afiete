@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/widgets/appointment_card.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
@@ -67,7 +68,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         children: [
           Expanded(
             child: _buildTabItem(
-              title: 'Upcoming',
+              title: SettingsStrings.upcoming,
               isSelected: isUpcoming,
               colorScheme: colorScheme,
               onTap: () {
@@ -80,7 +81,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: _buildTabItem(
-              title: 'Past',
+              title: SettingsStrings.past,
               isSelected: !isUpcoming,
               colorScheme: colorScheme,
               onTap: () {
@@ -172,7 +173,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             const SizedBox(height: 10),
             Text(
               isConnectionIssue
-                  ? 'No internet connection. Please reconnect and try again.'
+                  ? SettingsStrings
+                        .noInternetConnectionPleaseReconnectAndTryAgain
                   : message,
               style: AppStyles.bodyMedium,
               textAlign: TextAlign.center,
@@ -183,7 +185,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 context.read<AppointmentsCubit>().loadAppointments();
               },
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
+              label: Text(SettingsStrings.retry),
             ),
           ],
         ),
@@ -212,8 +214,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             Center(
               child: Text(
                 isUpcoming
-                    ? 'No upcoming appointments.'
-                    : 'No past appointments.',
+                    ? SettingsStrings.noUpcomingAppointments
+                    : SettingsStrings.noPastAppointments,
               ),
             ),
           ],
