@@ -52,9 +52,6 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
         ? AppStyles.padding * 0.8
         : AppStyles.padding;
     final avatarSize = widget.compactMode ? 44.0 : 50.0;
-    final titleStyle = widget.compactMode
-        ? AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)
-        : AppStyles.headingMedium;
 
     final content = Padding(
       padding: EdgeInsets.symmetric(
@@ -73,47 +70,36 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
           ),
           const SizedBox(height: 12),
 
-          Text(widget.article.title, style: titleStyle),
-          const SizedBox(height: 12),
-
           Text(
-            widget.compactMode
-                ? widget.article.summary
-                : _isExpanded
-                ? widget.article.content
-                : widget.article.summary,
+            widget.article.content,
             style: widget.compactMode
                 ? AppStyles.bodySmall
                 : AppStyles.bodyMedium,
             maxLines: widget.compactMode
-                ? 3
+                ? 4
                 : _isExpanded
                 ? null
-                : 3,
+                : 4,
             overflow: _isExpanded
                 ? TextOverflow.visible
                 : TextOverflow.ellipsis,
           ),
-          if (!widget.compactMode) ...[
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-                widget.onReadMore();
-              },
-              child: Text(
-                _isExpanded
-                    ? SettingsStrings.readLess
-                    : SettingsStrings.readMore,
-                style: AppStyles.bodyMedium.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+              widget.onReadMore();
+            },
+            child: Text(
+              _isExpanded ? SettingsStrings.readLess : SettingsStrings.readMore,
+              style: AppStyles.bodyMedium.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
+          ),
           const SizedBox(height: 16),
 
           Row(
@@ -150,13 +136,42 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
       return content;
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-      shape: RoundedRectangleBorder(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(AppStyles.borderRadius * 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 10,
+            spreadRadius: -4,
+            offset: const Offset(-2, 0),
+          ),
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 10,
+            spreadRadius: -4,
+            offset: const Offset(2, 0),
+          ),
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 10,
+            spreadRadius: -5,
+            offset: const Offset(0, -2),
+          ),
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 10,
+            spreadRadius: -5,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      elevation: 2,
-      child: content,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppStyles.borderRadius * 1.5),
+        child: content,
+      ),
     );
   }
 
