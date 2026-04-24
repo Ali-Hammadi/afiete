@@ -53,6 +53,7 @@ class CustomReportHeaderWidget extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
                   ),
+                  textAlign: TextAlign.start,
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 4),
@@ -61,6 +62,7 @@ class CustomReportHeaderWidget extends StatelessWidget {
                     style: AppStyles.bodyMedium.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.75),
                     ),
+                    textAlign: TextAlign.start,
                   ),
                 ],
                 if (description != null) ...[
@@ -70,6 +72,7 @@ class CustomReportHeaderWidget extends StatelessWidget {
                     style: AppStyles.bodySmall.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.75),
                     ),
+                    textAlign: TextAlign.start,
                   ),
                 ],
               ],

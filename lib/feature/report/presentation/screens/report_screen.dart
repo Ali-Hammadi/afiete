@@ -77,6 +77,10 @@ class _ReportScreenState extends State<ReportScreen> {
     }
   }
 
+  String _getReasonLabel(ReportReason reason) {
+    return reason.localizedLabel;
+  }
+
   bool _isFormValid() {
     return _selectedReason != null &&
         _descriptionController.text.trim().isNotEmpty;
@@ -183,7 +187,7 @@ class _ReportScreenState extends State<ReportScreen> {
             );
 
             return CustomReportReasonCard(
-              label: reason['label'],
+              label: _getReasonLabel(reportReason),
               icon: reason['icon'],
               color: reason['color'],
               isSelected: _selectedReason == reportReason,

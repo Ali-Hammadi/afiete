@@ -35,6 +35,7 @@ class CustomReportFormWidget extends StatelessWidget {
             fontWeight: FontWeight.w600,
             color: colorScheme.onSurface,
           ),
+          textAlign: TextAlign.start,
         ),
         const SizedBox(height: 8),
         TextField(
@@ -42,6 +43,7 @@ class CustomReportFormWidget extends StatelessWidget {
           maxLines: maxLines,
           maxLength: maxLength,
           onChanged: onChanged,
+          textAlign: TextAlign.start,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: AppStyles.bodyMedium.copyWith(

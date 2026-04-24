@@ -9,6 +9,7 @@ enum ReportReason {
   inappropriateContent('inappropriateContent'),
   missingAppointment('missingAppointment'),
   appBug('appBug'),
+  crashOrFreeze('crashOrFreeze'),
   paymentIssue('paymentIssue'),
   other('other');
 
@@ -27,6 +28,8 @@ enum ReportReason {
         return SettingsStrings.missingAppointments;
       case ReportReason.appBug:
         return SettingsStrings.appBugOrIssue;
+      case ReportReason.crashOrFreeze:
+        return SettingsStrings.appCrashesOrFreezes;
       case ReportReason.paymentIssue:
         return SettingsStrings.paymentOrTransactionIssue;
       case ReportReason.other:
