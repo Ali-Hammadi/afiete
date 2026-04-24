@@ -103,7 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: SettingsStrings.themeTitle,
                 trailing: SwitchTheme(
                   data: SwitchTheme.of(context).copyWith(
-                    trackOutlineWidth: const MaterialStatePropertyAll(0.8),
+                    trackOutlineWidth: const WidgetStatePropertyAll(0.8),
                   ),
                   child: Transform.scale(
                     scale: 0.88,

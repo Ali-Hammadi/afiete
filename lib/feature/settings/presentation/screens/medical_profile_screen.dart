@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:afiete/core/constants/app_colors.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/di/injection_container.dart';
@@ -381,35 +382,43 @@ class _PrescriptionTile extends StatelessWidget {
                     ),
             ),
           ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              SizedBox(
-                width: 160,
-                child: OutlinedButton.icon(
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primaryColor),
+
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: IconButton(
                   onPressed: _hasImage ? () => _openImageViewer(context) : null,
                   icon: const Icon(Icons.visibility_outlined),
-                  label: Text(SettingsStrings.viewDocument),
                 ),
               ),
-              SizedBox(
-                width: 190,
-                child: OutlinedButton.icon(
+
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primaryColor),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: IconButton(
                   onPressed: _hasImage
                       ? () => _downloadDocument(context)
                       : null,
                   icon: const Icon(Icons.download_outlined),
-                  label: Text(SettingsStrings.downloadDocument),
                 ),
               ),
-              SizedBox(
-                width: 150,
-                child: FilledButton.icon(
+
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primaryColor),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: IconButton(
                   onPressed: () => _shareWithPharmacist(context),
-                  icon: const Icon(Icons.local_pharmacy_outlined),
-                  label: Text(SettingsStrings.shareWithPharmacist),
+                  icon: const Icon(Icons.share_outlined),
                 ),
               ),
             ],

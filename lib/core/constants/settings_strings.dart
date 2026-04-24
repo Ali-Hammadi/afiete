@@ -365,7 +365,7 @@ abstract class SettingsStrings {
   static String get definedByProviderAvailability =>
       _t('Defined by provider availability', 'يتم تحديده حسب توفر المزود');
   static String minutesLabel(int minutes) =>
-      _t('$minutes ${minuteAbbreviation}', '$minutes ${minuteAbbreviation}');
+      _t('$minutes $minuteAbbreviation', '$minutes $minuteAbbreviation');
   static String get noInternetConnectionPleaseReconnectAndTryAgain => _t(
     'No internet connection. Please reconnect and try again.',
     'لا يوجد اتصال بالإنترنت. يرجى إعادة الاتصال والمحاولة مرة أخرى.',
@@ -377,8 +377,8 @@ abstract class SettingsStrings {
       _t('No past appointments.', 'لا توجد مواعيد سابقة.');
   static String get specialistLabelInAppointment => _t('Specialist', 'المتخصص');
   static String durationMinutesLabel(int minutes) => _t(
-    'Duration: $minutes ${minuteAbbreviation}',
-    'المدة: $minutes ${minuteAbbreviation}',
+    'Duration: $minutes $minuteAbbreviation',
+    'المدة: $minutes $minuteAbbreviation',
   );
   static String get selectLanguageTitle => _t('Select language', 'اختر اللغة');
   static String get cancel => _t('Cancel', 'إلغاء');
