@@ -221,4 +221,130 @@ abstract class SettingsStrings {
       _t('Please enter a valid email address', 'يرجى إدخال بريد إلكتروني صالح');
   static String get messageSentSuccess =>
       _t('Message sent successfully!', 'تم إرسال الرسالة بنجاح!');
+
+  static String get male => _t('Male', 'ذكر');
+  static String get female => _t('Female', 'أنثى');
+  static String get other => _t('Other', 'آخر');
+  static String yearsOld(int years) => _t('$years Years old', '$years سنة');
+  static String get saveProfileChangesConfirm =>
+      _t('Save these profile changes?', 'حفظ تغييرات الملف الشخصي؟');
+
+  static String get enterNewEmailAddress =>
+      _t('Enter your new email address', 'أدخل بريدك الإلكتروني الجديد');
+  static String currentEmailLabel(String email) =>
+      _t('Current email: $email', 'البريد الحالي: $email');
+  static String get newEmailHint => _t('new@example.com', 'new@example.com');
+  static String get emailRequired =>
+      _t('Email is required', 'البريد الإلكتروني مطلوب');
+  static String get continueText => _t('Continue', 'متابعة');
+  static String get verifyYourNewEmail =>
+      _t('Verify your new email', 'تحقق من بريدك الإلكتروني الجديد');
+  static String verificationCodeSentTo(String email) => _t(
+    'We sent a verification code to:\n$email',
+    'أرسلنا رمز التحقق إلى:\n$email',
+  );
+  static String get otpSentToNewEmail => _t(
+    'OTP sent to your new email address.',
+    'تم إرسال رمز التحقق إلى بريدك الإلكتروني الجديد.',
+  );
+  static String get otpResentToEmail => _t(
+    'OTP resent to your email.',
+    'تمت إعادة إرسال رمز التحقق إلى بريدك الإلكتروني.',
+  );
+  static String get invalidFourDigitCode => _t(
+    'Please enter a valid 4-digit code.',
+    'يرجى إدخال رمز صحيح مكون من 4 أرقام.',
+  );
+  static String get incorrectOtpTryAgain => _t(
+    'Incorrect OTP. Please try again.',
+    'رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.',
+  );
+
+  static String get forgotEmailHint => _t('your@email.com', 'your@email.com');
+  static String get sendResetLink =>
+      _t('Send Reset Link', 'إرسال رابط إعادة التعيين');
+  static String get resetInstructionsHint => _t(
+    'Check your email for password reset instructions.',
+    'تحقق من بريدك الإلكتروني للحصول على تعليمات إعادة تعيين كلمة المرور.',
+  );
+  static String get passwordResetLinkSent => _t(
+    'Password reset link sent to your email.',
+    'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.',
+  );
+
+  static String get deleteWhatWillBeDeleted =>
+      _t('What will be deleted:', 'ما الذي سيتم حذفه:');
+  static String get deleteItemProfileInfo =>
+      _t('Your profile information', 'معلومات ملفك الشخصي');
+  static String get deleteItemPrescriptions =>
+      _t('Medical prescriptions and reports', 'الوصفات والتقارير الطبية');
+  static String get deleteItemSessionHistory =>
+      _t('Session notes and history', 'ملاحظات الجلسات والسجل');
+  static String get deleteItemAllData =>
+      _t('All personal data', 'كل البيانات الشخصية');
+  static String get confirmPassword =>
+      _t('Confirm your password', 'أكد كلمة المرور');
+  static String get enterYourPasswordHint =>
+      _t('Enter your password', 'أدخل كلمة المرور');
+  static String get pleaseEnterPassword =>
+      _t('Please enter your password', 'يرجى إدخال كلمة المرور');
+  static String get deleteIrreversibleConfirm => _t(
+    'This action cannot be undone. Are you absolutely sure?',
+    'لا يمكن التراجع عن هذا الإجراء. هل أنت متأكد تماما؟',
+  );
+  static String get couldNotRetrieveUserEmail =>
+      _t('Could not retrieve user email', 'تعذر الحصول على بريد المستخدم');
+
+  static String get verifyAccountTitle =>
+      _t('Verify your account', 'تحقق من حسابك');
+  static String get verifyAccountDescription => _t(
+    'We have sent 4-digit code to your Email\nEnter the code below to verify your account.',
+    'لقد أرسلنا رمزًا مكونًا من 4 أرقام إلى بريدك الإلكتروني\nأدخل الرمز أدناه للتحقق من حسابك.',
+  );
+  static String otpVerifiedWith(String pin) =>
+      _t('OTP Verified: $pin', 'تم التحقق من الرمز: $pin');
+  static String get codeResentToEmail => _t(
+    'Code resent to your email',
+    'تمت إعادة إرسال الرمز إلى بريدك الإلكتروني',
+  );
+  static String get didntReceiveCodeResend =>
+      _t('Didn\'t receive the code? Resend', 'لم تتلق الرمز؟ أعد الإرسال');
+
+  static String get birthdateLabel => _t('Birthdate', 'تاريخ الميلاد');
+  static String get next => _t('Next', 'التالي');
+  static String get enterBirthdateAndGender => _t(
+    'Please enter your birthdate and gender.',
+    'يرجى إدخال تاريخ الميلاد والجنس.',
+  );
+
+  static String get createYourAccount =>
+      _t('Create your account', 'أنشئ حسابك');
+  static String get nicknameLabel => _t('Nickname', 'الاسم المستعار');
+  static String get nameRequired => _t('Name is required', 'الاسم مطلوب');
+  static String get nameMinTwoChars => _t(
+    'Name must be at least 2 characters',
+    'الاسم يجب أن يكون على الأقل حرفين',
+  );
+  static String get passwordRequired =>
+      _t('Password is required', 'كلمة المرور مطلوبة');
+  static String get passwordMinSixChars => _t(
+    'Password must be at least 6 characters',
+    'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+  );
+  static String get login => _t('Login', 'تسجيل الدخول');
+
+  static String get letsGetToKnowYou =>
+      _t("Let's get to know you", 'دعنا نتعرف عليك');
+  static String get personalizeExperienceHint => _t(
+    'The following information will help us to personalize your experience',
+    'ستساعدنا المعلومات التالية على تخصيص تجربتك',
+  );
+
+  static String get passwordChangePreparing => _t(
+    'Password change feature is being prepared. Please check back soon.',
+    'ميزة تغيير كلمة المرور قيد التجهيز. يرجى المحاولة لاحقا.',
+  );
+
+  static String errorWith(String message) =>
+      _t('Error: $message', 'خطأ: $message');
 }

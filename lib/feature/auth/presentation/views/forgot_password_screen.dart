@@ -52,7 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: SettingsStrings.emailAddressLabel,
-                hintText: 'your@email.com',
+                hintText: SettingsStrings.forgotEmailHint,
                 prefixIcon: const Icon(Icons.email_outlined),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -75,7 +75,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     )
                   : Text(
-                      'Send Reset Link',
+                      SettingsStrings.sendResetLink,
                       style: AppStyles.headingSmall.copyWith(
                         color: colorScheme.onPrimary,
                       ),
@@ -83,7 +83,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Check your email for password reset instructions.',
+              SettingsStrings.resetInstructionsHint,
               textAlign: TextAlign.center,
               style: AppStyles.bodySmall.copyWith(
                 color: colorScheme.onSurface.withValues(alpha: 0.6),
@@ -119,9 +119,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password reset link sent to your email.'),
-          ),
+          SnackBar(content: Text(SettingsStrings.passwordResetLinkSent)),
         );
         Navigator.pop(context);
       }
@@ -130,9 +128,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
     }
   }
 }

@@ -198,11 +198,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
     try {
       // Show message that feature is being prepared
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Password change feature is being prepared. Please check back soon.',
-          ),
-        ),
+        SnackBar(content: Text(SettingsStrings.passwordChangePreparing)),
       );
 
       if (mounted) {
@@ -215,9 +211,9 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
     }
   }
 }

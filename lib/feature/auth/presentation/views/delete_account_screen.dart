@@ -77,15 +77,18 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            Text('What will be deleted:', style: AppStyles.headingSmall),
+            Text(
+              SettingsStrings.deleteWhatWillBeDeleted,
+              style: AppStyles.headingSmall,
+            ),
             const SizedBox(height: 12),
-            _buildDeleteItem('Your profile information'),
-            _buildDeleteItem('Medical prescriptions and reports'),
-            _buildDeleteItem('Session notes and history'),
-            _buildDeleteItem('All personal data'),
+            _buildDeleteItem(SettingsStrings.deleteItemProfileInfo),
+            _buildDeleteItem(SettingsStrings.deleteItemPrescriptions),
+            _buildDeleteItem(SettingsStrings.deleteItemSessionHistory),
+            _buildDeleteItem(SettingsStrings.deleteItemAllData),
             const SizedBox(height: 32),
             Text(
-              'Confirm your password',
+              SettingsStrings.confirmPassword,
               style: AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
@@ -93,7 +96,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               controller: _passwordController,
               obscureText: !_showPassword,
               decoration: InputDecoration(
-                hintText: 'Enter your password',
+                hintText: SettingsStrings.enterYourPasswordHint,
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -197,7 +200,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     if (_passwordController.text.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter your password')),
+          SnackBar(content: Text(SettingsStrings.pleaseEnterPassword)),
         );
       }
       return;
@@ -211,9 +214,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(SettingsStrings.deleteAccountTitle),
-          content: const Text(
-            'This action cannot be undone. Are you absolutely sure?',
-          ),
+          content: Text(SettingsStrings.deleteIrreversibleConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
@@ -251,7 +252,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             _isLoading = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not retrieve user email')),
+            SnackBar(content: Text(SettingsStrings.couldNotRetrieveUserEmail)),
           );
         }
         return;
@@ -263,9 +264,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
     }
   }
 }

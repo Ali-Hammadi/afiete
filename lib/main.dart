@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/di/injection_container.dart';
 import 'core/routes/app_route.dart';
 import 'core/theme/app_theme.dart';
@@ -63,7 +64,12 @@ class MyApp extends StatelessWidget {
                 themeMode: themeMode,
                 locale: locale,
                 supportedLocales: const [Locale('en'), Locale('ar')],
-                initialRoute: MyRoutes.splashScreen,
+                localizationsDelegates: const [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                ],
+                initialRoute: MyRoutes.homeScreen,
                 onGenerateRoute: AppRouter.generateRoute,
               );
             },

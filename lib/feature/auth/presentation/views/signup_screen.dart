@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/auth/presentation/widgets/auth_google_button.dart';
@@ -53,24 +54,24 @@ class _SignupScreenState extends State<SignupScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const CustomAuthHeader(title: 'Create your account'),
+                    CustomAuthHeader(title: SettingsStrings.createYourAccount),
                     const SizedBox(height: 20),
                     Form(
                       key: formKey,
                       child: Column(
                         children: [
                           CustomTextFormFiled(
-                            label: 'Nickname',
+                            label: SettingsStrings.nicknameLabel,
                             controller: nameController,
                             obscureText: false,
                             keyboardType: TextInputType.text,
                             prefixIcon: Icons.text_fields,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Name is required';
+                                return SettingsStrings.nameRequired;
                               }
                               if (value.trim().length < 2) {
-                                return 'Name must be at least 2 characters';
+                                return SettingsStrings.nameMinTwoChars;
                               }
                               return null;
                             },
@@ -84,19 +85,19 @@ class _SignupScreenState extends State<SignupScreen> {
                             prefixIcon: Icons.email,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Email is required';
+                                return SettingsStrings.emailRequired;
                               }
                               if (!RegExp(
                                 r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                               ).hasMatch(value)) {
-                                return 'Please enter a valid email';
+                                return SettingsStrings.invalidEmailError;
                               }
                               return null;
                             },
                           ),
                           const SizedBox(height: 10),
                           CustomTextFormFiled(
-                            label: 'Password',
+                            label: SettingsStrings.passwordTitle,
                             controller: passwordController,
                             obscureText: obsecureText,
                             keyboardType: TextInputType.visiblePassword,
@@ -115,10 +116,10 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Password is required';
+                                return SettingsStrings.passwordRequired;
                               }
                               if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
+                                return SettingsStrings.passwordMinSixChars;
                               }
                               return null;
                             },
