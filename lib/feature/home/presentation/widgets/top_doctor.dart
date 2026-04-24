@@ -130,7 +130,7 @@ class CustomTopDoctorCard extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                doctor.specialization,
+                SettingsStrings.specialtyLabel(doctor.specialization),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,

@@ -38,7 +38,9 @@ class CustomDoctorCard extends StatelessWidget {
                 Expanded(
                   child: ListTile(
                     title: Text(doctor.name),
-                    subtitle: Text(doctor.specialization),
+                    subtitle: Text(
+                      SettingsStrings.specialtyLabel(doctor.specialization),
+                    ),
                     trailing: SizedBox(
                       width: 56,
                       child: Row(
@@ -69,7 +71,10 @@ class CustomDoctorCard extends StatelessWidget {
                         SettingsStrings.experienceLabel,
                         textAlign: TextAlign.center,
                       ),
-                      Text(doctor.experience, textAlign: TextAlign.center),
+                      Text(
+                        SettingsStrings.experienceYearsLabel(doctor.experience),
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
                 ),

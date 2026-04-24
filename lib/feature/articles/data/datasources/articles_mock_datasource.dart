@@ -16,11 +16,11 @@ abstract class ArticlesRemoteDataSource {
 }
 
 class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
-  final DoctorEntity _doctorAhmed = DoctorEntity(
+  DoctorEntity get _doctorAhmed => DoctorEntity(
     id: 'doc_001',
     name: 'Dr. Ahmed Mohsen',
     specialization: 'Psychiatrist',
-    experience: '8+ years',
+    experience: SettingsStrings.experienceYearsLabel('8+ years'),
     rating: '4.9',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Ahmed',
     description: 'Specialized in depression and anxiety management.',
@@ -35,11 +35,11 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
   );
 
-  final DoctorEntity _doctorFatima = DoctorEntity(
+  DoctorEntity get _doctorFatima => DoctorEntity(
     id: 'doc_002',
     name: 'Dr. Fatima Ali',
     specialization: 'Clinical Psychologist',
-    experience: '6+ years',
+    experience: SettingsStrings.experienceYearsLabel('6+ years'),
     rating: '4.8',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Fatima',
     description: 'Focused on insomnia and stress-related cases.',
@@ -54,11 +54,11 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
   );
 
-  final DoctorEntity _doctorMohammad = DoctorEntity(
+  DoctorEntity get _doctorMohammad => DoctorEntity(
     id: 'doc_003',
     name: 'Dr. Mohammad Khaled',
     specialization: 'Child Psychologist',
-    experience: '7+ years',
+    experience: SettingsStrings.experienceYearsLabel('7+ years'),
     rating: '4.7',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Mohammad',
     description: 'Child and adolescent mental health specialist.',
@@ -73,11 +73,11 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
   );
 
-  final DoctorEntity _doctorSarah = DoctorEntity(
+  DoctorEntity get _doctorSarah => DoctorEntity(
     id: 'doc_004',
     name: 'Dr. Sarah Hassan',
     specialization: 'Psychotherapist',
-    experience: '9+ years',
+    experience: SettingsStrings.experienceYearsLabel('9+ years'),
     rating: '4.9',
     imageUrl: 'https://via.placeholder.com/150?text=Dr+Sarah',
     description: 'Relationship and self-esteem therapist.',
@@ -92,7 +92,7 @@ class ArticlesMockDataSourceImpl implements ArticlesRemoteDataSource {
     ),
   );
 
-  late final List<ArticleModel> _mockArticles = _buildMockArticles();
+  List<ArticleModel> get _mockArticles => _buildMockArticles();
 
   List<ArticleModel> get _linkedArticles => _mockArticles
       .where(

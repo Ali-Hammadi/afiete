@@ -42,8 +42,9 @@ class _DoctorInfoState extends State<DoctorInfo> {
     final colorScheme = Theme.of(context).colorScheme;
     final doctor = widget.doctor;
     final doctorName = doctor?.name ?? SettingsStrings.doctorDefaultName;
-    final doctorSpecialization =
-        doctor?.specialization ?? SettingsStrings.doctorSpecialist;
+    final doctorSpecialization = doctor == null
+        ? SettingsStrings.doctorSpecialist
+        : SettingsStrings.specialtyLabel(doctor.specialization);
     final doctorDescription = doctor?.description.isNotEmpty == true
         ? doctor!.description
         : SettingsStrings.doctorProfileUnavailable;
@@ -81,13 +82,13 @@ class _DoctorInfoState extends State<DoctorInfo> {
               ),
             ),
             _buildSection(
-              title: SettingsStrings.doctorSpecialist,
+              title: SettingsStrings.medicalSpecialtiesLabel,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(doctorSpecialization, style: AppStyles.bodySmall),
                   Text(SettingsStrings.cardiology),
-                  Text(SettingsStrings.cbt),
+                  Text(SettingsStrings.specialtyLabel('cbtTherapist')),
                   Text(SettingsStrings.depression),
                 ],
               ),
@@ -147,7 +148,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
             SizedBox(height: 20),
             ErrorCustomButton(
               widget: Text(
-                "Report Doctor",
+                SettingsStrings.reportDoctorButton,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.onError,
                 ),
@@ -219,7 +220,11 @@ class _DoctorInfoState extends State<DoctorInfo> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(doctor?.experience ?? '+ 5 years'),
+                Text(
+                  SettingsStrings.experienceYearsLabel(
+                    doctor?.experience ?? '+ 5 years',
+                  ),
+                ),
                 Text(
                   SettingsStrings.experienceLabel,
                   style: AppStyles.bodySmall,
@@ -279,7 +284,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
               TextButton(
                 onPressed: () {},
                 child: Text(
-                  'See all',
+                  SettingsStrings.seeAll,
                   style: AppStyles.bodySmall.copyWith(
                     color: colorScheme.primary,
                   ),
@@ -339,7 +344,10 @@ class _DoctorInfoState extends State<DoctorInfo> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Articles', style: AppStyles.headingSmall),
+              Text(
+                SettingsStrings.articlesLabel,
+                style: AppStyles.headingSmall,
+              ),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(
@@ -352,7 +360,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                   );
                 },
                 child: Text(
-                  'Read all',
+                  SettingsStrings.seeAll,
                   style: AppStyles.bodySmall.copyWith(
                     color: colorScheme.primary,
                   ),
@@ -376,7 +384,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
-                      'No articles available for this doctor yet.',
+                      SettingsStrings.noArticlesAvailableForThisDoctorYet,
                       style: AppStyles.bodySmall.copyWith(
                         color: colorScheme.outline,
                       ),

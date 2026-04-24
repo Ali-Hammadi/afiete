@@ -1,4 +1,5 @@
 import 'package:afiete/core/constants/styles.dart';
+import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/feature/articles/domain/entities/article_entities.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -35,9 +36,10 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final formattedDate = DateFormat('d MMM yyyy', 'en_US').format(
-      widget.article.createdAt,
-    );
+    final formattedDate = DateFormat(
+      'd MMM yyyy',
+      'en_US',
+    ).format(widget.article.createdAt);
     final doctorImage = widget.article.doctor.imageUrl;
     final isNetworkImage = doctorImage.startsWith('http');
 
@@ -100,7 +102,9 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
                         ),
                       ),
                       Text(
-                        widget.article.doctor.specialization,
+                        SettingsStrings.specialtyLabel(
+                          widget.article.doctor.specialization,
+                        ),
                         style: AppStyles.bodySmall.copyWith(
                           color: colorScheme.outline,
                         ),
@@ -114,7 +118,7 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
 
             // Date
             Text(
-              formattedDate,
+              '${SettingsStrings.dateLabel}: $formattedDate',
               style: AppStyles.bodySmall.copyWith(color: colorScheme.outline),
             ),
             const SizedBox(height: 8),
@@ -143,7 +147,9 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
                 widget.onReadMore();
               },
               child: Text(
-                _isExpanded ? 'Read less' : 'Read more',
+                _isExpanded
+                    ? SettingsStrings.readLess
+                    : SettingsStrings.readMore,
                 style: AppStyles.bodyMedium.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w600,
@@ -159,7 +165,7 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
                 // Like Button
                 _buildReactionButton(
                   icon: Icons.thumb_up,
-                  label: '${widget.article.likesCount} Likes',
+                  label: SettingsStrings.likesLabel(widget.article.likesCount),
                   isActive: widget.article.isLikedByUser,
                   onTap: widget.onLike,
                   colorScheme: colorScheme,
@@ -173,7 +179,9 @@ class _ArticleCardWidgetState extends State<ArticleCardWidget> {
                 // Dislike Button
                 _buildReactionButton(
                   icon: Icons.thumb_down,
-                  label: '${widget.article.dislikesCount} Dislikes',
+                  label: SettingsStrings.dislikesLabel(
+                    widget.article.dislikesCount,
+                  ),
                   isActive: widget.article.isDislikedByUser,
                   onTap: widget.onDislike,
                   colorScheme: colorScheme,

@@ -53,7 +53,9 @@ class CustomSessionCard extends StatelessWidget {
                     children: [
                       Text(session.doctorName, style: AppStyles.headingSmall),
                       Text(
-                        session.doctorSpecialization,
+                        SettingsStrings.specialtyLabel(
+                          session.doctorSpecialization,
+                        ),
                         style: AppStyles.bodySmall,
                       ),
                     ],

@@ -17,16 +17,16 @@ import 'package:share_plus/share_plus.dart';
 class MedicalProfileScreen extends StatelessWidget {
   const MedicalProfileScreen({super.key});
 
-  static const List<ShareDoctorOption> _shareDoctors = [
+  static List<ShareDoctorOption> get _shareDoctors => [
     ShareDoctorOption(
       id: 'doc-101',
       name: 'Dr. Sarah Ali',
-      specialization: 'Psychiatry',
+      specialization: SettingsStrings.specialtyLabel('Psychiatrist'),
     ),
     ShareDoctorOption(
       id: 'doc-202',
       name: 'Dr. Omar Hassan',
-      specialization: 'Clinical Psychology',
+      specialization: SettingsStrings.specialtyLabel('Clinical Psychologist'),
     ),
   ];
 

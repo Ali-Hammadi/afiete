@@ -176,7 +176,7 @@ abstract class SettingsStrings {
   static String get videoCallTitle => _t('Video Call', 'مكالمة فيديو');
   static String get voiceCallTitle => _t('Voice Call', 'مكالمة صوتية');
   static String get viewDetails => _t('View details', 'عرض التفاصيل');
-  static String get consultationLabel => _t('Consultation', 'الاستشارة');
+  static String get consultationLabel => _t('Consultation', 'التقييمات');
   static String get onlineLabel => _t('Online', 'متصل');
   static String get availableLabel => _t('Available', 'متاح');
   static String get offlineLabel => _t('Offline', 'غير متصل');
@@ -240,6 +240,60 @@ abstract class SettingsStrings {
     'Healthy Relationships and Self-Worth',
     'العلاقات الصحية وتقدير الذات',
   );
+  static String get articlesLabel => _t('Articles', 'المقالات');
+  static String get readMore => _t('Read more', 'اقرأ المزيد');
+  static String get readLess => _t('Read less', 'اقرأ أقل');
+  static String likesLabel(int count) => _t('$count Likes', '$count إعجاب');
+  static String dislikesLabel(int count) =>
+      _t('$count Dislikes', '$count عدم إعجاب');
+  static String get yearsLabel => _t('Years', 'سنوات');
+  static String experienceYearsLabel(String experience) => _t(
+    experience,
+    experience.replaceAll('years', 'سنوات').replaceAll('year', 'سنة'),
+  );
+  static String get medicalSpecialtiesLabel =>
+      _t('Medical Specialties', 'التخصصات الطبية');
+  static String get noArticlesAvailableForThisDoctorYet => _t(
+    'No articles available for this doctor yet.',
+    'لا توجد مقالات متاحة لهذا الطبيب بعد.',
+  );
+  static String specialtyLabel(String specialty) {
+    final normalized = specialty.trim().toLowerCase();
+    switch (normalized) {
+      case 'psychiatrist':
+        return _t('Psychiatrist', 'طبيب نفسي');
+      case 'clinicalpsychologist':
+        return _t('Clinical Psychologist', 'أخصائي نفسي إكلينيكي');
+      case 'psychotherapist':
+        return _t('Psychotherapist', 'معالج نفسي');
+      case 'cbttherapist':
+        return _t('CBT Therapist', 'معالج معرفي سلوكي');
+      case 'psychoanalyst':
+        return _t('Psychoanalyst', 'محلل نفسي');
+      case 'traumatherapist':
+        return _t('Trauma Therapist', 'معالج صدمات');
+      case 'marriageandfamilytherapist':
+        return _t('Marriage and Family Therapist', 'معالج أسري وزواجي');
+      case 'counselor':
+        return _t('Counselor', 'مرشد نفسي');
+      case 'psychiatricsocialworker':
+        return _t('Psychiatric Social Worker', 'أخصائي اجتماعي نفسي');
+      case 'childpsychologist':
+        return _t('Child Psychologist', 'أخصائي نفسي للأطفال');
+      case 'speechlanguagepathologist':
+        return _t('Speech-Language Pathologist', 'أخصائي علاج النطق');
+      case 'all':
+        return _t('All', 'الكل');
+      default:
+        return specialty;
+    }
+  }
+
+  static String get articlesByDoctorTitle =>
+      _t('Articles by doctor', 'مقالات الطبيب');
+  static String get allArticlesTitle => _t('All Articles', 'كل المقالات');
+  static String get noArticlesAvailable =>
+      _t('No articles available', 'لا توجد مقالات متاحة');
   static String get seeAll => _t('See All', 'عرض الكل');
   static String get assessmentResultTitle =>
       _t('Assessment Result', 'نتيجة التقييم');

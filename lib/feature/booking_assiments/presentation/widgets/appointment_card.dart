@@ -57,8 +57,11 @@ class CustomAppointmentCard extends StatelessWidget {
                       style: AppStyles.headingSmall,
                     ),
                     subtitle: Text(
-                      doctor?.specialization ??
-                          SettingsStrings.specialistLabelInAppointment,
+                      doctor?.specialization == null
+                          ? SettingsStrings.specialistLabelInAppointment
+                          : SettingsStrings.specialtyLabel(
+                              doctor!.specialization,
+                            ),
                       style: AppStyles.bodyMedium,
                     ),
                   ),

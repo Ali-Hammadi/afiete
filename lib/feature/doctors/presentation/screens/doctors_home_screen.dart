@@ -180,7 +180,7 @@ class _DoctorsHomeScreenState extends State<DoctorsHomeScreen> {
     return specialties
         .map(
           (specialty) => SpecialtyChip(
-            label: specialty,
+            label: SettingsStrings.specialtyLabel(specialty),
             isSelected: selectedSpecialty == specialty,
             onSelected: () => _selectSpecialty(specialty),
           ),

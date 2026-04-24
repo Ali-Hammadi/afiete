@@ -137,7 +137,9 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
                       contentPadding: EdgeInsets.zero,
                       value: doctor,
                       title: Text(doctor.name),
-                      subtitle: Text(doctor.specialization),
+                      subtitle: Text(
+                        SettingsStrings.specialtyLabel(doctor.specialization),
+                      ),
                     ),
                   ),
                 ],

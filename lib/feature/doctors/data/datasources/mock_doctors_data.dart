@@ -1,15 +1,18 @@
+import 'package:afiete/core/constants/settings_strings.dart';
+
 class MockDoctorsData {
   // Mock doctors data
-  static const List<Map<String, dynamic>> mockDoctors = [
+  static List<Map<String, dynamic>> get mockDoctors => [
     {
       'id': 'doc_001',
       'name': 'Dr. Ahmed Malik',
       'specialization': 'psychiatrist',
-      'experience': '12 years',
+      'experience': SettingsStrings.experienceYearsLabel('12 years'),
       'rating': '4.8',
       'ratingValue': 4.8,
       'imageUrl': 'https://via.placeholder.com/150?text=Ahmed+Malik',
-      'description': 'Specialized in treating depression, anxiety disorders, and PTSD with evidence-based approaches.',
+      'description':
+          'Specialized in treating depression, anxiety disorders, and PTSD with evidence-based approaches.',
       'isOnline': true,
       'createdAt': '2023-01-15T00:00:00Z',
       'availableTimes': [
@@ -26,11 +29,12 @@ class MockDoctorsData {
       'id': 'doc_002',
       'name': 'Dr. Fatima Zahra',
       'specialization': 'clinicalPsychologist',
-      'experience': '10 years',
+      'experience': SettingsStrings.experienceYearsLabel('10 years'),
       'rating': '4.9',
       'ratingValue': 4.9,
       'imageUrl': 'https://via.placeholder.com/150?text=Fatima+Zahra',
-      'description': 'Expert in cognitive behavioral therapy and anxiety management. Compassionate and patient-centered approach.',
+      'description':
+          'Expert in cognitive behavioral therapy and anxiety management. Compassionate and patient-centered approach.',
       'isOnline': true,
       'createdAt': '2023-02-20T00:00:00Z',
       'availableTimes': [
@@ -47,11 +51,12 @@ class MockDoctorsData {
       'id': 'doc_003',
       'name': 'Dr. Mohammed Hassan',
       'specialization': 'psychotherapist',
-      'experience': '15 years',
+      'experience': SettingsStrings.experienceYearsLabel('15 years'),
       'rating': '4.7',
       'ratingValue': 4.7,
       'imageUrl': 'https://via.placeholder.com/150?text=Mohammed+Hassan',
-      'description': 'Specializes in marriage and family therapy, relationship counseling. Expert in conflict resolution.',
+      'description':
+          'Specializes in marriage and family therapy, relationship counseling. Expert in conflict resolution.',
       'isOnline': false,
       'createdAt': '2023-03-10T00:00:00Z',
       'availableTimes': [
@@ -67,11 +72,12 @@ class MockDoctorsData {
       'id': 'doc_004',
       'name': 'Dr. Leila Mansour',
       'specialization': 'cbtTherapist',
-      'experience': '9 years',
+      'experience': SettingsStrings.experienceYearsLabel('9 years'),
       'rating': '4.6',
       'ratingValue': 4.6,
       'imageUrl': 'https://via.placeholder.com/150?text=Leila+Mansour',
-      'description': 'CBT specialist for anxiety, panic attacks, and OCD. Structured and goal-oriented therapy approach.',
+      'description':
+          'CBT specialist for anxiety, panic attacks, and OCD. Structured and goal-oriented therapy approach.',
       'isOnline': true,
       'createdAt': '2023-04-05T00:00:00Z',
       'availableTimes': [
@@ -87,11 +93,12 @@ class MockDoctorsData {
       'id': 'doc_005',
       'name': 'Dr. Sarah Ali',
       'specialization': 'counselor',
-      'experience': '7 years',
+      'experience': SettingsStrings.experienceYearsLabel('7 years'),
       'rating': '4.5',
       'ratingValue': 4.5,
       'imageUrl': 'https://via.placeholder.com/150?text=Sarah+Ali',
-      'description': 'Professional counselor for stress management, life coaching, and personal growth.',
+      'description':
+          'Professional counselor for stress management, life coaching, and personal growth.',
       'isOnline': true,
       'createdAt': '2023-05-12T00:00:00Z',
       'availableTimes': [
@@ -107,11 +114,12 @@ class MockDoctorsData {
       'id': 'doc_006',
       'name': 'Dr. Omar Taha',
       'specialization': 'traumaTherapist',
-      'experience': '13 years',
+      'experience': SettingsStrings.experienceYearsLabel('13 years'),
       'rating': '4.8',
       'ratingValue': 4.8,
       'imageUrl': 'https://via.placeholder.com/150?text=Omar+Taha',
-      'description': 'Trauma specialist with expertise in EMDR and trauma processing. Certified and experienced.',
+      'description':
+          'Trauma specialist with expertise in EMDR and trauma processing. Certified and experienced.',
       'isOnline': false,
       'createdAt': '2023-06-08T00:00:00Z',
       'availableTimes': [
@@ -127,11 +135,12 @@ class MockDoctorsData {
       'id': 'doc_007',
       'name': 'Dr. Noor Khalil',
       'specialization': 'marriageFamilyTherapist',
-      'experience': '11 years',
+      'experience': SettingsStrings.experienceYearsLabel('11 years'),
       'rating': '4.7',
       'ratingValue': 4.7,
       'imageUrl': 'https://via.placeholder.com/150?text=Noor+Khalil',
-      'description': 'Marriage and family therapist helping couples and families improve relationships and communication.',
+      'description':
+          'Marriage and family therapist helping couples and families improve relationships and communication.',
       'isOnline': true,
       'createdAt': '2023-07-20T00:00:00Z',
       'availableTimes': [
@@ -147,11 +156,12 @@ class MockDoctorsData {
       'id': 'doc_008',
       'name': 'Dr. Karim Hassan',
       'specialization': 'psychiatrist',
-      'experience': '14 years',
+      'experience': SettingsStrings.experienceYearsLabel('14 years'),
       'rating': '4.9',
       'ratingValue': 4.9,
       'imageUrl': 'https://via.placeholder.com/150?text=Karim+Hassan',
-      'description': 'Board-certified psychiatrist specializing in medication management and complex mental health cases.',
+      'description':
+          'Board-certified psychiatrist specializing in medication management and complex mental health cases.',
       'isOnline': true,
       'createdAt': '2023-08-15T00:00:00Z',
       'availableTimes': [
@@ -167,11 +177,12 @@ class MockDoctorsData {
       'id': 'doc_009',
       'name': 'Dr. Hana Mohammad',
       'specialization': 'childPsychologist',
-      'experience': '8 years',
+      'experience': SettingsStrings.experienceYearsLabel('8 years'),
       'rating': '4.6',
       'ratingValue': 4.6,
       'imageUrl': 'https://via.placeholder.com/150?text=Hana+Mohammad',
-      'description': 'Child psychologist specializing in developmental issues, behavioral problems, and educational support.',
+      'description':
+          'Child psychologist specializing in developmental issues, behavioral problems, and educational support.',
       'isOnline': true,
       'createdAt': '2023-09-10T00:00:00Z',
       'availableTimes': [
@@ -187,11 +198,12 @@ class MockDoctorsData {
       'id': 'doc_010',
       'name': 'Dr. Layla Rahman',
       'specialization': 'psychoanalyst',
-      'experience': '16 years',
+      'experience': SettingsStrings.experienceYearsLabel('16 years'),
       'rating': '4.8',
       'ratingValue': 4.8,
       'imageUrl': 'https://via.placeholder.com/150?text=Layla+Rahman',
-      'description': 'Experienced psychoanalyst offering deep insight-oriented therapy for long-term psychological growth.',
+      'description':
+          'Experienced psychoanalyst offering deep insight-oriented therapy for long-term psychological growth.',
       'isOnline': false,
       'createdAt': '2023-10-05T00:00:00Z',
       'availableTimes': [
@@ -207,7 +219,9 @@ class MockDoctorsData {
 
   static List<Map<String, dynamic>> getMockDoctors() => mockDoctors;
 
-  static List<Map<String, dynamic>> getMockDoctorsBySpecialty(String specialty) {
+  static List<Map<String, dynamic>> getMockDoctorsBySpecialty(
+    String specialty,
+  ) {
     return mockDoctors
         .where((doc) => doc['specialization'] == specialty)
         .toList();
@@ -219,7 +233,9 @@ class MockDoctorsData {
 
   static List<Map<String, dynamic>> getTopRatedDoctors(int limit) {
     final sorted = List<Map<String, dynamic>>.from(mockDoctors);
-    sorted.sort((a, b) => (b['ratingValue'] as num).compareTo(a['ratingValue'] as num));
+    sorted.sort(
+      (a, b) => (b['ratingValue'] as num).compareTo(a['ratingValue'] as num),
+    );
     return sorted.take(limit).toList();
   }
 
@@ -234,9 +250,13 @@ class MockDoctorsData {
   static List<Map<String, dynamic>> searchDoctors(String query) {
     final lowerQuery = query.toLowerCase();
     return mockDoctors
-        .where((doc) =>
-            doc['name'].toString().toLowerCase().contains(lowerQuery) ||
-            doc['specialization'].toString().toLowerCase().contains(lowerQuery))
+        .where(
+          (doc) =>
+              doc['name'].toString().toLowerCase().contains(lowerQuery) ||
+              doc['specialization'].toString().toLowerCase().contains(
+                lowerQuery,
+              ),
+        )
         .toList();
   }
 }
