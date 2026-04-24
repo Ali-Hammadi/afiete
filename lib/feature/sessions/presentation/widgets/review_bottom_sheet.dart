@@ -6,8 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CustomReviewBottomSheet extends StatefulWidget {
   final String sessionId;
+  final String doctorId;
 
-  const CustomReviewBottomSheet({super.key, required this.sessionId});
+  const CustomReviewBottomSheet({
+    super.key,
+    required this.sessionId,
+    required this.doctorId,
+  });
 
   @override
   State<CustomReviewBottomSheet> createState() =>
@@ -28,76 +33,88 @@ class _CustomReviewBottomSheetState extends State<CustomReviewBottomSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadiusDirectional.only(
-          topStart: Radius.circular(20),
-          topEnd: Radius.circular(20),
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadiusDirectional.only(
+            topStart: Radius.circular(20),
+            topEnd: Radius.circular(20),
+          ),
         ),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colorScheme.outline.withValues(alpha: 0.35),
-                  borderRadius: BorderRadius.circular(2),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outline.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(SettingsStrings.addReview, style: AppStyles.headingMedium),
-            const SizedBox(height: 20),
-            Center(
-              child: _StarRating(
-                rating: _rating,
-                onRatingChanged: (newRating) {
-                  setState(() => _rating = newRating);
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(SettingsStrings.writeComment, style: AppStyles.headingSmall),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _commentController,
-              maxLines: 6,
-              decoration: InputDecoration(
-                hintText: SettingsStrings.writeCommentHint,
-                hintStyle: AppStyles.bodySmall,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+              const SizedBox(height: 20),
+              Text(SettingsStrings.addReview, style: AppStyles.headingMedium),
+              const SizedBox(height: 20),
+              Center(
+                child: _StarRating(
+                  rating: _rating,
+                  onRatingChanged: (newRating) {
+                    setState(() => _rating = newRating);
+                  },
                 ),
-                filled: true,
-                fillColor: colorScheme.primaryContainer.withValues(alpha: 0.45),
               ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _rating > 0 && _commentController.text.isNotEmpty
-                    ? () {
-                        context.read<SessionsCubit>().submitReview(
-                          sessionId: widget.sessionId,
-                          rating: _rating,
-                          comment: _commentController.text,
-                        );
-                        Navigator.pop(context);
-                      }
-                    : null,
-                child: Text(SettingsStrings.submit),
+              const SizedBox(height: 24),
+              Text(SettingsStrings.writeComment, style: AppStyles.headingSmall),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _commentController,
+                maxLines: 6,
+                scrollPadding: EdgeInsets.only(bottom: bottomInset + 24),
+                decoration: InputDecoration(
+                  hintText: SettingsStrings.writeCommentHint,
+                  hintStyle: AppStyles.bodySmall,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: colorScheme.primaryContainer.withValues(
+                    alpha: 0.45,
+                  ),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _rating > 0 && _commentController.text.isNotEmpty
+                      ? () async {
+                          await context.read<SessionsCubit>().submitReview(
+                            sessionId: widget.sessionId,
+                            doctorId: widget.doctorId,
+                            rating: _rating,
+                            comment: _commentController.text,
+                          );
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        }
+                      : null,
+                  child: Text(SettingsStrings.submit),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

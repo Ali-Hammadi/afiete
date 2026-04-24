@@ -4,6 +4,8 @@ class MockDoctorsData {
   static String _localized(String en, String ar) =>
       SettingsStrings.isArabic ? ar : en;
 
+  static final Map<String, List<Map<String, dynamic>>> _extraDoctorReviews = {};
+
   // Mock doctors data
   static List<Map<String, dynamic>> get mockDoctors => [
     {
@@ -304,36 +306,59 @@ class MockDoctorsData {
       ],
     };
 
-    return reviewsByDoctor[doctorId] ??
-        [
-          _review(
-            reviewerName: _localized('Patient', 'مراجع'),
-            reviewTime: _localized('Recently', 'مؤخرًا'),
-            rating: '4.8',
-            review: _localized(
-              'This doctor provided thoughtful and helpful care.',
-              'قدّم هذا الطبيب رعاية مفيدة ومدروسة.',
-            ),
-          ),
-          _review(
-            reviewerName: _localized('Patient', 'مراجع'),
-            reviewTime: _localized('Recently', 'مؤخرًا'),
-            rating: '4.8',
-            review: _localized(
-              'The consultation was clear and reassuring.',
-              'كانت الاستشارة واضحة ومطمئنة.',
-            ),
-          ),
-          _review(
-            reviewerName: _localized('Patient', 'مراجع'),
-            reviewTime: _localized('Recently', 'مؤخرًا'),
-            rating: '4.8',
-            review: _localized(
-              'I would recommend this doctor.',
-              'أنصح بهذا الطبيب.',
-            ),
-          ),
-        ];
+    final defaultReviews = [
+      _review(
+        reviewerName: _localized('Patient', 'مراجع'),
+        reviewTime: _localized('Recently', 'مؤخرًا'),
+        rating: '4.8',
+        review: _localized(
+          'This doctor provided thoughtful and helpful care.',
+          'قدّم هذا الطبيب رعاية مفيدة ومدروسة.',
+        ),
+      ),
+      _review(
+        reviewerName: _localized('Patient', 'مراجع'),
+        reviewTime: _localized('Recently', 'مؤخرًا'),
+        rating: '4.8',
+        review: _localized(
+          'The consultation was clear and reassuring.',
+          'كانت الاستشارة واضحة ومطمئنة.',
+        ),
+      ),
+      _review(
+        reviewerName: _localized('Patient', 'مراجع'),
+        reviewTime: _localized('Recently', 'مؤخرًا'),
+        rating: '4.8',
+        review: _localized(
+          'I would recommend this doctor.',
+          'أنصح بهذا الطبيب.',
+        ),
+      ),
+    ];
+
+    return [
+      ...(_extraDoctorReviews[doctorId] ?? const []),
+      ...(reviewsByDoctor[doctorId] ?? defaultReviews),
+    ];
+  }
+
+  static void addMockDoctorReview({
+    required String doctorId,
+    required int rating,
+    required String review,
+  }) {
+    final reviewEntry = _review(
+      reviewerName: _localized('Patient', 'مراجع'),
+      reviewTime: _localized('Just now', 'الآن'),
+      rating: rating.toStringAsFixed(1),
+      review: review,
+    );
+
+    final current = List<Map<String, dynamic>>.from(
+      _extraDoctorReviews[doctorId] ?? const [],
+    );
+    current.insert(0, reviewEntry);
+    _extraDoctorReviews[doctorId] = current;
   }
 
   static Map<String, dynamic> _review({

@@ -5,6 +5,7 @@ import 'package:afiete/feature/sessions/domain/usecase/cancel_session_usecase.da
 import 'package:afiete/feature/sessions/domain/usecase/get_past_sessions_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/get_upcoming_sessions_usecase.dart';
 import 'package:afiete/feature/sessions/domain/usecase/reschedule_session_usecase.dart';
+import 'package:afiete/feature/doctors/data/datasources/mock_doctors_data.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -87,15 +88,20 @@ class SessionsCubit extends Cubit<SessionsState> {
 
   Future<void> submitReview({
     required String sessionId,
+    required String doctorId,
     required int rating,
     required String comment,
   }) async {
     final result = await addReviewUseCase(
       AddReviewParams(sessionId: sessionId, rating: rating, comment: comment),
     );
-    result.fold(
-      (failure) => emit(SessionsError(failure.errorMessage)),
-      (_) => emit(const ReviewSubmitted()),
-    );
+    result.fold((failure) => emit(SessionsError(failure.errorMessage)), (_) {
+      MockDoctorsData.addMockDoctorReview(
+        doctorId: doctorId,
+        rating: rating,
+        review: comment,
+      );
+      emit(const ReviewSubmitted());
+    });
   }
 }

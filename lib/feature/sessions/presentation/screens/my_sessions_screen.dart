@@ -116,8 +116,10 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
                   showModalBottomSheet<void>(
                     context: context,
                     isScrollControlled: true,
-                    builder: (_) =>
-                        CustomReviewBottomSheet(sessionId: session.id),
+                    builder: (_) => CustomReviewBottomSheet(
+                      sessionId: session.id,
+                      doctorId: session.doctorId,
+                    ),
                   );
                 }
               : null,

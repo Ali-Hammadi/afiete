@@ -1,9 +1,14 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
+import 'package:afiete/core/di/injection_container.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/booking_assiments/presentation/cubits/appointments_cubit.dart';
 import 'package:afiete/feature/booking_assiments/presentation/widgets/appointment_card.dart';
-import 'package:afiete/core/routes/app_route.dart';
+import 'package:afiete/feature/chat/presentation/helpers/chat_session_navigator.dart';
+import 'package:afiete/feature/booking_assiments/domain/entities/appointment_entity.dart';
 import 'package:afiete/feature/doctors/domain/entites/doctor_entity.dart';
+import 'package:afiete/feature/sessions/presentation/cubits/sessions_cubit.dart';
+import 'package:afiete/feature/sessions/presentation/widgets/review_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -240,6 +245,16 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           return CustomAppointmentCard(
             doctor: matchedDoctor,
             appointment: appointment,
+            isPast: !isUpcoming,
+            onAddReview: matchedDoctor == null
+                ? null
+                : () => _showReviewSheet(
+                    appointmentId: appointment.id,
+                    doctorId: matchedDoctor.id,
+                  ),
+            onBookAgain: matchedDoctor == null
+                ? null
+                : () => _handleBookAgain(doctor: matchedDoctor),
             onReschedule: matchedDoctor == null
                 ? null
                 : () => _handleReschedule(
@@ -248,6 +263,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                   ),
             onCancel: () =>
                 _confirmCancel(context, appointmentId: appointment.id),
+            onJoinSession: () => _handleJoinSession(appointment),
           );
         },
       ),
@@ -294,6 +310,40 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         SnackBar(content: Text(SettingsStrings.sessionRescheduledSuccessfully)),
       );
     }
+  }
+
+  void _handleJoinSession(AppointmentEntity appointment) {
+    ChatSessionNavigator.openFromAppointment(
+      context,
+      appointment,
+      doctorName: appointment.doctorName,
+    );
+  }
+
+  Future<void> _handleBookAgain({required DoctorEntity doctor}) async {
+    await Navigator.pushNamed(
+      context,
+      MyRoutes.bookSessionScreen,
+      arguments: doctor,
+    );
+  }
+
+  void _showReviewSheet({
+    required String appointmentId,
+    required String doctorId,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BlocProvider<SessionsCubit>(
+        create: (_) => sl<SessionsCubit>(),
+        child: CustomReviewBottomSheet(
+          sessionId: appointmentId,
+          doctorId: doctorId,
+        ),
+      ),
+    );
   }
 
   void _confirmCancel(BuildContext context, {required String appointmentId}) {
