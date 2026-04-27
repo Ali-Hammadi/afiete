@@ -40,11 +40,11 @@ import 'package:afiete/feature/feeling/data/repositories/feeling_repository_impl
 import 'package:afiete/feature/feeling/domain/repositories/feeling_repository.dart';
 import 'package:afiete/feature/feeling/domain/usecase/feeling_usecases.dart';
 import 'package:afiete/feature/feeling/presentation/cubit/feeling_cubit.dart';
-import 'package:afiete/feature/music/data/datasources/music_local_data_source.dart';
-import 'package:afiete/feature/music/data/repositories/music_repository_impl.dart';
-import 'package:afiete/feature/music/domain/repositories/music_repository.dart';
-import 'package:afiete/feature/music/domain/usecase/get_recommended_music_usecase.dart';
-import 'package:afiete/feature/music/presentation/cubit/music_cubit.dart';
+import 'package:afiete/feature/relax/data/datasources/music_local_data_source.dart';
+import 'package:afiete/feature/relax/data/repositories/music_repository_impl.dart';
+import 'package:afiete/feature/relax/domain/repositories/music_repository.dart';
+import 'package:afiete/feature/relax/domain/usecase/get_recommended_music_usecase.dart';
+import 'package:afiete/feature/relax/presentation/cubit/music_cubit.dart';
 import 'package:afiete/feature/payment/data/datasources/payment_mock_datasource.dart';
 import 'package:afiete/feature/payment/data/datasources/payment_remote_datasource.dart';
 import 'package:afiete/feature/payment/data/repositories/payment_repository_impl.dart';

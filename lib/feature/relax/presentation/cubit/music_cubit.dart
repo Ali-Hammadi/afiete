@@ -2,9 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:afiete/core/constants/feeling_type.dart';
 import 'package:equatable/equatable.dart';
 import 'package:afiete/core/usecases/usecase.dart';
-import 'package:afiete/feature/music/domain/entities/breathing_exercise_entity.dart';
-import 'package:afiete/feature/music/domain/entities/music_entity.dart';
-import 'package:afiete/feature/music/domain/usecase/get_recommended_music_usecase.dart';
+import 'package:afiete/feature/relax/domain/entities/breathing_exercise_entity.dart';
+import 'package:afiete/feature/relax/domain/entities/music_entity.dart';
+import 'package:afiete/feature/relax/domain/usecase/get_recommended_music_usecase.dart';
 
 part 'music_state.dart';
 

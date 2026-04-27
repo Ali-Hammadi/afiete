@@ -1,6 +1,6 @@
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
-import 'package:afiete/feature/music/domain/entities/breathing_exercise_entity.dart';
+import 'package:afiete/feature/relax/domain/entities/breathing_exercise_entity.dart';
 import 'package:flutter/material.dart';
 
 class BreathingExerciseCard extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
-import 'package:afiete/feature/music/presentation/cubit/music_cubit.dart';
-import 'package:afiete/feature/music/presentation/screens/music_hub_screen.dart';
+import 'package:afiete/feature/relax/presentation/cubit/music_cubit.dart';
+import 'package:afiete/feature/relax/presentation/screens/music_hub_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

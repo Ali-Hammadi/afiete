@@ -11,7 +11,7 @@ import 'package:afiete/feature/home/presentation/widgets/assignment_widget.dart'
 import 'package:afiete/feature/home/presentation/widgets/emotions_widget.dart';
 import 'package:afiete/feature/home/presentation/widgets/music_widget.dart';
 import 'package:afiete/feature/home/presentation/widgets/top_doctor.dart';
-import 'package:afiete/feature/music/presentation/cubit/music_cubit.dart';
+import 'package:afiete/feature/relax/presentation/cubit/music_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

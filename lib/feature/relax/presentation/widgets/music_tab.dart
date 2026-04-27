@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
-import 'package:afiete/feature/music/domain/entities/music_entity.dart';
-import 'package:afiete/feature/music/presentation/cubit/music_cubit.dart';
-import 'package:afiete/feature/music/presentation/widgets/music_track_card.dart';
+import 'package:afiete/feature/relax/domain/entities/music_entity.dart';
+import 'package:afiete/feature/relax/presentation/cubit/music_cubit.dart';
+import 'package:afiete/feature/relax/presentation/widgets/music_track_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';

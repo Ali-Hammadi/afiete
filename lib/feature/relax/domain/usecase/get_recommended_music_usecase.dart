@@ -1,9 +1,9 @@
 import 'package:afiete/core/constants/feeling_type.dart';
 import 'package:afiete/core/error/failure.dart';
 import 'package:afiete/core/usecases/usecase.dart';
-import 'package:afiete/feature/music/domain/entities/breathing_exercise_entity.dart';
-import 'package:afiete/feature/music/domain/entities/music_entity.dart';
-import 'package:afiete/feature/music/domain/repositories/music_repository.dart';
+import 'package:afiete/feature/relax/domain/entities/breathing_exercise_entity.dart';
+import 'package:afiete/feature/relax/domain/entities/music_entity.dart';
+import 'package:afiete/feature/relax/domain/repositories/music_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class GetRecommendedMusicParams {
