@@ -210,7 +210,7 @@ class AuthCubit extends Cubit<AuthState> {
       },
       (message) {
         _log('request_email_otp:success', data: {'message': message});
-        return message;
+        return null;
       },
     );
   }
