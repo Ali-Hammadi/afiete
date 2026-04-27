@@ -97,7 +97,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           <String, dynamic>{'email': email, 'nickname': email.split('@').first};
 
       return UserModel(
-        id: (userData['id'] ?? userData['user_id'] ?? email).toString(),
+        id: email,
         name:
             (userData['name'] ?? userData['nickname'] ?? email.split('@').first)
                 .toString(),
@@ -165,6 +165,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         email: email,
         password: password,
         token: '',
+        isVerified:
+            (response.data as Map<String, dynamic>?)?['is_verified'] == true,
       );
     } on DioException catch (e) {
       _logError(
@@ -612,7 +614,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             };
 
         return UserModel(
-          id: (userData['id'] ?? userData['user_id'] ?? email).toString(),
+          id: email,
           name:
               (userData['name'] ??
                       userData['nickname'] ??
@@ -621,6 +623,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           email: (userData['email'] ?? email).toString(),
           password: '',
           token: accessToken,
+          isVerified: true,
         );
       }
       throw DioException(

@@ -35,7 +35,15 @@ class _SignupScreenState extends State<SignupScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthLoaded) {
-            Navigator.pushNamed(context, MyRoutes.authInfoScreens);
+            if (state.user.isVerified) {
+              Navigator.pushNamed(context, MyRoutes.authInfoScreens);
+            } else {
+              Navigator.pushNamed(
+                context,
+                MyRoutes.verifyAccountScreen,
+                arguments: state.user.email,
+              );
+            }
           } else if (state is WaitingForOtpVerification) {
             // Auto-navigate to OTP verification screen when account not verified
             Navigator.pushNamed(

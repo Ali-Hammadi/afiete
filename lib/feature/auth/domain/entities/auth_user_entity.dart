@@ -6,6 +6,7 @@ class UserAuthEntity extends Equatable {
   final String email;
   final String password;
   final String token;
+  final bool isVerified;
   final DateTime? birthDate;
   final int? age;
   final String? gender;
@@ -17,6 +18,7 @@ class UserAuthEntity extends Equatable {
     required this.email,
     required this.password,
     required this.token,
+    this.isVerified = true,
     this.birthDate,
     this.age,
     this.gender,
@@ -29,6 +31,7 @@ class UserAuthEntity extends Equatable {
     String? email,
     String? password,
     String? token,
+    bool? isVerified,
     DateTime? birthDate,
     int? age,
     String? gender,
@@ -40,6 +43,7 @@ class UserAuthEntity extends Equatable {
       email: email ?? this.email,
       password: password ?? this.password,
       token: token ?? this.token,
+      isVerified: isVerified ?? this.isVerified,
       birthDate: birthDate ?? this.birthDate,
       age: age ?? this.age,
       gender: gender ?? this.gender,
@@ -54,6 +58,7 @@ class UserAuthEntity extends Equatable {
     email,
     password,
     token,
+    isVerified,
     birthDate,
     age,
     gender,

@@ -7,6 +7,7 @@ class UserModel extends Equatable {
   final String email;
   final String password;
   final String token;
+  final bool isVerified;
   final DateTime? birthDate;
   final int? age;
   final String? gender;
@@ -18,6 +19,7 @@ class UserModel extends Equatable {
     required this.email,
     required this.password,
     required this.token,
+    this.isVerified = true,
     this.birthDate,
     this.age,
     this.gender,
@@ -40,6 +42,7 @@ class UserModel extends Equatable {
     String? email,
     String? password,
     String? token,
+    bool? isVerified,
     DateTime? birthDate,
     int? age,
     String? gender,
@@ -51,6 +54,7 @@ class UserModel extends Equatable {
       email: email ?? this.email,
       password: password ?? this.password,
       token: token ?? this.token,
+      isVerified: isVerified ?? this.isVerified,
       birthDate: birthDate ?? this.birthDate,
       age: age ?? this.age,
       gender: gender ?? this.gender,
@@ -63,7 +67,12 @@ class UserModel extends Equatable {
     final mergedJson = <String, dynamic>{...json, ...userJson};
 
     return UserModel(
-      id: (mergedJson['id'] ?? mergedJson['user_id'] ?? '').toString(),
+      id:
+          (mergedJson['email'] ??
+                  mergedJson['id'] ??
+                  mergedJson['user_id'] ??
+                  '')
+              .toString(),
       name:
           (mergedJson['name'] ??
                   mergedJson['nickname'] ??
@@ -73,6 +82,11 @@ class UserModel extends Equatable {
       email: (mergedJson['email'] ?? '').toString(),
       password: (mergedJson['password'] ?? '').toString(),
       token: (mergedJson['token'] ?? mergedJson['access'] ?? '').toString(),
+      isVerified:
+          (mergedJson['is_verified'] ?? mergedJson['isVerified'])
+              ?.toString()
+              .toLowerCase() ==
+          'true',
       birthDate: (mergedJson['birthDate'] ?? mergedJson['birth_date']) != null
           ? DateTime.tryParse(
               (mergedJson['birthDate'] ?? mergedJson['birth_date']).toString(),
@@ -93,6 +107,7 @@ class UserModel extends Equatable {
     email: email,
     password: password,
     token: token,
+    isVerified: isVerified,
     birthDate: birthDate,
     age: age,
     gender: gender,
@@ -106,6 +121,7 @@ class UserModel extends Equatable {
     email,
     password,
     token,
+    isVerified,
     birthDate,
     age,
     gender,

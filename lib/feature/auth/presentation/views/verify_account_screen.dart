@@ -46,8 +46,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthLoaded) {
-            // OTP verification successful, navigate to home
-            Navigator.pushNamed(context, MyRoutes.homeScreen);
+            // OTP verification successful, continue to profile completion
+            Navigator.pushReplacementNamed(context, MyRoutes.authInfoScreens);
           } else if (state is AuthError) {
             // Show error message
             ScaffoldMessenger.of(

@@ -168,7 +168,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                   if (!context.mounted || !saved) return;
                   Navigator.pushReplacementNamed(
                     context,
-                    MyRoutes.verifyAccountScreen,
+                    MyRoutes.profileInfoScreen,
                   );
                 },
               ),

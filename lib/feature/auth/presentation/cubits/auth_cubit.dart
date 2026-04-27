@@ -4,6 +4,7 @@ import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../domain/usecase/login_usecase.dart';
@@ -24,6 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
   final GoogleSignInUseCase googleSignInUseCase;
   final UpdateProfileInfoUseCase updateProfileInfoUseCase;
   final RequestEmailChangeOtpUseCase requestEmailChangeOtpUseCase;
+  final VerifyOtpUseCase verifyOtpUseCase;
   final ConfirmEmailChangeUseCase confirmEmailChangeUseCase;
   final AuthRepository authRepository;
 
@@ -35,6 +37,7 @@ class AuthCubit extends Cubit<AuthState> {
     this.googleSignInUseCase,
     this.updateProfileInfoUseCase,
     this.requestEmailChangeOtpUseCase,
+    this.verifyOtpUseCase,
     this.confirmEmailChangeUseCase,
     this.authRepository,
   ) : super(AuthInitial());
@@ -48,10 +51,22 @@ class AuthCubit extends Cubit<AuthState> {
     result.fold(
       (failure) {
         _log('login:error', data: {'message': failure.errorMessage});
+        if (_isNotVerifiedError(failure.errorMessage)) {
+          _log('login:account_not_verified_send_otp', data: {'email': email});
+          return sendVerificationOtp(email);
+        }
         emit(AuthError(failure.errorMessage));
       },
       (user) {
         _log('login:success', data: {'userId': user.id, 'email': user.email});
+        // If account is not verified, send OTP instead of rejecting
+        if (!user.isVerified) {
+          _log(
+            'login:account_not_verified_send_otp',
+            data: {'email': user.email},
+          );
+          return sendVerificationOtp(user.email);
+        }
         emit(AuthLoaded(user));
       },
     );
@@ -66,9 +81,10 @@ class AuthCubit extends Cubit<AuthState> {
     result.fold(
       (failure) {
         _log('signup:error', data: {'message': failure.errorMessage});
-        // Auto-trigger OTP verification if account is not verified
-        if (_isNotVerifiedError(failure.errorMessage)) {
-          _log('signup:auto_trigger_otp', data: {'email': email});
+        // If email already exists (unverified), send OTP for verification
+        if (_isNotVerifiedError(failure.errorMessage) ||
+            _isEmailAlreadyExistsError(failure.errorMessage)) {
+          _log('signup:email_unverified_send_otp', data: {'email': email});
           return sendVerificationOtp(email);
         } else {
           emit(AuthError(failure.errorMessage));
@@ -76,6 +92,11 @@ class AuthCubit extends Cubit<AuthState> {
       },
       (user) {
         _log('signup:success', data: {'userId': user.id, 'email': user.email});
+        // If account is not verified, send OTP instead of loading
+        if (!user.isVerified) {
+          _log('signup:account_not_verified', data: {'email': user.email});
+          return sendVerificationOtp(user.email);
+        }
         emit(AuthLoaded(user));
       },
     );
@@ -283,8 +304,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> verifyOtpCode(String email, String code) async {
     _log('verify_otp:start', data: {'email': email, 'codeLength': code.length});
     emit(AuthLoading());
-    final result = await confirmEmailChangeUseCase(
-      ConfirmEmailChangeParams(userId: email, newEmail: email, otp: code),
+    final result = await verifyOtpUseCase(
+      VerifyOtpParams(email: email, code: code),
     );
 
     result.fold(
@@ -297,7 +318,7 @@ class AuthCubit extends Cubit<AuthState> {
           'verify_otp:success',
           data: {'userId': user.id, 'email': user.email},
         );
-        emit(AuthLoaded(user));
+        emit(AuthLoaded(user.copyWith(isVerified: true)));
       },
     );
   }
@@ -379,6 +400,12 @@ class AuthCubit extends Cubit<AuthState> {
   bool _isNotVerifiedError(String errorMessage) {
     return errorMessage.toLowerCase().contains('not verified') ||
         errorMessage.toLowerCase().contains('verify your account');
+  }
+
+  bool _isEmailAlreadyExistsError(String errorMessage) {
+    return errorMessage.toLowerCase().contains('already exists') ||
+        errorMessage.toLowerCase().contains('user with this email') ||
+        errorMessage.toLowerCase().contains('email already');
   }
 
   void _log(String message, {Map<String, dynamic>? data}) {
