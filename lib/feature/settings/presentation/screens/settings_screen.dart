@@ -139,6 +139,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Navigator.pushNamed(context, MyRoutes.reportIssueScreen);
                 },
               ),
+              const SizedBox(height: 12),
+              CustomSettingTile(
+                icon: Icons.logout,
+                title: SettingsStrings.logoutTitle,
+                subtitle: SettingsStrings.logoutSubtitle,
+                trailing: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.black,
+                ),
+                onTap: () => _confirmLogout(context, authState),
+              ),
             ],
           ),
         ),
@@ -267,6 +279,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
           },
         );
       },
+    );
+  }
+
+  Future<void> _confirmLogout(BuildContext context, AuthState authState) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(SettingsStrings.logoutConfirmTitle),
+          content: Text(SettingsStrings.logoutConfirmMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(SettingsStrings.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(SettingsStrings.logoutTitle),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final user = authState is AuthLoaded
+        ? authState.user
+        : authState is AuthProfileUpdated
+        ? authState.user
+        : null;
+
+    if (user == null) return;
+
+    final loggedOut = await context.read<AuthCubit>().logout(
+      user.email,
+      user.password,
+    );
+
+    if (!context.mounted || !loggedOut) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(SettingsStrings.logoutSuccess)));
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      MyRoutes.signup,
+      (route) => false,
     );
   }
 

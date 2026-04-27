@@ -33,6 +33,17 @@ abstract class SettingsStrings {
       _t('Terms & Privacy', 'الشروط والخصوصية');
   static String get contactUsTitle => _t('Contact us', 'تواصل معنا');
   static String get reportsTitle => _t('Reports', 'التقارير');
+  static String get logoutTitle => _t('Log out', 'تسجيل الخروج');
+  static String get logoutSubtitle =>
+      _t('Sign out from this device', 'الخروج من هذا الجهاز');
+  static String get logoutConfirmTitle =>
+      _t('Log out?', 'هل تريد تسجيل الخروج؟');
+  static String get logoutConfirmMessage => _t(
+    'You will need to sign in again to access the app.',
+    'ستحتاج إلى تسجيل الدخول مرة أخرى للوصول إلى التطبيق.',
+  );
+  static String get logoutSuccess =>
+      _t('Logged out successfully', 'تم تسجيل الخروج بنجاح');
   static String get homeNavLabel => _t('Home', 'الرئيسية');
   static String get doctorsNavLabel => _t('Doctors', 'الأطباء');
   static String get appointmentsNavLabel => _t('Appointments', 'المواعيد');

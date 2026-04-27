@@ -102,20 +102,22 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<void> logout(String email, String password) async {
+  Future<bool> logout(String email, String password) async {
     _log('logout:start', data: {'email': email});
     emit(AuthLoading());
     final result = await logoutUseCase(
       LogoutParams(email: email, password: password),
     );
-    result.fold(
+    return result.fold(
       (failure) {
         _log('logout:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
+        return false;
       },
       (user) {
         _log('logout:success', data: {'userId': user.id, 'email': user.email});
-        emit(AuthLoaded(user));
+        emit(const AuthInitial());
+        return true;
       },
     );
   }

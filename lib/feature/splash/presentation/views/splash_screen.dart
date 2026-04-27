@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     final nextRoute = (token != null && token.isNotEmpty)
         ? MyRoutes.homeScreen
-        : MyRoutes.login;
+        : MyRoutes.signup;
 
     Navigator.pushReplacementNamed(context, nextRoute);
   }
