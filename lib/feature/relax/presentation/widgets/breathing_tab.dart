@@ -46,12 +46,15 @@ class BreathingTab extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        state.activeBreathingExercise!.title,
+                        state.activeBreathingExercise!.type.localizedTitle,
                         style: AppStyles.headingSmall,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        state.activeBreathingExercise!.description,
+                        state
+                            .activeBreathingExercise!
+                            .type
+                            .localizedDescription,
                         style: AppStyles.bodyMedium,
                       ),
                       const SizedBox(height: 12),

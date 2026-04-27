@@ -268,6 +268,113 @@ abstract class SettingsStrings {
   static String get holdLabel => _t('Hold', 'حبس');
   static String get exhaleLabel => _t('Exhale', 'زفير');
   static String get restLabel => _t('Rest', 'راحة');
+
+  // Breathing Exercise Titles
+  static String get boxBreathingTitle =>
+      _t('Box Breathing', 'تمرين التنفس الصندوقي');
+  static String get fourSevenEightTitle =>
+      _t('4-7-8 Breathing', 'تمرين 4-7-8 للتنفس');
+  static String get diaphragmaticTitle =>
+      _t('Diaphragmatic Breathing', 'التنفس الحجابي');
+  static String get pacedBreathingTitle =>
+      _t('Paced Breathing', 'التنفس المتزن');
+  static String get resonanceTitle =>
+      _t('Resonance Breathing', 'التنفس الرنيني');
+
+  // Breathing Exercise Descriptions
+  static String get boxBreathingDesc => _t(
+    'Used in stress control and focus training.',
+    'يُستخدم في التحكم في التوتر والتدريب على التركيز.',
+  );
+  static String get fourSevenEightDesc => _t(
+    'Common relaxation technique used for anxiety and sleep.',
+    'تقنية استرخاء شائعة تُستخدم للقلق والنوم.',
+  );
+  static String get diaphragmaticDesc => _t(
+    'Slow belly breathing to support body relaxation.',
+    'تنفس بطيء من البطن لدعم استرخاء الجسم.',
+  );
+  static String get pacedBreathingDesc => _t(
+    'Even breathing rhythm used for heart-rate regulation.',
+    'إيقاع تنفسي منتظم يُستخدم لتنظيم نبضات القلب.',
+  );
+  static String get resonanceDesc => _t(
+    'Slow therapeutic breathing around six breaths per minute.',
+    'تنفس علاجي بطيء حوالي ستة أنفاس في الدقيقة.',
+  );
+
+  // Breathing Exercise Recommended For
+  static String get boxBreathingFor => _t(
+    'Stress, focus, and emotional reset',
+    'التوتر والتركيز وإعادة تعيين الحالة الانفعالية',
+  );
+  static String get fourSevenEightFor => _t(
+    'Anxiety, insomnia, and pre-sleep calming',
+    'القلق والأرق والهدوء قبل النوم',
+  );
+  static String get diaphragmaticFor => _t(
+    'Panic sensitivity, stress, and body tension',
+    'حساسية الذعر والتوتر وشد الجسم',
+  );
+  static String get pacedBreathingFor => _t(
+    'Daily regulation and calming the nervous system',
+    'التنظيم اليومي وتهدئة الجهاز العصبي',
+  );
+  static String get resonanceFor => _t(
+    'HRV training and long-term stress regulation',
+    'تدريب تقلب معدل ضربات القلب وتنظيم التوتر طويل الأجل',
+  );
+
+  // Breathing Exercise Steps
+  static String get boxBreathingStep1 =>
+      _t('Inhale for 4 seconds', 'استنشق لمدة 4 ثواني');
+  static String get boxBreathingStep2 =>
+      _t('Hold for 4 seconds', 'احبس النفس لمدة 4 ثواني');
+  static String get boxBreathingStep3 =>
+      _t('Exhale for 4 seconds', 'أطلق النفس لمدة 4 ثواني');
+  static String get boxBreathingStep4 =>
+      _t('Hold for 4 seconds', 'احبس النفس لمدة 4 ثواني');
+
+  static String get fourSevenEightStep1 =>
+      _t('Inhale for 4 seconds', 'استنشق لمدة 4 ثواني');
+  static String get fourSevenEightStep2 =>
+      _t('Hold for 7 seconds', 'احبس النفس لمدة 7 ثواني');
+  static String get fourSevenEightStep3 =>
+      _t('Exhale for 8 seconds', 'أطلق النفس لمدة 8 ثواني');
+
+  static String get diaphragmaticStep1 => _t(
+    'Place one hand on chest and one on belly',
+    'ضع يدًا على الصدر وأخرى على البطن',
+  );
+  static String get diaphragmaticStep2 =>
+      _t('Breathe in slowly through the nose', 'خذ نفسًا بطيئًا من الأنف');
+  static String get diaphragmaticStep3 => _t(
+    'Let the belly rise more than the chest',
+    'دع البطن ترتفع أكثر من الصدر',
+  );
+  static String get diaphragmaticStep4 =>
+      _t('Exhale gently through the mouth', 'أطلق النفس برفق من الفم');
+
+  // Breathing Exercise Helper Translations
+  static String get bellyLabel => _t('Belly', 'البطن');
+  static String get slowLabel => _t('Slow', 'ببطء');
+
+  static String get pacedBreathingStep1 =>
+      _t('Inhale for 5 seconds', 'استنشق لمدة 5 ثواني');
+  static String get pacedBreathingStep2 =>
+      _t('Exhale for 5 seconds', 'أطلق النفس لمدة 5 ثواني');
+  static String get pacedBreathingStep3 =>
+      _t('Keep the rhythm gentle and even', 'اجعل الإيقاع لطيفًا ومنتظمًا');
+
+  static String get resonanceStep1 =>
+      _t('Inhale slowly through the nose', 'استنشق ببطء من الأنف');
+  static String get resonanceStep2 => _t(
+    'Exhale longer and softer than the inhale',
+    'أطلق النفس أطول وأنعم من الاستنشاق',
+  );
+  static String get resonanceStep3 =>
+      _t('Stay relaxed and steady', 'ابقَ متسترخيًا ومستقرًا');
+
   static String get takeAssignmentTitle =>
       _t('Not sure where to start?', 'لست متأكدًا من أين تبدأ؟');
   static String get takeAssignmentDescription => _t(

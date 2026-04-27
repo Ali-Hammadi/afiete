@@ -77,7 +77,7 @@ class MyApp extends StatelessWidget {
                     GlobalCupertinoLocalizations.delegate,
                     GlobalWidgetsLocalizations.delegate,
                   ],
-                  initialRoute: MyRoutes.homeScreen,
+                  initialRoute: MyRoutes.splashScreen,
                   onGenerateRoute: AppRouter.generateRoute,
                 );
               },

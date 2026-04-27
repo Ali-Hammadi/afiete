@@ -24,6 +24,16 @@ class UserModel extends Equatable {
     this.phoneNumber,
   });
 
+  static Map<String, dynamic> signupRequestBody({
+    required String nickname,
+    required String email,
+    required String password,
+  }) {
+    return {
+      'user': {'nickname': nickname, 'email': email, 'password': password},
+    };
+  }
+
   UserModel copyWith({
     String? id,
     String? name,
@@ -48,26 +58,34 @@ class UserModel extends Equatable {
     );
   }
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: (json['id'] ?? json['user_id'] ?? '').toString(),
-    name:
-      (json['name'] ??
-          json['nickname'] ??
-          '${json['first_name'] ?? ''} ${json['last_name'] ?? ''}')
-        .toString()
-        .trim(),
-    email: (json['email'] ?? '').toString(),
-    password: (json['password'] ?? '').toString(),
-    token: (json['token'] ?? json['access'] ?? '').toString(),
-    birthDate: (json['birthDate'] ?? json['birth_date']) != null
-      ? DateTime.tryParse((json['birthDate'] ?? json['birth_date']).toString())
-        : null,
-    age: json['age'] is int
-        ? json['age'] as int
-        : int.tryParse('${json['age'] ?? ''}'),
-    gender: json['gender']?.toString(),
-    phoneNumber: (json['phoneNumber'] ?? json['phone'])?.toString(),
-  );
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    final userJson = (json['user'] as Map<String, dynamic>?) ?? json;
+    final mergedJson = <String, dynamic>{...json, ...userJson};
+
+    return UserModel(
+      id: (mergedJson['id'] ?? mergedJson['user_id'] ?? '').toString(),
+      name:
+          (mergedJson['name'] ??
+                  mergedJson['nickname'] ??
+                  '${mergedJson['first_name'] ?? ''} ${mergedJson['last_name'] ?? ''}')
+              .toString()
+              .trim(),
+      email: (mergedJson['email'] ?? '').toString(),
+      password: (mergedJson['password'] ?? '').toString(),
+      token: (mergedJson['token'] ?? mergedJson['access'] ?? '').toString(),
+      birthDate: (mergedJson['birthDate'] ?? mergedJson['birth_date']) != null
+          ? DateTime.tryParse(
+              (mergedJson['birthDate'] ?? mergedJson['birth_date']).toString(),
+            )
+          : null,
+      age: mergedJson['age'] is int
+          ? mergedJson['age'] as int
+          : int.tryParse('${mergedJson['age'] ?? ''}'),
+      gender: mergedJson['gender']?.toString(),
+      phoneNumber: (mergedJson['phoneNumber'] ?? mergedJson['phone'])
+          ?.toString(),
+    );
+  }
 
   UserAuthEntity toEntity() => UserAuthEntity(
     id: id,

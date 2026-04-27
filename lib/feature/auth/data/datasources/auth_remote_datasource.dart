@@ -41,11 +41,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> login(String email, String password) async {
     try {
-      await _dio.post(
-        ApiEndpoints.login,
-        data: {'email': email, 'password': password},
-      );
-
+      // Get tokens directly from /api/token/
       final tokenResponse = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.tokenObtainPair,
         data: {'email': email, 'password': password},
@@ -74,25 +70,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         password: password,
         token: accessToken,
       );
-    } on DioException catch (e) {
-      final nonFieldErrors = (e.response?.data is Map<String, dynamic>)
-          ? (e.response?.data['non_field_errors'] as List?)
-          : null;
-
-      if (nonFieldErrors != null && nonFieldErrors.isNotEmpty) {
-        throw DioException(
-          requestOptions: e.requestOptions,
-          response: e.response,
-          type: e.type,
-          error: nonFieldErrors.first.toString(),
-          message: nonFieldErrors.first.toString(),
-        );
-      }
-
+    } on DioException {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.login),
+        requestOptions: RequestOptions(path: ApiEndpoints.tokenObtainPair),
         error: e.toString(),
       );
     }
@@ -101,21 +83,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> signup(String name, String email, String password) async {
     try {
+      // Register user at /api/patients/register/
       final response = await _dio.post(
         ApiEndpoints.signup,
-        data: {
-          'user': {'nickname': name, 'email': email, 'password': password},
-        },
+        data: UserModel.signupRequestBody(
+          nickname: name,
+          email: email,
+          password: password,
+        ),
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          error: 'Signup failed',
+          error: 'Signup failed: ${response.statusCode}',
         );
       }
 
+      // Get tokens from /api/token/ after successful registration
       final tokenResponse = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.tokenObtainPair,
         data: {'email': email, 'password': password},
@@ -123,12 +109,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final accessToken = tokenResponse.data?['access']?.toString() ?? '';
       final refreshToken = tokenResponse.data?['refresh']?.toString() ?? '';
-      if (accessToken.isNotEmpty && refreshToken.isNotEmpty) {
-        await TokenStorage.saveTokens(
-          accessToken: accessToken,
-          refreshToken: refreshToken,
+
+      if (accessToken.isEmpty || refreshToken.isEmpty) {
+        throw DioException(
+          requestOptions: tokenResponse.requestOptions,
+          response: tokenResponse,
+          error: 'Failed to obtain tokens after signup',
         );
       }
+
+      await TokenStorage.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
 
       return UserModel(
         id: email,

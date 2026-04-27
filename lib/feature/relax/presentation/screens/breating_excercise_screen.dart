@@ -33,32 +33,40 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
   List<_PhaseStep> _buildSteps(BreathingExerciseEntity exercise) {
     switch (exercise.type) {
       case BreathingExerciseType.boxBreathing:
-        return const [
-          _PhaseStep(_PhaseType.inhale, 'Inhale', 4),
-          _PhaseStep(_PhaseType.hold, 'Hold', 4),
-          _PhaseStep(_PhaseType.exhale, 'Exhale', 4),
-          _PhaseStep(_PhaseType.rest, 'Hold', 4),
+        return [
+          _PhaseStep(_PhaseType.inhale, SettingsStrings.inhaleLabel, 4),
+          _PhaseStep(_PhaseType.hold, SettingsStrings.holdLabel, 4),
+          _PhaseStep(_PhaseType.exhale, SettingsStrings.exhaleLabel, 4),
+          _PhaseStep(_PhaseType.rest, SettingsStrings.holdLabel, 4),
         ];
       case BreathingExerciseType.fourSevenEight:
-        return const [
-          _PhaseStep(_PhaseType.inhale, 'Inhale', 4),
-          _PhaseStep(_PhaseType.hold, 'Hold', 7),
-          _PhaseStep(_PhaseType.exhale, 'Exhale', 8),
+        return [
+          _PhaseStep(_PhaseType.inhale, SettingsStrings.inhaleLabel, 4),
+          _PhaseStep(_PhaseType.hold, SettingsStrings.holdLabel, 7),
+          _PhaseStep(_PhaseType.exhale, SettingsStrings.exhaleLabel, 8),
         ];
       case BreathingExerciseType.diaphragmatic:
-        return const [
-          _PhaseStep(_PhaseType.inhale, 'Belly inhale', 5),
-          _PhaseStep(_PhaseType.exhale, 'Slow exhale', 5),
+        return [
+          _PhaseStep(
+            _PhaseType.inhale,
+            '${SettingsStrings.inhaleLabel} (${SettingsStrings.bellyLabel})',
+            5,
+          ),
+          _PhaseStep(
+            _PhaseType.exhale,
+            '${SettingsStrings.slowLabel} ${SettingsStrings.exhaleLabel}',
+            5,
+          ),
         ];
       case BreathingExerciseType.pacedBreathing:
-        return const [
-          _PhaseStep(_PhaseType.inhale, 'Inhale', 5),
-          _PhaseStep(_PhaseType.exhale, 'Exhale', 5),
+        return [
+          _PhaseStep(_PhaseType.inhale, SettingsStrings.inhaleLabel, 5),
+          _PhaseStep(_PhaseType.exhale, SettingsStrings.exhaleLabel, 5),
         ];
       case BreathingExerciseType.resonance:
-        return const [
-          _PhaseStep(_PhaseType.inhale, 'Inhale', 5),
-          _PhaseStep(_PhaseType.exhale, 'Exhale', 5),
+        return [
+          _PhaseStep(_PhaseType.inhale, SettingsStrings.inhaleLabel, 5),
+          _PhaseStep(_PhaseType.exhale, SettingsStrings.exhaleLabel, 5),
         ];
     }
   }
@@ -115,15 +123,20 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
     final totalSeconds = widget.exercise.durationMinutes * 60;
     final progress = totalSeconds == 0 ? 0.0 : _elapsedSeconds / totalSeconds;
 
+    // Get localized exercise details
+    final localizedTitle = widget.exercise.type.localizedTitle;
+    final localizedDescription = widget.exercise.type.localizedDescription;
+    final localizedSteps = widget.exercise.type.localizedSteps;
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(title: Text(widget.exercise.title), centerTitle: true),
+      appBar: AppBar(title: Text(localizedTitle), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             Text(
-              widget.exercise.description,
+              localizedDescription,
               textAlign: TextAlign.center,
               style: AppStyles.bodyMedium.copyWith(
                 color: colorScheme.onSurfaceVariant,
@@ -181,7 +194,7 @@ class _BreathingExerciseScreenState extends State<BreathingExerciseScreen> {
             ),
             const SizedBox(height: 28),
             Text(
-              widget.exercise.steps.join('\n'),
+              localizedSteps.join('\n'),
               textAlign: TextAlign.center,
               style: AppStyles.bodyMedium.copyWith(
                 color: colorScheme.onSurfaceVariant,

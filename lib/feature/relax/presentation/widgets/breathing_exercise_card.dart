@@ -18,6 +18,12 @@ class BreathingExerciseCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Get localized exercise details
+    final localizedTitle = exercise.type.localizedTitle;
+    final localizedDescription = exercise.type.localizedDescription;
+    final localizedRecommendedFor = exercise.type.localizedRecommendedFor;
+    final localizedSteps = exercise.type.localizedSteps;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -45,14 +51,14 @@ class BreathingExerciseCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        exercise.title,
+                        localizedTitle,
                         style: AppStyles.bodyMedium.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${exercise.durationMinutes} min • ${exercise.recommendedFor}',
+                        '${exercise.durationMinutes} ${SettingsStrings.minuteAbbreviation} • $localizedRecommendedFor',
                         style: AppStyles.bodySmall.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -64,7 +70,7 @@ class BreathingExerciseCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              exercise.description,
+              localizedDescription,
               style: AppStyles.bodySmall.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -73,7 +79,7 @@ class BreathingExerciseCard extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: exercise.steps
+              children: localizedSteps
                   .map(
                     (step) => Chip(
                       label: Text(step),
