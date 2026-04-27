@@ -60,7 +60,12 @@ class AppRouter {
       case MyRoutes.firstHomeScreen:
         return MaterialPageRoute(builder: (_) => const FirstHomeScreen());
       case MyRoutes.verifyAccountScreen:
-        return MaterialPageRoute(builder: (_) => const VerifyAccountScreen());
+        final email = settings.arguments is String
+            ? settings.arguments as String
+            : '';
+        return MaterialPageRoute(
+          builder: (_) => VerifyAccountScreen(email: email),
+        );
       case MyRoutes.authInfoScreens:
         return MaterialPageRoute(builder: (_) => const AuthInfoScreen());
       case MyRoutes.emailChangeScreen:

@@ -1,7 +1,9 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/widget/custom_button.dart';
+import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PasswordChangeScreen extends StatefulWidget {
   const PasswordChangeScreen({super.key});
@@ -196,15 +198,52 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
     });
 
     try {
-      // Show message that feature is being prepared
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(SettingsStrings.passwordChangePreparing)),
+      final authCubit = context.read<AuthCubit>();
+      final authState = authCubit.state;
+
+      String? email;
+      if (authState is AuthLoaded) {
+        email = authState.user.email;
+      } else if (authState is AuthProfileUpdated) {
+        email = authState.user.email;
+      }
+
+      if (email == null || email.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(SettingsStrings.couldNotRetrieveUserEmail)),
+          );
+        }
+        return;
+      }
+
+      final success = await authCubit.changePassword(
+        email: email,
+        currentPassword: _oldPasswordController.text,
+        newPassword: _newPasswordController.text,
       );
 
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? SettingsStrings.passwordChanged
+                  : SettingsStrings.invalidOldPassword,
+            ),
+          ),
+        );
+
+        if (success) {
+          Navigator.pop(context);
+        }
       }
     } catch (e) {
       if (!mounted) return;

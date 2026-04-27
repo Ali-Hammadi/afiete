@@ -36,6 +36,13 @@ class _SignupScreenState extends State<SignupScreen> {
         listener: (context, state) {
           if (state is AuthLoaded) {
             Navigator.pushNamed(context, MyRoutes.authInfoScreens);
+          } else if (state is WaitingForOtpVerification) {
+            // Auto-navigate to OTP verification screen when account not verified
+            Navigator.pushNamed(
+              context,
+              MyRoutes.verifyAccountScreen,
+              arguments: state.email,
+            );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(
               context,

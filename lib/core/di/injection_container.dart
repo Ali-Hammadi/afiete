@@ -6,7 +6,6 @@ import 'package:afiete/feature/assignments/domain/repositories/assignments_repos
 import 'package:afiete/feature/assignments/domain/usecase/get_assignment_questions_usecase.dart';
 import 'package:afiete/feature/assignments/domain/usecase/submit_assignment_usecase.dart';
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
-import 'package:afiete/feature/auth/data/datasources/auth_mock_datasource.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
@@ -107,7 +106,6 @@ import 'package:dio/dio.dart';
 
 final sl = GetIt.instance;
 const bool useMockDataSources = true;
-const bool useMockAuthDataSource = false;
 
 Future<void> init() async {
   // Core network
@@ -115,9 +113,7 @@ Future<void> init() async {
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => useMockAuthDataSource
-        ? AuthMockDataSourceImpl()
-        : AuthRemoteDataSourceImpl(dio: sl<Dio>()),
+    () => AuthRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
   // Repositories
@@ -162,6 +158,7 @@ Future<void> init() async {
       sl<UpdateProfileInfoUseCase>(),
       sl<RequestEmailChangeOtpUseCase>(),
       sl<ConfirmEmailChangeUseCase>(),
+      sl<AuthRepository>(),
     ),
   );
 

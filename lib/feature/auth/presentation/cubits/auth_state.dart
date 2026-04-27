@@ -41,3 +41,13 @@ class AuthError extends AuthState {
   @override
   List<Object> get props => [message];
 }
+
+class WaitingForOtpVerification extends AuthState {
+  final String email;
+
+  const WaitingForOtpVerification(this.email);
+
+  @override
+  List<Object> get props => [email];
+}
+

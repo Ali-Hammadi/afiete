@@ -33,4 +33,16 @@ abstract class AuthRepository {
     required String newEmail,
     required String otp,
   });
+
+  Future<Either<Failure, String>> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  Future<Either<Failure, String>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  });
 }

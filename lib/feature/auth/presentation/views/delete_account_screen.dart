@@ -12,6 +12,7 @@ class DeleteAccountScreen extends StatefulWidget {
 }
 
 class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -19,6 +20,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   @override
   void dispose() {
+    _emailController.dispose();
     _confirmController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -87,6 +89,23 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             _buildDeleteItem(SettingsStrings.deleteItemSessionHistory),
             _buildDeleteItem(SettingsStrings.deleteItemAllData),
             const SizedBox(height: 32),
+            Text(
+              SettingsStrings.emailAddressLabel,
+              style: AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                hintText: SettingsStrings.forgotEmailHint,
+                prefixIcon: const Icon(Icons.email_outlined),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             Text(
               SettingsStrings.confirmPassword,
               style: AppStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
@@ -197,6 +216,16 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   }
 
   Future<void> _handleDeleteAccount() async {
+    final emailInput = _emailController.text.trim();
+    if (emailInput.isEmpty || !emailInput.contains('@')) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(SettingsStrings.invalidEmailError)),
+        );
+      }
+      return;
+    }
+
     if (_passwordController.text.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -237,28 +266,22 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     });
 
     try {
-      final authState = authCubit.state;
+      final success = await authCubit.deleteAccount(
+        emailInput,
+        _passwordController.text,
+      );
 
-      String? email;
-      if (authState is AuthLoaded) {
-        email = authState.user.email;
-      } else if (authState is AuthProfileUpdated) {
-        email = authState.user.email;
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(SettingsStrings.accountDeletedSuccess)),
+        );
+        Navigator.pop(context);
       }
-
-      if (email == null || email.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(SettingsStrings.couldNotRetrieveUserEmail)),
-          );
-        }
-        return;
-      }
-
-      authCubit.deleteAccount(email, _passwordController.text);
     } catch (e) {
       if (!mounted) return;
       setState(() {

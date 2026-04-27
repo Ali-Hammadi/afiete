@@ -20,6 +20,8 @@ abstract class ApiEndpoints {
   static const String updateProfile = '$patients/profile/';
   static const String requestEmailChangeOtp = '$users/otp/resend';
   static const String confirmEmailChange = '$users/otp/verify';
+  static const String changePassword = '$users/password/change/';
+  static const String resetPassword = '$users/password/reset/';
   static const String tokenObtainPair = '$token/';
   static const String tokenRefresh = '$token/refresh/';
   static const String tokenVerify = '$token/verify/';

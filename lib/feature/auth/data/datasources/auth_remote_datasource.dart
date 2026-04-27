@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import '../models/user_model.dart';
 import 'package:afiete/core/network/api_endpoints.dart';
 import 'package:afiete/core/network/token_storage.dart';
@@ -28,9 +30,26 @@ abstract class AuthRemoteDataSource {
     required String newEmail,
     required String otp,
   });
+
+  Future<bool> sendVerificationOtp(String email);
+
+  Future<UserModel> verifyOtp(String email, String code);
+
+  Future<String> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  Future<String> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  static const String _logName = 'AuthRemoteDataSource';
   final Dio _dio;
   late final GoogleSignIn _googleSignIn;
 
@@ -41,40 +60,75 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> login(String email, String password) async {
     try {
-      // Get tokens directly from /api/token/
-      final tokenResponse = await _dio.post<Map<String, dynamic>>(
-        ApiEndpoints.tokenObtainPair,
+      _logInfo('login:start', data: {'email': email});
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
-
-      final accessToken = tokenResponse.data?['access']?.toString() ?? '';
-      final refreshToken = tokenResponse.data?['refresh']?.toString() ?? '';
-
-      if (accessToken.isEmpty || refreshToken.isEmpty) {
-        throw DioException(
-          requestOptions: tokenResponse.requestOptions,
-          response: tokenResponse,
-          error: 'Login failed: missing access or refresh token.',
-        );
-      }
-
-      await TokenStorage.saveTokens(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
+      _logInfo(
+        'login:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
       );
 
+      final data = response.data ?? <String, dynamic>{};
+      final accessToken =
+          data['access']?.toString() ??
+          data['token']?.toString() ??
+          data['access_token']?.toString() ??
+          '';
+      final refreshToken =
+          data['refresh']?.toString() ??
+          data['refresh_token']?.toString() ??
+          '';
+
+      if (accessToken.isNotEmpty && refreshToken.isNotEmpty) {
+        await TokenStorage.saveTokens(
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        );
+        _logInfo('login:token_saved', data: {'type': 'access+refresh'});
+      } else if (accessToken.isNotEmpty) {
+        await TokenStorage.saveToken(accessToken);
+        _logInfo('login:token_saved', data: {'type': 'access_only'});
+      }
+
+      final userData =
+          (data['user'] as Map<String, dynamic>?) ??
+          <String, dynamic>{'email': email, 'nickname': email.split('@').first};
+
       return UserModel(
-        id: email,
-        name: email.split('@').first,
-        email: email,
+        id: (userData['id'] ?? userData['user_id'] ?? email).toString(),
+        name:
+            (userData['name'] ?? userData['nickname'] ?? email.split('@').first)
+                .toString(),
+        email: (userData['email'] ?? email).toString(),
         password: password,
         token: accessToken,
       );
-    } on DioException {
+    } on DioException catch (e) {
+      _logError(
+        'login:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.tokenObtainPair),
+        requestOptions: RequestOptions(path: ApiEndpoints.login),
         error: e.toString(),
       );
     }
@@ -83,7 +137,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> signup(String name, String email, String password) async {
     try {
-      // Register user at /api/patients/register/
+      _logInfo('signup:start', data: {'email': email, 'nickname': name});
       final response = await _dio.post(
         ApiEndpoints.signup,
         data: UserModel.signupRequestBody(
@@ -91,6 +145,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           email: email,
           password: password,
         ),
+      );
+      _logInfo(
+        'signup:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -101,36 +159,33 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
 
-      // Get tokens from /api/token/ after successful registration
-      final tokenResponse = await _dio.post<Map<String, dynamic>>(
-        ApiEndpoints.tokenObtainPair,
-        data: {'email': email, 'password': password},
-      );
-
-      final accessToken = tokenResponse.data?['access']?.toString() ?? '';
-      final refreshToken = tokenResponse.data?['refresh']?.toString() ?? '';
-
-      if (accessToken.isEmpty || refreshToken.isEmpty) {
-        throw DioException(
-          requestOptions: tokenResponse.requestOptions,
-          response: tokenResponse,
-          error: 'Failed to obtain tokens after signup',
-        );
-      }
-
-      await TokenStorage.saveTokens(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      );
-
       return UserModel(
         id: email,
         name: name,
         email: email,
         password: password,
-        token: accessToken,
+        token: '',
       );
-    } on DioException {
+    } on DioException catch (e) {
+      _logError(
+        'signup:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
       rethrow;
     } catch (e) {
       throw DioException(
@@ -143,7 +198,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> logout(String email, String password) async {
     try {
+      _logInfo('logout:start', data: {'email': email});
       await TokenStorage.clearTokens();
+      _logInfo('logout:success', data: {'email': email});
       return UserModel(
         id: email,
         name: 'Logged Out',
@@ -163,18 +220,69 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> deleteAccount(String email, String password) async {
-    throw DioException(
-      requestOptions: RequestOptions(path: ApiEndpoints.deleteAccount),
-      error:
-          'Delete account endpoint is not available in the current backend schema.',
-    );
+    try {
+      _logInfo('delete_account:start', data: {'email': email});
+      final response = await _dio.post(
+        ApiEndpoints.deleteAccount,
+        data: {'email': email, 'password': password},
+      );
+      _logInfo(
+        'delete_account:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        await TokenStorage.clearTokens();
+        return UserModel(
+          id: email,
+          name: 'Deleted User',
+          email: email,
+          password: '',
+          token: '',
+        );
+      }
+
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Delete account failed',
+      );
+    } on DioException catch (e) {
+      _logError(
+        'delete_account:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.deleteAccount),
+        error: e.toString(),
+      );
+    }
   }
 
   @override
   Future<UserModel> googleSignIn() async {
     try {
+      _logInfo('google_sign_in:start');
       final account = await _googleSignIn.signIn();
       if (account == null) {
+        _logError('google_sign_in:cancelled');
         throw Exception('Google Sign-In cancelled');
       }
       final auth = await account.authentication;
@@ -182,10 +290,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiEndpoints.googleLogin,
         data: {'id_token': auth.idToken},
       );
+      _logInfo(
+        'google_sign_in:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
       if (response.statusCode == 200) {
         final user = _resolveUserFromAuthResponse(response.data);
         if (user.token.isNotEmpty) {
           await TokenStorage.saveToken(user.token);
+          _logInfo('google_sign_in:token_saved');
         }
         return user;
       } else {
@@ -196,6 +309,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
     } on DioException catch (e) {
+      _logError(
+        'google_sign_in:failed',
+        error: {
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
       if (e.response?.statusCode == 404) {
         throw DioException(
           requestOptions: e.requestOptions,
@@ -223,6 +344,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String phoneNumber,
   }) async {
     try {
+      _logInfo(
+        'update_profile:start',
+        data: {
+          'userId': userId,
+          'name': name,
+          'birthDate': birthDate.toIso8601String(),
+          'gender': gender,
+          'phoneNumber': phoneNumber,
+        },
+      );
       final response = await _dio.patch(
         ApiEndpoints.updateProfile,
         data: {
@@ -232,6 +363,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             'phone': phoneNumber,
           },
         },
+      );
+      _logInfo(
+        'update_profile:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
       );
       if (response.statusCode == 200) {
         final accessToken = await TokenStorage.getAccessToken();
@@ -274,11 +409,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String newEmail,
   }) async {
     try {
+      _logInfo('request_email_otp:start', data: {'newEmail': newEmail});
       final response = await _dio.post(
         ApiEndpoints.requestEmailChangeOtp,
         data: {'email': newEmail},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
+        _logInfo(
+          'request_email_otp:success',
+          data: {'statusCode': response.statusCode, 'body': response.data},
+        );
         return _extractMessage(response.data) ?? 'OTP sent successfully.';
       }
       throw DioException(
@@ -287,6 +427,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         error: 'Failed to request email OTP',
       );
     } on DioException catch (e) {
+      _logError(
+        'request_email_otp:failed',
+        error: {
+          'newEmail': newEmail,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
       final message = _extractMessage(e.response?.data);
       if (e.response?.statusCode == 400 &&
           message == 'User with this email does not exist') {
@@ -318,9 +467,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String otp,
   }) async {
     try {
+      _logInfo(
+        'confirm_email_change:start',
+        data: {'userId': userId, 'newEmail': newEmail, 'otpLength': otp.length},
+      );
       final response = await _dio.post(
         ApiEndpoints.confirmEmailChange,
         data: {'email': newEmail, 'code': otp},
+      );
+      _logInfo(
+        'confirm_email_change:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
       );
       if (response.statusCode == 200) {
         final accessToken = await TokenStorage.getAccessToken();
@@ -338,6 +495,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         error: 'Email confirmation failed',
       );
     } on DioException catch (e) {
+      _logError(
+        'confirm_email_change:failed',
+        error: {
+          'newEmail': newEmail,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
       final message = _extractMessage(e.response?.data);
       if (e.response?.statusCode == 400 && message == 'Invalid OTP or email') {
         throw DioException(
@@ -359,6 +525,252 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  @override
+  Future<bool> sendVerificationOtp(String email) async {
+    try {
+      _logInfo('send_verification_otp:start', data: {'email': email});
+      final response = await _dio.post(
+        ApiEndpoints.requestEmailChangeOtp,
+        data: {'email': email},
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _logInfo(
+          'send_verification_otp:success',
+          data: {'statusCode': response.statusCode, 'body': response.data},
+        );
+        return true;
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Failed to send verification OTP',
+      );
+    } on DioException catch (e) {
+      _logError(
+        'send_verification_otp:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(
+          path: ApiEndpoints.requestEmailChangeOtp,
+        ),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<UserModel> verifyOtp(String email, String code) async {
+    try {
+      _logInfo(
+        'verify_otp:start',
+        data: {'email': email, 'codeLength': code.length},
+      );
+      final response = await _dio.post(
+        ApiEndpoints.confirmEmailChange,
+        data: {'email': email, 'code': code},
+      );
+      _logInfo(
+        'verify_otp:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
+      if (response.statusCode == 200) {
+        final data = response.data ?? <String, dynamic>{};
+        final accessToken =
+            data['access']?.toString() ??
+            data['token']?.toString() ??
+            data['access_token']?.toString() ??
+            '';
+        final refreshToken =
+            data['refresh']?.toString() ??
+            data['refresh_token']?.toString() ??
+            '';
+
+        if (accessToken.isNotEmpty && refreshToken.isNotEmpty) {
+          await TokenStorage.saveTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          );
+          _logInfo('verify_otp:token_saved', data: {'type': 'access+refresh'});
+        } else if (accessToken.isNotEmpty) {
+          await TokenStorage.saveToken(accessToken);
+          _logInfo('verify_otp:token_saved', data: {'type': 'access_only'});
+        }
+
+        final userData =
+            (data['user'] as Map<String, dynamic>?) ??
+            <String, dynamic>{
+              'email': email,
+              'nickname': email.split('@').first,
+            };
+
+        return UserModel(
+          id: (userData['id'] ?? userData['user_id'] ?? email).toString(),
+          name:
+              (userData['name'] ??
+                      userData['nickname'] ??
+                      email.split('@').first)
+                  .toString(),
+          email: (userData['email'] ?? email).toString(),
+          password: '',
+          token: accessToken,
+        );
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'OTP verification failed',
+      );
+    } on DioException catch (e) {
+      _logError(
+        'verify_otp:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.confirmEmailChange),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<String> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      _logInfo('change_password:start', data: {'email': email});
+      final response = await _dio.post(
+        ApiEndpoints.changePassword,
+        data: {
+          'email': email,
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+      );
+      _logInfo(
+        'change_password:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return _extractMessage(response.data) ?? 'Password changed successfully.';
+      }
+
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Password change failed',
+      );
+    } on DioException catch (e) {
+      _logError(
+        'change_password:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.changePassword),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<String> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      _logInfo('reset_password:start', data: {'email': email});
+      final response = await _dio.post(
+        ApiEndpoints.resetPassword,
+        data: {'email': email, 'otp': otp, 'new_password': newPassword},
+      );
+      _logInfo(
+        'reset_password:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return _extractMessage(response.data) ?? 'Password reset successfully.';
+      }
+
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Password reset failed',
+      );
+    } on DioException catch (e) {
+      _logError(
+        'reset_password:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.resetPassword),
+        error: e.toString(),
+      );
+    }
+  }
+
   UserModel _resolveUserFromAuthResponse(dynamic responseData) {
     final dataMap = responseData as Map<String, dynamic>;
     final userJson =
@@ -373,6 +785,56 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return UserModel.fromJson(userJson);
   }
 
+  void _logInfo(String message, {Object? data}) {
+    developer.log(
+      data == null
+          ? message
+          : '$message | ${_shorten(_sanitize(data).toString())}',
+      name: _logName,
+    );
+  }
+
+  void _logError(String message, {Object? error, StackTrace? stackTrace}) {
+    developer.log(
+      error == null
+          ? message
+          : '$message | ${_shorten(_sanitize(error).toString())}',
+      name: _logName,
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
+  dynamic _sanitize(dynamic value) {
+    if (value is Map) {
+      final output = <String, dynamic>{};
+      value.forEach((key, val) {
+        final normalizedKey = key.toString().toLowerCase();
+        if (normalizedKey.contains('password') ||
+            normalizedKey.contains('token') ||
+            normalizedKey == 'id_token' ||
+            normalizedKey == 'code') {
+          output[key.toString()] = '***';
+        } else {
+          output[key.toString()] = _sanitize(val);
+        }
+      });
+      return output;
+    }
+    if (value is List) {
+      return value.map(_sanitize).toList();
+    }
+    return value;
+  }
+
+  String _shorten(String input) {
+    const max = 600;
+    if (input.length <= max) {
+      return input;
+    }
+    return '${input.substring(0, max)}...';
+  }
+
   String? _extractMessage(dynamic data) {
     if (data is Map<String, dynamic>) {
       final message = data['message']?.toString();
@@ -380,12 +842,44 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return message;
       }
 
-      for (final value in data.values) {
-        if (value is List && value.isNotEmpty) {
-          return value.first.toString();
-        }
+      final detail = data['detail']?.toString();
+      if (detail != null && detail.isNotEmpty) {
+        return detail;
       }
     }
-    return null;
+    return _extractFirstText(data);
+  }
+
+  String? _extractFirstText(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value is String) {
+      final text = value.trim();
+      return text.isEmpty ? null : text;
+    }
+
+    if (value is List) {
+      for (final item in value) {
+        final found = _extractFirstText(item);
+        if (found != null && found.isNotEmpty) {
+          return found;
+        }
+      }
+      return null;
+    }
+
+    if (value is Map) {
+      for (final entryValue in value.values) {
+        final found = _extractFirstText(entryValue);
+        if (found != null && found.isNotEmpty) {
+          return found;
+        }
+      }
+      return null;
+    }
+
+    return value.toString();
   }
 }

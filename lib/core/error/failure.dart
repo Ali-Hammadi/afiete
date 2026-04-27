@@ -49,19 +49,50 @@ class ServerFailure extends Failure {
   }
 
   factory ServerFailure.fromResponse(int? statusCode, dynamic response) {
-    final error = response?['error'];
-    final code = error?['code'] ?? '';
+    String? extractedMessage;
+    String code = '';
+
+    if (response is Map<String, dynamic>) {
+      final error = response['error'];
+      if (error is Map<String, dynamic>) {
+        extractedMessage = error['message']?.toString();
+        code = error['code']?.toString() ?? '';
+      }
+
+      extractedMessage ??= response['detail']?.toString();
+      extractedMessage ??= response['message']?.toString();
+
+      final nonFieldErrors = response['non_field_errors'];
+      if (extractedMessage == null &&
+          nonFieldErrors is List &&
+          nonFieldErrors.isNotEmpty) {
+        extractedMessage = nonFieldErrors.first.toString();
+      }
+
+      if (extractedMessage == null) {
+        for (final value in response.values) {
+          if (value is List && value.isNotEmpty) {
+            extractedMessage = value.first.toString();
+            break;
+          }
+        }
+      }
+    }
 
     if (statusCode == 400 || statusCode == 401 || statusCode == 403) {
-      return ServerFailure(error?['message'] ?? "Authentication error");
+      return ServerFailure(extractedMessage ?? "Authentication error");
     } else if (statusCode == 404) {
       return ServerFailure(
-        "$code Your request was not found, please try again",
+        "${code.isNotEmpty ? '$code ' : ''}Your request was not found, please try again",
       );
     } else if (statusCode == 500) {
-      return ServerFailure("$code Internal server error, please try later");
+      return ServerFailure(
+        "${code.isNotEmpty ? '$code ' : ''}Internal server error, please try later",
+      );
     } else {
-      return ServerFailure("Ops there was an error, please try again");
+      return ServerFailure(
+        extractedMessage ?? "Ops there was an error, please try again",
+      );
     }
   }
 }

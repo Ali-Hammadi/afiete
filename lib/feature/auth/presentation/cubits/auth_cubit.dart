@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
@@ -8,11 +10,13 @@ import '../../domain/usecase/login_usecase.dart';
 import '../../domain/usecase/signup_usecase.dart';
 import '../../domain/usecase/google_signin_usecase.dart';
 import '../../domain/usecase/update_profile_info_usecase.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../domain/entities/auth_user_entity.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
+  static const String _logName = 'AuthCubit';
   final LoginUseCase loginUseCase;
   final SignupUseCase signupUseCase;
   final LogoutUseCase logoutUseCase;
@@ -21,6 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
   final UpdateProfileInfoUseCase updateProfileInfoUseCase;
   final RequestEmailChangeOtpUseCase requestEmailChangeOtpUseCase;
   final ConfirmEmailChangeUseCase confirmEmailChangeUseCase;
+  final AuthRepository authRepository;
 
   AuthCubit(
     this.loginUseCase,
@@ -31,58 +36,108 @@ class AuthCubit extends Cubit<AuthState> {
     this.updateProfileInfoUseCase,
     this.requestEmailChangeOtpUseCase,
     this.confirmEmailChangeUseCase,
+    this.authRepository,
   ) : super(AuthInitial());
 
   Future<void> login(String email, String password) async {
+    _log('login:start', data: {'email': email});
     emit(AuthLoading());
     final result = await loginUseCase(
       LoginParams(email: email, password: password),
     );
     result.fold(
-      (failure) => emit(AuthError(failure.errorMessage)),
-      (user) => emit(AuthLoaded(user)),
+      (failure) {
+        _log('login:error', data: {'message': failure.errorMessage});
+        emit(AuthError(failure.errorMessage));
+      },
+      (user) {
+        _log('login:success', data: {'userId': user.id, 'email': user.email});
+        emit(AuthLoaded(user));
+      },
     );
   }
 
   Future<void> signup(String name, String email, String password) async {
+    _log('signup:start', data: {'email': email, 'name': name});
     emit(AuthLoading());
     final result = await signupUseCase(
       SignupParams(name: name, email: email, password: password),
     );
     result.fold(
-      (failure) => emit(AuthError(failure.errorMessage)),
-      (user) => emit(AuthLoaded(user)),
+      (failure) {
+        _log('signup:error', data: {'message': failure.errorMessage});
+        // Auto-trigger OTP verification if account is not verified
+        if (_isNotVerifiedError(failure.errorMessage)) {
+          _log('signup:auto_trigger_otp', data: {'email': email});
+          return sendVerificationOtp(email);
+        } else {
+          emit(AuthError(failure.errorMessage));
+        }
+      },
+      (user) {
+        _log('signup:success', data: {'userId': user.id, 'email': user.email});
+        emit(AuthLoaded(user));
+      },
     );
   }
 
   Future<void> logout(String email, String password) async {
+    _log('logout:start', data: {'email': email});
     emit(AuthLoading());
     final result = await logoutUseCase(
       LogoutParams(email: email, password: password),
     );
     result.fold(
-      (failure) => emit(AuthError(failure.errorMessage)),
-      (user) => emit(AuthLoaded(user)),
+      (failure) {
+        _log('logout:error', data: {'message': failure.errorMessage});
+        emit(AuthError(failure.errorMessage));
+      },
+      (user) {
+        _log('logout:success', data: {'userId': user.id, 'email': user.email});
+        emit(AuthLoaded(user));
+      },
     );
   }
 
-  Future<void> deleteAccount(String email, String password) async {
+  Future<bool> deleteAccount(String email, String password) async {
+    _log('delete_account:start', data: {'email': email});
     emit(AuthLoading());
     final result = await deleteAccountUseCase(
       DeleteAccountParams(email: email, password: password),
     );
-    result.fold(
-      (failure) => emit(AuthError(failure.errorMessage)),
-      (user) => emit(AuthLoaded(user)),
+    return result.fold(
+      (failure) {
+        _log('delete_account:error', data: {'message': failure.errorMessage});
+        emit(AuthError(failure.errorMessage));
+        return false;
+      },
+      (user) {
+        _log(
+          'delete_account:success',
+          data: {'userId': user.id, 'email': user.email},
+        );
+        emit(const AuthInitial());
+        return true;
+      },
     );
   }
 
   Future<void> googleSignIn() async {
+    _log('google_sign_in:start');
     emit(AuthLoading());
     final result = await googleSignInUseCase(const GoogleSignInParams());
     result.fold(
-      (failure) => emit(AuthError(failure.errorMessage)),
-      (user) => emit(AuthLoaded(user)),
+      (failure) {
+        _log('google_sign_in:error', data: {'message': failure.errorMessage});
+        emit(AuthError(failure.errorMessage));
+      },
+      (user) {
+        _log(
+          'google_sign_in:success',
+          data: {'userId': user.id, 'email': user.email},
+        );
+        emit(AuthLoaded(user));
+      },
     );
   }
 
@@ -94,6 +149,7 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     final currentState = state;
     if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
+      _log('update_profile:skipped', data: {'reason': 'invalid_state'});
       return false;
     }
 
@@ -112,10 +168,15 @@ class AuthCubit extends Cubit<AuthState> {
 
     return result.fold(
       (failure) {
+        _log('update_profile:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (updatedUser) {
+        _log(
+          'update_profile:success',
+          data: {'userId': updatedUser.id, 'email': updatedUser.email},
+        );
         emit(AuthProfileUpdated(updatedUser));
         return true;
       },
@@ -123,8 +184,10 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<String?> requestEmailChangeOtp({required String newEmail}) async {
+    _log('request_email_otp:start', data: {'newEmail': newEmail});
     final currentState = state;
     if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
+      _log('request_email_otp:skipped', data: {'reason': 'invalid_state'});
       return null;
     }
 
@@ -136,18 +199,30 @@ class AuthCubit extends Cubit<AuthState> {
       RequestEmailChangeOtpParams(userId: existingUser.id, newEmail: newEmail),
     );
 
-    return result.fold((failure) {
-      emit(AuthError(failure.errorMessage));
-      return failure.errorMessage;
-    }, (message) => message);
+    return result.fold(
+      (failure) {
+        _log(
+          'request_email_otp:error',
+          data: {'message': failure.errorMessage},
+        );
+        emit(AuthError(failure.errorMessage));
+        return failure.errorMessage;
+      },
+      (message) {
+        _log('request_email_otp:success', data: {'message': message});
+        return message;
+      },
+    );
   }
 
   Future<bool> confirmEmailChange({
     required String newEmail,
     required String otp,
   }) async {
+    _log('confirm_email_change:start', data: {'newEmail': newEmail});
     final currentState = state;
     if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
+      _log('confirm_email_change:skipped', data: {'reason': 'invalid_state'});
       return false;
     }
 
@@ -165,13 +240,148 @@ class AuthCubit extends Cubit<AuthState> {
 
     return result.fold(
       (failure) {
+        _log(
+          'confirm_email_change:error',
+          data: {'message': failure.errorMessage},
+        );
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (updatedUser) {
+        _log(
+          'confirm_email_change:success',
+          data: {'userId': updatedUser.id, 'email': updatedUser.email},
+        );
         emit(AuthProfileUpdated(updatedUser));
         return true;
       },
     );
+  }
+
+  Future<void> sendVerificationOtp(String email) async {
+    _log('send_verification_otp:start', data: {'email': email});
+    emit(AuthLoading());
+    final result = await requestEmailChangeOtpUseCase(
+      RequestEmailChangeOtpParams(userId: email, newEmail: email),
+    );
+
+    result.fold(
+      (failure) {
+        _log(
+          'send_verification_otp:error',
+          data: {'message': failure.errorMessage},
+        );
+        emit(AuthError(failure.errorMessage));
+      },
+      (message) {
+        _log('send_verification_otp:success', data: {'message': message});
+        emit(WaitingForOtpVerification(email));
+      },
+    );
+  }
+
+  Future<void> verifyOtpCode(String email, String code) async {
+    _log('verify_otp:start', data: {'email': email, 'codeLength': code.length});
+    emit(AuthLoading());
+    final result = await confirmEmailChangeUseCase(
+      ConfirmEmailChangeParams(userId: email, newEmail: email, otp: code),
+    );
+
+    result.fold(
+      (failure) {
+        _log('verify_otp:error', data: {'message': failure.errorMessage});
+        emit(AuthError(failure.errorMessage));
+      },
+      (user) {
+        _log(
+          'verify_otp:success',
+          data: {'userId': user.id, 'email': user.email},
+        );
+        emit(AuthLoaded(user));
+      },
+    );
+  }
+
+  Future<bool> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _log('change_password:start', data: {'email': email});
+
+    final result = await authRepository.changePassword(
+      email: email,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+
+    return result.fold(
+      (failure) {
+        _log('change_password:error', data: {'message': failure.errorMessage});
+        emit(AuthError(failure.errorMessage));
+        return false;
+      },
+      (message) {
+        _log('change_password:success', data: {'message': message});
+        return true;
+      },
+    );
+  }
+
+  Future<String?> requestForgotPasswordOtp({required String email}) async {
+    _log('forgot_password_otp:start', data: {'email': email});
+    final result = await requestEmailChangeOtpUseCase(
+      RequestEmailChangeOtpParams(userId: email, newEmail: email),
+    );
+
+    return result.fold(
+      (failure) {
+        _log(
+          'forgot_password_otp:error',
+          data: {'message': failure.errorMessage},
+        );
+        emit(AuthError(failure.errorMessage));
+        return failure.errorMessage;
+      },
+      (message) {
+        _log('forgot_password_otp:success', data: {'message': message});
+        return null;
+      },
+    );
+  }
+
+  Future<bool> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    _log('reset_password:start', data: {'email': email});
+
+    final result = await authRepository.resetPassword(
+      email: email,
+      otp: otp,
+      newPassword: newPassword,
+    );
+
+    return result.fold(
+      (failure) {
+        _log('reset_password:error', data: {'message': failure.errorMessage});
+        emit(AuthError(failure.errorMessage));
+        return false;
+      },
+      (message) {
+        _log('reset_password:success', data: {'message': message});
+        return true;
+      },
+    );
+  }
+
+  bool _isNotVerifiedError(String errorMessage) {
+    return errorMessage.toLowerCase().contains('not verified') ||
+        errorMessage.toLowerCase().contains('verify your account');
+  }
+
+  void _log(String message, {Map<String, dynamic>? data}) {
+    developer.log(data == null ? message : '$message | $data', name: _logName);
   }
 }
