@@ -32,9 +32,11 @@ abstract class ApiEndpoints {
   // Articles endpoints
   static const String allArticles = '$articles/';
   static String articleById(String id) => '$articles/$id/';
-  static String articlesByDoctor(String doctorId) => '$doctors/$doctorId/articles/';
+  static String articlesByDoctor(String doctorId) =>
+      '$doctors/$doctorId/articles/';
   static String articleLike(String articleId) => '$articles/$articleId/like/';
-  static String articleDislike(String articleId) => '$articles/$articleId/dislike/';
+  static String articleDislike(String articleId) =>
+      '$articles/$articleId/dislike/';
 
   // Articles query/body keys for doctor linkage and filtering
   static const String keyDoctor = 'doctor';

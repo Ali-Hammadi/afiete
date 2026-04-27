@@ -679,7 +679,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return _extractMessage(response.data) ?? 'Password changed successfully.';
+        return _extractMessage(response.data) ??
+            'Password changed successfully.';
       }
 
       throw DioException(

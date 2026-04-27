@@ -250,9 +250,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
 
     if (_newPasswordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(SettingsStrings.passwordMismatch)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(SettingsStrings.passwordMismatch)));
       return;
     }
 
