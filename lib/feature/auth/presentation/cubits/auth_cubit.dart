@@ -175,6 +175,46 @@ class AuthCubit extends Cubit<AuthState> {
     result.fold(
       (failure) {
         _log('google_sign_in:error', data: {'message': failure.errorMessage});
+
+        final msg = failure.errorMessage.toLowerCase();
+
+        // Specific handling for common Google Sign-In plugin errors
+        if (msg.contains('id_token') || msg.contains('id token')) {
+          emit(
+            const AuthError(
+              'Google Sign-In failed: id_token is missing. Please ensure you provide the OAuth Web Client ID in the app settings.',
+            ),
+          );
+          return;
+        }
+
+        if (msg.contains('apiexception: 10') ||
+            msg.contains(': 10') ||
+            msg.contains('developer_error')) {
+          emit(
+            const AuthError(
+              'Google Sign-In failed: Configuration error (ApiException 10). Ensure your Android OAuth client is configured in Google Cloud Console with the correct package name and SHA-1 fingerprint.',
+            ),
+          );
+          return;
+        }
+
+        if (msg.contains('sign_in_cancelled') ||
+            msg.contains('cancelled') ||
+            msg.contains('cancel')) {
+          emit(
+            const AuthError('Google Sign-In was cancelled.'),
+          );
+          return;
+        }
+
+        if (msg.contains('play services') || msg.contains('google play')) {
+          emit(
+            const AuthError('Please ensure Google Play Services is available on your device.'),
+          );
+          return;
+        }
+
         if (_isAlreadyVerifiedError(failure.errorMessage)) {
           emit(
             const AuthError(
@@ -183,6 +223,8 @@ class AuthCubit extends Cubit<AuthState> {
           );
           return;
         }
+
+        // Fallback: show server-provided or generic message
         emit(AuthError(failure.errorMessage));
       },
       (user) {

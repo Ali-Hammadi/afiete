@@ -27,7 +27,9 @@ abstract class ApiEndpoints {
   static const String logout = '$auth/logout';
   // Backend provided delete account path
   static const String deleteAccount = '$users/account/delete/';
-  static const String googleLogin = '$auth/google-login';
+  // Backend Google auth endpoint used for sign-in / registration with Google.
+  // Points to `/api/patients/google/auth/` as requested by backend team.
+  static const String googleLogin = '$patients/google/auth/';
   static const String updateProfile = '$patients/profile/';
   // OTP endpoints (present in OpenAPI)
   static const String requestEmailChangeOtp = '$users/otp/resend';
@@ -46,14 +48,14 @@ abstract class ApiEndpoints {
   static const String tokenRefresh = '$token/refresh/';
   static const String tokenVerify = '$token/verify/';
 
-    // Auth request keys
-    static const String keyEmail = 'email';
-    static const String keyPassword = 'password';
-    static const String keyCurrentPassword = 'current_password';
-    static const String keyNewPassword = 'new_password';
-    static const String keyOtp = 'otp';
-    static const String keyCode = 'code';
-    static const String keyIdToken = 'id_token';
+  // Auth request keys
+  static const String keyEmail = 'email';
+  static const String keyPassword = 'password';
+  static const String keyCurrentPassword = 'current_password';
+  static const String keyNewPassword = 'new_password';
+  static const String keyOtp = 'otp';
+  static const String keyCode = 'code';
+  static const String keyIdToken = 'id_token';
 
   static const String allDoctors = doctors;
   static String doctorById(String id) => '$doctors/$id';

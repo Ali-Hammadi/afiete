@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
@@ -150,6 +151,13 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(remoteUser.toEntity());
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));
+    } on PlatformException catch (e) {
+      final message = e.message ?? e.toString();
+      return Left(
+        ServerFailure(
+          'Google Sign-In failed: $message. Please check Google OAuth configuration (package name, SHA-1) and ensure Google Play Services are available.',
+        ),
+      );
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

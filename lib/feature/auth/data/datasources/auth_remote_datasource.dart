@@ -1,5 +1,7 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/services.dart';
+
 import '../models/user_model.dart';
 import 'package:afiete/core/network/api_endpoints.dart';
 import 'package:afiete/core/network/token_storage.dart';
@@ -54,9 +56,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio _dio;
   late final GoogleSignIn _googleSignIn;
 
-  AuthRemoteDataSourceImpl({required Dio dio})
+  /// [serverClientId] is the OAuth 2.0 Web client ID for your backend.
+  /// Provide it to enable returning an `idToken` on Android/iOS.
+  AuthRemoteDataSourceImpl({required Dio dio, String? serverClientId})
     : _dio = dio,
-      _googleSignIn = GoogleSignIn();
+      _googleSignIn = serverClientId != null
+          ? GoogleSignIn(
+              scopes: ['email', 'profile'],
+              serverClientId: serverClientId,
+            )
+          : GoogleSignIn();
 
   @override
   Future<UserModel> login(String email, String password) async {
@@ -303,6 +312,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw Exception('Google Sign-In cancelled');
       }
       final auth = await account.authentication;
+      if (auth.idToken == null || auth.idToken!.isEmpty) {
+        _logError(
+          'google_sign_in:id_token_missing',
+          error: 'idToken is null — configure GoogleSignIn with serverClientId',
+        );
+        throw DioException(
+          requestOptions: RequestOptions(path: ApiEndpoints.googleLogin),
+          error:
+              'Google id_token is missing. Make sure you provide your OAuth Web client ID as `serverClientId` when creating GoogleSignIn so the plugin returns an id_token.',
+        );
+      }
+
       final response = await _dio.post(
         ApiEndpoints.googleLogin,
         data: {ApiEndpoints.keyIdToken: auth.idToken},
@@ -344,6 +365,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
       rethrow;
+    } on PlatformException catch (e) {
+      // Handle Google plugin errors (e.g., ApiException: 10 from Android)
+      _logError(
+        'google_sign_in:platform_error',
+        error: {'code': e.code, 'message': e.message, 'details': e.details},
+      );
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.googleLogin),
+        error: e.message ?? e.code,
+      );
     } catch (e) {
       throw DioException(
         requestOptions: RequestOptions(path: ApiEndpoints.googleLogin),
