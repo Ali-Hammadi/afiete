@@ -5,6 +5,7 @@ import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/settings/presentation/widgets/info_row.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileInfoScreen extends StatefulWidget {
@@ -23,6 +24,8 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  final TextEditingController _phoneController = TextEditingController();
+
   DateTime _selectedBirthDate = DateTime.now();
   String _selectedGender = _genderMale;
   bool _isInitialized = false;
@@ -35,6 +38,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     final user = _currentUser;
     _nameController.text = user?.name ?? '';
     _emailController.text = user?.email ?? '';
+    _phoneController.text = user?.phoneNumber ?? '';
     _selectedBirthDate = user?.birthDate ?? DateTime.now();
     _selectedGender = _normalizeGenderValue(user?.gender);
     _isInitialized = true;
@@ -56,6 +60,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -64,8 +69,8 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final user = _currentUser;
-    final displayId = user?.id.isNotEmpty == true ? user!.id : '1253465';
-    final displayAge = user?.age ?? 24;
+    final displayId = user?.username.isNotEmpty == true ? user!.username : '';
+    final displayAge = user?.age ?? 0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -110,16 +115,33 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                           style: AppStyles.headingSmall,
                         ),
                         const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(displayId, style: AppStyles.bodyLarge),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.copy_outlined,
-                              size: 18,
-                              color: colorScheme.primary,
+                        Text(
+                          SettingsStrings.usernameLabel,
+                          style: AppStyles.bodySmall.copyWith(
+                            color: colorScheme.onSurface.withValues(
+                              alpha: 0.65,
                             ),
-                          ],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        InkWell(
+                          onTap: () => _copyUsername(context, displayId),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(displayId, style: AppStyles.bodyLarge),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  Icons.copy_outlined,
+                                  size: 18,
+                                  color: colorScheme.primary,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -226,6 +248,21 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 },
               ),
               const SizedBox(height: 18),
+              _buildField(
+                controller: _phoneController,
+                label: SettingsStrings.phoneTitleProfile,
+                icon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value != null && value.isNotEmpty) {
+                    if (value.length < 9) {
+                      return SettingsStrings.invalidPhoneNumber;
+                    }
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 18),
               Row(
                 children: [
                   Icon(
@@ -275,6 +312,17 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               ),
               const SizedBox(height: 20),
               CustomInfoRow(
+                icon: Icons.phone,
+                leftText: _phoneController.text.isNotEmpty
+                    ? _phoneController.text
+                    : '—',
+                rightActionText: SettingsStrings.addNumberTitle,
+                onActionPressed: () {
+                  // Could implement phone number change functionality
+                },
+              ),
+              const SizedBox(height: 20),
+              CustomInfoRow(
                 icon: Icons.lock,
                 leftText: '************',
                 rightActionText: SettingsStrings.changePasswordTitle,
@@ -307,6 +355,15 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _copyUsername(BuildContext context, String username) async {
+    if (username.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: username));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${SettingsStrings.usernameLabel} copied')),
     );
   }
 
@@ -375,7 +432,9 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
         name: name,
         birthDate: _selectedBirthDate,
         gender: _selectedGender,
-        phoneNumber: '',
+        phoneNumber: _phoneController.text.trim().isNotEmpty
+            ? _phoneController.text.trim()
+            : null,
       );
 
       if (!mounted || !saved) return;

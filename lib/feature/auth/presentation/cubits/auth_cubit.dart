@@ -18,6 +18,7 @@ part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   static const String _logName = 'AuthCubit';
+  UserAuthEntity? _pendingSignupUser;
   final LoginUseCase loginUseCase;
   final SignupUseCase signupUseCase;
   final LogoutUseCase logoutUseCase;
@@ -67,13 +68,14 @@ class AuthCubit extends Cubit<AuthState> {
           );
           return sendVerificationOtp(user.email);
         }
-        emit(AuthLoaded(user));
+        return _cacheAndEmitUser(user);
       },
     );
   }
 
   Future<void> signup(String name, String email, String password) async {
     _log('signup:start', data: {'email': email, 'name': name});
+    _pendingSignupUser = null;
     emit(AuthLoading());
     final result = await signupUseCase(
       SignupParams(name: name, email: email, password: password),
@@ -94,10 +96,12 @@ class AuthCubit extends Cubit<AuthState> {
         _log('signup:success', data: {'userId': user.id, 'email': user.email});
         // If account is not verified, send OTP instead of loading
         if (!user.isVerified) {
+          _pendingSignupUser = user;
           _log('signup:account_not_verified', data: {'email': user.email});
           return sendVerificationOtp(user.email);
         }
-        emit(AuthLoaded(user));
+        _pendingSignupUser = null;
+        return _cacheAndEmitUser(user);
       },
     );
   }
@@ -114,8 +118,9 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(failure.errorMessage));
         return false;
       },
-      (user) {
+      (user) async {
         _log('logout:success', data: {'userId': user.id, 'email': user.email});
+        await authRepository.clearCachedSession();
         emit(const AuthInitial());
         return true;
       },
@@ -134,11 +139,12 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(failure.errorMessage));
         return false;
       },
-      (user) {
+      (user) async {
         _log(
           'delete_account:success',
           data: {'userId': user.id, 'email': user.email},
         );
+        await authRepository.clearCachedSession();
         emit(const AuthInitial());
         return true;
       },
@@ -159,7 +165,7 @@ class AuthCubit extends Cubit<AuthState> {
           'google_sign_in:success',
           data: {'userId': user.id, 'email': user.email},
         );
-        emit(AuthLoaded(user));
+        return _cacheAndEmitUser(user);
       },
     );
   }
@@ -200,8 +206,7 @@ class AuthCubit extends Cubit<AuthState> {
           'update_profile:success',
           data: {'userId': updatedUser.id, 'email': updatedUser.email},
         );
-        emit(AuthProfileUpdated(updatedUser));
-        return true;
+        return _cacheAndEmitUser(updatedUser, asProfileUpdated: true);
       },
     );
   }
@@ -320,9 +325,53 @@ class AuthCubit extends Cubit<AuthState> {
           'verify_otp:success',
           data: {'userId': user.id, 'email': user.email},
         );
-        emit(AuthLoaded(user.copyWith(isVerified: true)));
+        final mergedUser = _pendingSignupUser == null
+            ? user.copyWith(isVerified: true)
+            : user.copyWith(
+                id: _pendingSignupUser!.id.isNotEmpty
+                    ? _pendingSignupUser!.id
+                    : user.id,
+                username: _pendingSignupUser!.username.isNotEmpty
+                    ? _pendingSignupUser!.username
+                    : user.username,
+                name: _pendingSignupUser!.name.isNotEmpty
+                    ? _pendingSignupUser!.name
+                    : user.name,
+                email: _pendingSignupUser!.email.isNotEmpty
+                    ? _pendingSignupUser!.email
+                    : user.email,
+                password: _pendingSignupUser!.password.isNotEmpty
+                    ? _pendingSignupUser!.password
+                    : user.password,
+                token: user.token,
+                isVerified: true,
+                birthDate: user.birthDate ?? _pendingSignupUser!.birthDate,
+                age: user.age ?? _pendingSignupUser!.age,
+                gender: user.gender ?? _pendingSignupUser!.gender,
+                phoneNumber:
+                    user.phoneNumber ?? _pendingSignupUser!.phoneNumber,
+              );
+        _pendingSignupUser = null;
+        return _cacheAndEmitUser(mergedUser);
       },
     );
+  }
+
+  Future<bool> restoreSession() async {
+    _log('restore_session:start');
+    final cachedUser = await authRepository.getCachedSession();
+    if (cachedUser == null) {
+      _log('restore_session:missing_cache');
+      emit(const AuthInitial());
+      return false;
+    }
+
+    _log(
+      'restore_session:success',
+      data: {'userId': cachedUser.id, 'email': cachedUser.email},
+    );
+    emit(AuthLoaded(cachedUser));
+    return true;
   }
 
   Future<bool> changePassword({
@@ -412,5 +461,18 @@ class AuthCubit extends Cubit<AuthState> {
 
   void _log(String message, {Map<String, dynamic>? data}) {
     developer.log(data == null ? message : '$message | $data', name: _logName);
+  }
+
+  Future<bool> _cacheAndEmitUser(
+    UserAuthEntity user, {
+    bool asProfileUpdated = false,
+  }) async {
+    await authRepository.cacheSession(user);
+    if (asProfileUpdated) {
+      emit(AuthProfileUpdated(user));
+    } else {
+      emit(AuthLoaded(user));
+    }
+    return true;
   }
 }

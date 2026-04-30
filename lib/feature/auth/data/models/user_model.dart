@@ -3,6 +3,7 @@ import '../../domain/entities/auth_user_entity.dart';
 
 class UserModel extends Equatable {
   final String id;
+  final String username;
   final String name;
   final String email;
   final String password;
@@ -15,6 +16,7 @@ class UserModel extends Equatable {
 
   const UserModel({
     required this.id,
+    this.username = '',
     required this.name,
     required this.email,
     required this.password,
@@ -38,6 +40,7 @@ class UserModel extends Equatable {
 
   UserModel copyWith({
     String? id,
+    String? username,
     String? name,
     String? email,
     String? password,
@@ -50,6 +53,7 @@ class UserModel extends Equatable {
   }) {
     return UserModel(
       id: id ?? this.id,
+      username: username ?? this.username,
       name: name ?? this.name,
       email: email ?? this.email,
       password: password ?? this.password,
@@ -65,14 +69,21 @@ class UserModel extends Equatable {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     final userJson = (json['user'] as Map<String, dynamic>?) ?? json;
     final mergedJson = <String, dynamic>{...json, ...userJson};
+    final birthDateValue = (mergedJson['birthDate'] ?? mergedJson['birth_date'])
+        ?.toString();
+    final birthDate = birthDateValue != null
+        ? DateTime.tryParse(birthDateValue)
+        : null;
 
     return UserModel(
-      id:
-          (mergedJson['email'] ??
-                  mergedJson['id'] ??
-                  mergedJson['user_id'] ??
+      id: (mergedJson['id'] ?? mergedJson['user_id'] ?? '').toString(),
+      username:
+          (mergedJson['username'] ??
+                  mergedJson['nickname'] ??
+                  mergedJson['name'] ??
                   '')
-              .toString(),
+              .toString()
+              .trim(),
       name:
           (mergedJson['name'] ??
                   mergedJson['nickname'] ??
@@ -87,11 +98,7 @@ class UserModel extends Equatable {
               ?.toString()
               .toLowerCase() ==
           'true',
-      birthDate: (mergedJson['birthDate'] ?? mergedJson['birth_date']) != null
-          ? DateTime.tryParse(
-              (mergedJson['birthDate'] ?? mergedJson['birth_date']).toString(),
-            )
-          : null,
+      birthDate: birthDate,
       age: mergedJson['age'] is int
           ? mergedJson['age'] as int
           : int.tryParse('${mergedJson['age'] ?? ''}'),
@@ -103,6 +110,7 @@ class UserModel extends Equatable {
 
   UserAuthEntity toEntity() => UserAuthEntity(
     id: id,
+    username: username,
     name: name,
     email: email,
     password: password,
@@ -117,6 +125,7 @@ class UserModel extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    username,
     name,
     email,
     password,

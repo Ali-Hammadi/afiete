@@ -50,6 +50,7 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   static const String _logName = 'AuthRemoteDataSource';
+
   final Dio _dio;
   late final GoogleSignIn _googleSignIn;
 
@@ -92,18 +93,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         _logInfo('login:token_saved', data: {'type': 'access_only'});
       }
 
-      final userData =
-          (data['user'] as Map<String, dynamic>?) ??
-          <String, dynamic>{'email': email, 'nickname': email.split('@').first};
+      // Parse user data from response - same as signup
+      final responseMap = data;
+      final parsedUser = UserModel.fromJson(responseMap);
 
-      return UserModel(
-        id: email,
-        name:
-            (userData['name'] ?? userData['nickname'] ?? email.split('@').first)
-                .toString(),
-        email: (userData['email'] ?? email).toString(),
+      return parsedUser.copyWith(
+        id: parsedUser.id.isNotEmpty ? parsedUser.id : email,
+        email: parsedUser.email.isNotEmpty ? parsedUser.email : email,
         password: password,
         token: accessToken,
+        isVerified:
+            parsedUser.isVerified ||
+            responseMap['is_verified'] == true ||
+            responseMap['isVerified'] == true,
       );
     } on DioException catch (e) {
       _logError(
@@ -159,14 +161,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
 
-      return UserModel(
-        id: email,
-        name: name,
-        email: email,
+      final responseMap =
+          (response.data as Map<String, dynamic>?) ?? <String, dynamic>{};
+      final parsedUser = UserModel.fromJson(responseMap);
+
+      return parsedUser.copyWith(
+        id: parsedUser.id.isNotEmpty ? parsedUser.id : email,
+        username: parsedUser.username.isNotEmpty ? parsedUser.username : name,
+        name: parsedUser.name.isNotEmpty ? parsedUser.name : name,
+        email: parsedUser.email.isNotEmpty ? parsedUser.email : email,
         password: password,
-        token: '',
+        token: parsedUser.token,
         isVerified:
-            (response.data as Map<String, dynamic>?)?['is_verified'] == true,
+            parsedUser.isVerified ||
+            responseMap['is_verified'] == true ||
+            responseMap['isVerified'] == true,
       );
     } on DioException catch (e) {
       _logError(
@@ -237,6 +246,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         await TokenStorage.clearTokens();
         return UserModel(
           id: email,
+          username: 'Deleted User',
           name: 'Deleted User',
           email: email,
           password: '',
@@ -379,6 +389,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
         return UserModel(
           id: userId,
+          username:
+              (userMap['username'] ??
+                      userMap['nickname'] ??
+                      userMap['name'] ??
+                      name)
+                  .toString(),
           name: name,
           email: userMap['email']?.toString() ?? '',
           password: '',
@@ -485,6 +501,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final accessToken = await TokenStorage.getAccessToken();
         return UserModel(
           id: userId,
+          username: userId,
           name: '',
           email: newEmail,
           password: '',
@@ -615,6 +632,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
         return UserModel(
           id: email,
+          username:
+              (userData['username'] ??
+                      userData['nickname'] ??
+                      userData['name'] ??
+                      email.split('@').first)
+                  .toString(),
           name:
               (userData['name'] ??
                       userData['nickname'] ??

@@ -19,10 +19,12 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
   DateTime? selectedDate;
   String? selectedGender;
   final TextEditingController birthdateController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
   @override
   void dispose() {
     birthdateController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
@@ -136,6 +138,22 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                       });
                     },
                   ),
+                  const SizedBox(height: 20),
+                  CustomTextFormFiled(
+                    label: SettingsStrings.phoneNumberTitle,
+                    controller: phoneController,
+                    obscureText: false,
+                    keyboardType: TextInputType.phone,
+                    prefixIcon: Icons.phone,
+                    validator: (value) {
+                      if (value != null && value.isNotEmpty) {
+                        if (value.length < 9) {
+                          return SettingsStrings.invalidPhoneNumber;
+                        }
+                      }
+                      return null;
+                    },
+                  ),
                 ],
               ),
               SizedBox(height: 20),
@@ -164,12 +182,12 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                         name: currentName,
                         birthDate: selectedDate!,
                         gender: selectedGender!,
+                        phoneNumber: phoneController.text.trim().isNotEmpty
+                            ? phoneController.text.trim()
+                            : null,
                       );
                   if (!context.mounted || !saved) return;
-                  Navigator.pushReplacementNamed(
-                    context,
-                    MyRoutes.profileInfoScreen,
-                  );
+                  Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
                 },
               ),
               SizedBox(height: 70),

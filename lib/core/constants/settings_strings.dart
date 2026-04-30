@@ -782,6 +782,11 @@ abstract class SettingsStrings {
       _t('Please fill in all fields', 'يرجى تعبئة جميع الحقول');
   static String get invalidEmailError =>
       _t('Please enter a valid email address', 'يرجى إدخال بريد إلكتروني صالح');
+  static String get invalidPhoneNumber => _t(
+    'Phone number must be at least 9 digits',
+    'يجب أن يكون رقم الهاتف 9 أرقام على الأقل',
+  );
+  static String get phoneNumberTitle => _t('Phone Number', 'رقم الهاتف');
   static String get messageSentSuccess =>
       _t('Message sent successfully!', 'تم إرسال الرسالة بنجاح!');
 
@@ -1123,6 +1128,7 @@ abstract class SettingsStrings {
   static String get createYourAccount =>
       _t('Create your account', 'أنشئ حسابك');
   static String get nicknameLabel => _t('Nickname', 'الاسم المستعار');
+  static String get usernameLabel => _t('Username', 'اسم المستخدم');
   static String get nameRequired => _t('Name is required', 'الاسم مطلوب');
   static String get nameMinTwoChars => _t(
     'Name must be at least 2 characters',

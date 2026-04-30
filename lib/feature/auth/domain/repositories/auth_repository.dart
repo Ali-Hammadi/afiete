@@ -4,6 +4,9 @@ import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 
 abstract class AuthRepository {
   Future<Either<Failure, UserAuthEntity>> login(String email, String password);
+  Future<void> cacheSession(UserAuthEntity user);
+  Future<UserAuthEntity?> getCachedSession();
+  Future<void> clearCachedSession();
   Future<Either<Failure, UserAuthEntity>> signup(
     String name,
     String email,

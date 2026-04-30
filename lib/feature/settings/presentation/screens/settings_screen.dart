@@ -9,6 +9,7 @@ import 'package:afiete/feature/settings/domin/entity/setting_entity.dart';
 import 'package:afiete/feature/settings/presentation/widgets/language_option.dart';
 import 'package:afiete/feature/settings/presentation/widgets/setting_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -19,15 +20,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  static const UserSettingsProfileEntity _profile = UserSettingsProfileEntity(
-    fullName: 'ALi Hammadi',
-    userId: '1253465',
-    email: 'hamadea524@gmail.com',
-    phoneNumber: '0963937472856',
-    gender: 'Male',
-    age: 24,
-  );
-
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.select<ThemeCubit, bool>(
@@ -181,22 +173,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text(profile.fullName, style: AppStyles.headingSmall),
                 const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(profile.userId, style: AppStyles.bodyMedium),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.copy_outlined,
-                      size: 18,
-                      color: colorScheme.primary,
+                Text(
+                  SettingsStrings.usernameLabel,
+                  style: AppStyles.bodySmall.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.65),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                InkWell(
+                  onTap: () => _copyUsername(context, profile.userId),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(profile.userId, style: AppStyles.bodyMedium),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.copy_outlined,
+                          size: 18,
+                          color: colorScheme.primary,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _copyUsername(BuildContext context, String username) async {
+    if (username.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: username));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${SettingsStrings.usernameLabel} copied')),
     );
   }
 
@@ -311,11 +327,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ? authState.user
         : null;
 
-    if (user == null) return;
-
     final loggedOut = await context.read<AuthCubit>().logout(
-      user.email,
-      user.password,
+      user?.email ?? '',
+      user?.password ?? '',
     );
 
     if (!context.mounted || !loggedOut) return;
@@ -341,20 +355,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     if (user == null) {
-      return _profile;
+      return const UserSettingsProfileEntity(
+        fullName: '',
+        userId: '',
+        email: '',
+        phoneNumber: '',
+        gender: '',
+        age: 0,
+      );
     }
 
     return UserSettingsProfileEntity(
-      fullName: user.name.isNotEmpty ? user.name : _profile.fullName,
-      userId: user.id.isNotEmpty ? user.id : _profile.userId,
-      email: user.email.isNotEmpty ? user.email : _profile.email,
-      phoneNumber: (user.phoneNumber != null && user.phoneNumber!.isNotEmpty)
-          ? user.phoneNumber!
-          : _profile.phoneNumber,
-      gender: (user.gender != null && user.gender!.isNotEmpty)
-          ? user.gender!
-          : _profile.gender,
-      age: user.age ?? _profile.age,
+      fullName: user.name,
+      userId: user.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber ?? '',
+      gender: user.gender ?? '',
+      age: user.age ?? 0,
     );
   }
 }

@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:afiete/core/assets/icon_image_links.dart';
 import 'package:afiete/core/network/token_storage.dart';
 import 'package:afiete/core/routes/app_route.dart';
+import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,11 +22,17 @@ class _SplashScreenState extends State<SplashScreen>
     final token = await TokenStorage.getAccessToken();
     if (!mounted) return;
 
-    final nextRoute = (token != null && token.isNotEmpty)
-        ? MyRoutes.homeScreen
-        : MyRoutes.signup;
+    if (token != null && token.isNotEmpty) {
+      final restored = await context.read<AuthCubit>().restoreSession();
+      if (!mounted) return;
 
-    Navigator.pushReplacementNamed(context, nextRoute);
+      if (restored && context.read<AuthCubit>().state is AuthLoaded) {
+        Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
+        return;
+      }
+    }
+
+    Navigator.pushReplacementNamed(context, MyRoutes.signup);
   }
 
   @override

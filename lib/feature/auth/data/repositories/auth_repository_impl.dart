@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:afiete/core/error/failure.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
+  static const String _cachedUserKey = 'auth_cached_user';
   final AuthRemoteDataSource remoteDataSource;
 
   const AuthRepositoryImpl({required this.remoteDataSource});
@@ -23,6 +27,70 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
+  }
+
+  @override
+  Future<void> cacheSession(UserAuthEntity user) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(_cachedUserKey, jsonEncode(_encodeUser(user)));
+  }
+
+  @override
+  Future<UserAuthEntity?> getCachedSession() async {
+    final preferences = await SharedPreferences.getInstance();
+    final cached = preferences.getString(_cachedUserKey);
+    if (cached == null || cached.isEmpty) return null;
+
+    try {
+      final decoded = jsonDecode(cached) as Map<String, dynamic>;
+      return _decodeUser(decoded);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> clearCachedSession() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_cachedUserKey);
+  }
+
+  Map<String, dynamic> _encodeUser(UserAuthEntity user) {
+    return {
+      'id': user.id,
+      'username': user.username,
+      'name': user.name,
+      'email': user.email,
+      'password': user.password,
+      'token': user.token,
+      'isVerified': user.isVerified,
+      'birthDate': user.birthDate?.toIso8601String(),
+      'age': user.age,
+      'gender': user.gender,
+      'phoneNumber': user.phoneNumber,
+    };
+  }
+
+  UserAuthEntity _decodeUser(Map<String, dynamic> json) {
+    return UserAuthEntity(
+      id: json['id']?.toString() ?? '',
+      username: json['username']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      password: json['password']?.toString() ?? '',
+      token: json['token']?.toString() ?? '',
+      isVerified: json['isVerified'] == true ||
+          json['is_verified'] == true ||
+          json['isVerified']?.toString().toLowerCase() == 'true',
+      birthDate: json['birthDate'] != null
+          ? DateTime.tryParse(json['birthDate'].toString())
+          : null,
+      age: json['age'] is int
+          ? json['age'] as int
+          : int.tryParse('${json['age'] ?? ''}'),
+      gender: json['gender']?.toString(),
+      phoneNumber: json['phoneNumber']?.toString(),
+    );
   }
 
   @override
