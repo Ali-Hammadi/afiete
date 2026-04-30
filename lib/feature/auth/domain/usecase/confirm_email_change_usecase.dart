@@ -5,12 +5,12 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class ConfirmEmailChangeParams {
-  final String userId;
+  final String username;
   final String newEmail;
   final String otp;
 
   const ConfirmEmailChangeParams({
-    required this.userId,
+    required this.username,
     required this.newEmail,
     required this.otp,
   });
@@ -27,7 +27,7 @@ class ConfirmEmailChangeUseCase
     ConfirmEmailChangeParams params,
   ) {
     return repository.confirmEmailChange(
-      userId: params.userId,
+      userId: params.username,
       newEmail: params.newEmail,
       otp: params.otp,
     );

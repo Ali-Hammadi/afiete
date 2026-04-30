@@ -3,7 +3,7 @@ import '../../domain/entities/auth_user_entity.dart';
 
 class UserModel extends Equatable {
   final String username;
-  final String nickname;
+  final String? nickname;
   final String email;
   final String password;
   final String token;
@@ -102,7 +102,7 @@ class UserModel extends Equatable {
 
   UserAuthEntity toEntity() => UserAuthEntity(
     username: username,
-    nickname: nickname,
+    nickname: nickname?.toString() ?? '',
     email: email,
     password: password,
     token: token,

@@ -4,11 +4,11 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class RequestEmailChangeOtpParams {
-  final String userId;
+  final String username;
   final String newEmail;
 
   const RequestEmailChangeOtpParams({
-    required this.userId,
+    required this.username,
     required this.newEmail,
   });
 }
@@ -22,7 +22,7 @@ class RequestEmailChangeOtpUseCase
   @override
   Future<Either<Failure, String>> call(RequestEmailChangeOtpParams params) {
     return repository.requestEmailChangeOtp(
-      userId: params.userId,
+      userId: params.username,
       newEmail: params.newEmail,
     );
   }

@@ -143,9 +143,9 @@ class _BookSessionScreenState extends State<BookSessionScreen> {
     final authState = context.read<AuthCubit>().state;
     String patientId = 'unknown-patient';
     if (authState is AuthLoaded) {
-      patientId = authState.user.id;
+      patientId = authState.user.username;
     } else if (authState is AuthProfileUpdated) {
-      patientId = authState.user.id;
+      patientId = authState.user.username;
     }
 
     final cubit = context.read<AppointmentsCubit>();

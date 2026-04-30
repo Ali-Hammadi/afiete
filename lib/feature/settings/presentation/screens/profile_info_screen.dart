@@ -134,8 +134,8 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
 
                         const SizedBox(height: 2),
                         Text(
-                          user?.nickname?.isNotEmpty == true
-                              ? user!.nickname ?? '—'
+                          user?.nickname.isNotEmpty == true
+                              ? user!.nickname
                               : '—',
                           style: AppStyles.bodyMedium,
                         ),

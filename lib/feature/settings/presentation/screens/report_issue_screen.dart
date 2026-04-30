@@ -39,9 +39,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
 
     final authState = context.read<AuthCubit>().state;
     final userId = authState is AuthLoaded
-        ? authState.user.id
+        ? authState.user.username
         : authState is AuthProfileUpdated
-        ? authState.user.id
+        ? authState.user.username
         : '';
 
     return BlocProvider<SettingsCubit>(

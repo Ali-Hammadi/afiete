@@ -37,9 +37,9 @@ class MedicalProfileScreen extends StatelessWidget {
 
     final authState = context.read<AuthCubit>().state;
     final userId = authState is AuthLoaded
-        ? authState.user.id
+        ? authState.user.username
         : authState is AuthProfileUpdated
-        ? authState.user.id
+        ? authState.user.username
         : '';
 
     return DefaultTabController(

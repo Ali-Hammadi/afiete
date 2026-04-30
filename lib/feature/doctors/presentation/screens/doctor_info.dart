@@ -157,8 +157,8 @@ class _DoctorInfoState extends State<DoctorInfo> {
               onPressed: () {
                 final authState = context.read<AuthCubit>().state;
                 final userId = switch (authState) {
-                  AuthLoaded(:final user) => user.id,
-                  AuthProfileUpdated(:final user) => user.id,
+                  AuthLoaded(:final user) => user.username,
+                  AuthProfileUpdated(:final user) => user.username,
                   _ => '',
                 };
 

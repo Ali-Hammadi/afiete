@@ -5,7 +5,7 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class UpdateProfileInfoParams {
-  final String userId;
+  final String username;
 
   final String nickname;
   final DateTime birthDate;
@@ -13,7 +13,7 @@ class UpdateProfileInfoParams {
   final String phoneNumber;
 
   const UpdateProfileInfoParams({
-    required this.userId,
+    required this.username,
     required this.nickname,
     required this.birthDate,
     required this.gender,
@@ -30,7 +30,7 @@ class UpdateProfileInfoUseCase
   @override
   Future<Either<Failure, UserAuthEntity>> call(UpdateProfileInfoParams params) {
     return repository.updateProfileInfo(
-      userId: params.userId,
+      userId: params.username,
 
       nickname: params.nickname,
       birthDate: params.birthDate,
