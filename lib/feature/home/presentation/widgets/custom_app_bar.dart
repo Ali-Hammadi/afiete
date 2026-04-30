@@ -15,7 +15,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final authState = context.watch<AuthCubit>().state;
 
-    // Get the user nickname from auth state
     String userName = '';
     if (authState is AuthLoaded) {
       userName = authState.user.nickname;
@@ -23,8 +22,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       userName = authState.user.nickname;
     }
 
-    // Extract first name from full name for greeting
-    final displayName = userName.isNotEmpty ? userName.split(' ').first : '';
+    final greetingText = userName.isNotEmpty
+        ? SettingsStrings.welcomeUser(userName)
+        : SettingsStrings.startYourJourney;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 5.0),
@@ -35,7 +35,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         contentPadding: EdgeInsets.zero,
         title: Text(
-          SettingsStrings.welcomeUser(displayName),
+          greetingText,
           style: AppStyles.headingMedium.copyWith(color: colorScheme.primary),
         ),
         subtitle: Text(

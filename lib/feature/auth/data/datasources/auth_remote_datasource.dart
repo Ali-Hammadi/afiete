@@ -238,7 +238,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _logInfo('delete_account:start', data: {'email': email});
       final response = await _dio.post(
         ApiEndpoints.deleteAccount,
-        data: {'email': email, 'password': password},
+        data: {
+          ApiEndpoints.keyEmail: email,
+          ApiEndpoints.keyPassword: password,
+        },
       );
       _logInfo(
         'delete_account:response',
@@ -302,7 +305,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final auth = await account.authentication;
       final response = await _dio.post(
         ApiEndpoints.googleLogin,
-        data: {'id_token': auth.idToken},
+        data: {ApiEndpoints.keyIdToken: auth.idToken},
       );
       _logInfo(
         'google_sign_in:response',
@@ -432,7 +435,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _logInfo('request_email_otp:start', data: {'newEmail': newEmail});
       final response = await _dio.post(
         ApiEndpoints.requestEmailChangeOtp,
-        data: {'email': newEmail},
+        data: {ApiEndpoints.keyEmail: newEmail},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         _logInfo(
@@ -493,7 +496,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       final response = await _dio.post(
         ApiEndpoints.confirmEmailChange,
-        data: {'email': newEmail, 'code': otp},
+        data: {ApiEndpoints.keyEmail: newEmail, ApiEndpoints.keyCode: otp},
       );
       _logInfo(
         'confirm_email_change:response',
@@ -551,7 +554,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _logInfo('send_verification_otp:start', data: {'email': email});
       final response = await _dio.post(
         ApiEndpoints.requestEmailChangeOtp,
-        data: {'email': email},
+        data: {ApiEndpoints.keyEmail: email},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         _logInfo(
@@ -605,7 +608,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       final response = await _dio.post(
         ApiEndpoints.confirmEmailChange,
-        data: {'email': email, 'code': code},
+        data: {ApiEndpoints.keyEmail: email, ApiEndpoints.keyCode: code},
       );
       _logInfo(
         'verify_otp:response',
@@ -700,9 +703,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final response = await _dio.post(
         ApiEndpoints.changePassword,
         data: {
-          'email': email,
-          'current_password': currentPassword,
-          'new_password': newPassword,
+          ApiEndpoints.keyEmail: email,
+          ApiEndpoints.keyCurrentPassword: currentPassword,
+          ApiEndpoints.keyNewPassword: newPassword,
         },
       );
       _logInfo(
@@ -759,7 +762,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _logInfo('reset_password:start', data: {'email': email});
       final response = await _dio.post(
         ApiEndpoints.resetPassword,
-        data: {'email': email, 'otp': otp, 'new_password': newPassword},
+        data: {
+          ApiEndpoints.keyEmail: email,
+          ApiEndpoints.keyOtp: otp,
+          ApiEndpoints.keyNewPassword: newPassword,
+        },
       );
       _logInfo(
         'reset_password:response',
@@ -846,7 +853,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (normalizedKey.contains('password') ||
             normalizedKey.contains('token') ||
             normalizedKey == 'id_token' ||
-            normalizedKey == 'code') {
+            normalizedKey == 'code' ||
+            normalizedKey == 'otp') {
           output[key.toString()] = '***';
         } else {
           output[key.toString()] = _sanitize(val);

@@ -1,6 +1,10 @@
 abstract class ApiEndpoints {
   static const String api = '/api';
-  static const String auth = '/api/auth';
+  // Note: the backend OpenAPI exposes auth-related routes directly under
+  // `/api` (e.g. `/api/token/`, `/api/users/...`). Keep `auth` for
+  // backward compatibility but point it to `api` so concatenation yields
+  // `/api/...` paths.
+  static const String auth = '/api';
   static const String doctors = '/api/doctors';
   static const String articles = '/api/articles';
   static const String appointments = '/api/appointments';
@@ -16,19 +20,40 @@ abstract class ApiEndpoints {
 
   static const String login = '$users/login/';
   static const String signup = '$patients/register/';
+  // The OpenAPI available locally documents `login` and user OTP endpoints.
+  // Endpoints below (logout, deleteAccount, googleLogin) are kept for the
+  // app flow but are not listed in the OpenAPI; verify with backend if
+  // different paths are required.
   static const String logout = '$auth/logout';
-  static const String deleteAccount = '$auth/delete-account';
+  // Backend provided delete account path
+  static const String deleteAccount = '$users/account/delete/';
   static const String googleLogin = '$auth/google-login';
   static const String updateProfile = '$patients/profile/';
+  // OTP endpoints (present in OpenAPI)
   static const String requestEmailChangeOtp = '$users/otp/resend';
   static const String confirmEmailChange = '$users/otp/verify';
-  static const String requestEmailChange = '$users/email-change/request';
+
+  // The following endpoints are not present in the local OpenAPI file.
+  // Keep them here but verify path names with the backend team and update
+  // if the server exposes different routes.
+  // The backend uses the same endpoint for email reset (and password reset)
+  // per server info: /api/users/email/reset
+  static const String requestEmailChange = '$users/email/reset';
   static const String confirmEmailChangeNew = '$users/email-change/confirm';
   static const String changePassword = '$users/password/change/';
-  static const String resetPassword = '$users/password/reset/';
+  static const String resetPassword = '$users/password/reset';
   static const String tokenObtainPair = '$token/';
   static const String tokenRefresh = '$token/refresh/';
   static const String tokenVerify = '$token/verify/';
+
+    // Auth request keys
+    static const String keyEmail = 'email';
+    static const String keyPassword = 'password';
+    static const String keyCurrentPassword = 'current_password';
+    static const String keyNewPassword = 'new_password';
+    static const String keyOtp = 'otp';
+    static const String keyCode = 'code';
+    static const String keyIdToken = 'id_token';
 
   static const String allDoctors = doctors;
   static String doctorById(String id) => '$doctors/$id';

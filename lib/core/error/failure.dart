@@ -79,9 +79,7 @@ class ServerFailure extends Failure {
         extractedMessage = _extractNestedMessage(nonFieldErrors);
       }
 
-      if (extractedMessage == null) {
-        extractedMessage = _extractNestedMessage(response);
-      }
+      extractedMessage ??= _extractNestedMessage(response);
 
       extractedMessage ??= response['message']?.toString();
       extractedMessage ??= response['detail']?.toString();
@@ -136,7 +134,14 @@ class ServerFailure extends Failure {
     }
 
     if (value is Map) {
-      const reservedKeys = {'message', 'detail', 'error', 'errors', 'status', 'code'};
+      const reservedKeys = {
+        'message',
+        'detail',
+        'error',
+        'errors',
+        'status',
+        'code',
+      };
 
       final map = value.cast<dynamic, dynamic>();
       final directMessage = map['message']?.toString();
@@ -223,7 +228,8 @@ class ServerFailure extends Failure {
         normalized.contains('not found')) {
       return 'No account was found for this data. Please check your input or create a new account.';
     }
-    if (normalized.contains('invalid otp') || normalized.contains('invalid code')) {
+    if (normalized.contains('invalid otp') ||
+        normalized.contains('invalid code')) {
       return 'The verification code is incorrect or expired. Please request a new code.';
     }
     if (normalized.contains('password') && normalized.contains('incorrect')) {
