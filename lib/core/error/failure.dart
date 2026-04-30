@@ -10,9 +10,19 @@ class ServerFailure extends Failure {
   ServerFailure(super.errorMessage);
 
   factory ServerFailure.fromDioError(DioException dioError) {
-    final cleanError = dioError.error?.toString();
+    final cleanError = dioError.error?.toString().trim();
     if (cleanError != null && cleanError.isNotEmpty) {
-      return ServerFailure(cleanError);
+      if (_isGenericMessage(cleanError)) {
+        final statusCode = dioError.response?.statusCode;
+        final responseData = dioError.response?.data;
+        final parsed = ServerFailure.fromResponse(statusCode, responseData);
+        if (parsed.errorMessage.isNotEmpty &&
+            !_isGenericMessage(parsed.errorMessage)) {
+          return parsed;
+        }
+      }
+
+      return ServerFailure(_toUserFriendlyMessage(cleanError));
     }
 
     switch (dioError.type) {
@@ -59,28 +69,32 @@ class ServerFailure extends Failure {
         code = error['code']?.toString() ?? '';
       }
 
-      extractedMessage ??= response['detail']?.toString();
-      extractedMessage ??= response['message']?.toString();
+      extractedMessage ??= _nonGeneric(response['detail']?.toString());
+      extractedMessage ??= _nonGeneric(response['message']?.toString());
 
       final nonFieldErrors = response['non_field_errors'];
       if (extractedMessage == null &&
           nonFieldErrors is List &&
           nonFieldErrors.isNotEmpty) {
-        extractedMessage = nonFieldErrors.first.toString();
+        extractedMessage = _extractNestedMessage(nonFieldErrors);
       }
 
       if (extractedMessage == null) {
-        for (final value in response.values) {
-          if (value is List && value.isNotEmpty) {
-            extractedMessage = value.first.toString();
-            break;
-          }
-        }
+        extractedMessage = _extractNestedMessage(response);
       }
+
+      extractedMessage ??= response['message']?.toString();
+      extractedMessage ??= response['detail']?.toString();
+    } else {
+      extractedMessage = _extractNestedMessage(response);
     }
 
+    extractedMessage = _toUserFriendlyMessage(extractedMessage ?? '');
+
     if (statusCode == 400 || statusCode == 401 || statusCode == 403) {
-      return ServerFailure(extractedMessage ?? "Authentication error");
+      return ServerFailure(
+        extractedMessage.isNotEmpty ? extractedMessage : 'Authentication error',
+      );
     } else if (statusCode == 404) {
       return ServerFailure(
         "${code.isNotEmpty ? '$code ' : ''}Your request was not found, please try again",
@@ -91,8 +105,134 @@ class ServerFailure extends Failure {
       );
     } else {
       return ServerFailure(
-        extractedMessage ?? "Ops there was an error, please try again",
+        extractedMessage.isNotEmpty
+            ? extractedMessage
+            : 'Something went wrong. Please try again.',
       );
     }
+  }
+
+  static String? _extractNestedMessage(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value is String) {
+      final text = value.trim();
+      if (text.isEmpty) {
+        return null;
+      }
+      return _isGenericMessage(text) ? null : text;
+    }
+
+    if (value is List) {
+      for (final item in value) {
+        final found = _extractNestedMessage(item);
+        if (found != null && found.isNotEmpty) {
+          return found;
+        }
+      }
+      return null;
+    }
+
+    if (value is Map) {
+      const reservedKeys = {'message', 'detail', 'error', 'errors', 'status', 'code'};
+
+      final map = value.cast<dynamic, dynamic>();
+      final directMessage = map['message']?.toString();
+      final directDetail = map['detail']?.toString();
+
+      final messageCandidate = _nonGeneric(directMessage);
+      if (messageCandidate != null) {
+        return messageCandidate;
+      }
+
+      final detailCandidate = _nonGeneric(directDetail);
+      if (detailCandidate != null) {
+        return detailCandidate;
+      }
+
+      for (final entry in map.entries) {
+        final key = entry.key.toString().toLowerCase();
+        if (reservedKeys.contains(key)) {
+          continue;
+        }
+        final found = _extractNestedMessage(entry.value);
+        if (found != null && found.isNotEmpty) {
+          return found;
+        }
+      }
+
+      final fromError = _extractNestedMessage(map['error']);
+      if (fromError != null && fromError.isNotEmpty) {
+        return fromError;
+      }
+
+      final fromErrors = _extractNestedMessage(map['errors']);
+      if (fromErrors != null && fromErrors.isNotEmpty) {
+        return fromErrors;
+      }
+
+      if (directMessage != null && directMessage.trim().isNotEmpty) {
+        return directMessage.trim();
+      }
+      if (directDetail != null && directDetail.trim().isNotEmpty) {
+        return directDetail.trim();
+      }
+      return null;
+    }
+
+    return value.toString();
+  }
+
+  static String? _nonGeneric(String? message) {
+    if (message == null) {
+      return null;
+    }
+    final text = message.trim();
+    if (text.isEmpty || _isGenericMessage(text)) {
+      return null;
+    }
+    return text;
+  }
+
+  static bool _isGenericMessage(String message) {
+    final normalized = message.trim().toLowerCase();
+    return normalized == 'invalid request. please check your input.' ||
+        normalized == 'invalid request' ||
+        normalized == 'bad request' ||
+        normalized == 'authentication error' ||
+        normalized == 'ops there was an error, please try again';
+  }
+
+  static String _toUserFriendlyMessage(String message) {
+    final trimmed = message.trim();
+    if (trimmed.isEmpty) {
+      return trimmed;
+    }
+
+    final normalized = trimmed.toLowerCase();
+    if (normalized.contains('already verified')) {
+      return 'Your account is already verified. Please sign in directly.';
+    }
+    if (normalized.contains('already exists') ||
+        normalized.contains('user with this email')) {
+      return 'This email is already registered. Please sign in or use another email.';
+    }
+    if (normalized.contains('does not exist') ||
+        normalized.contains('not found')) {
+      return 'No account was found for this data. Please check your input or create a new account.';
+    }
+    if (normalized.contains('invalid otp') || normalized.contains('invalid code')) {
+      return 'The verification code is incorrect or expired. Please request a new code.';
+    }
+    if (normalized.contains('password') && normalized.contains('incorrect')) {
+      return 'The current password is incorrect. Please try again.';
+    }
+    if (_isGenericMessage(normalized)) {
+      return 'Your request could not be processed. Please review the entered data and try again.';
+    }
+
+    return trimmed;
   }
 }

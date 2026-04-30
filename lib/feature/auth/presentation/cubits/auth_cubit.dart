@@ -56,6 +56,14 @@ class AuthCubit extends Cubit<AuthState> {
           _log('login:account_not_verified_send_otp', data: {'email': email});
           return sendVerificationOtp(email);
         }
+        if (_isAlreadyVerifiedError(failure.errorMessage)) {
+          emit(
+            const AuthError(
+              'Your account is already verified. Please sign in again.',
+            ),
+          );
+          return Future.value();
+        }
         emit(AuthError(failure.errorMessage));
       },
       (user) {
@@ -66,19 +74,19 @@ class AuthCubit extends Cubit<AuthState> {
             'login:account_not_verified_send_otp',
             data: {'email': user.email},
           );
-          return sendVerificationOtp(user.email);
+          return sendVerificationOtp(user.email, fallbackUser: user);
         }
         return _cacheAndEmitUser(user);
       },
     );
   }
 
-  Future<void> signup(String name, String email, String password) async {
-    _log('signup:start', data: {'email': email, 'name': name});
+   Future<void> signup(String nickname, String email, String password) async {
+     _log('signup:start', data: {'email': email, 'nickname': nickname});
     _pendingSignupUser = null;
     emit(AuthLoading());
     final result = await signupUseCase(
-      SignupParams(name: name, email: email, password: password),
+      SignupParams(nickname: nickname, email: email, password: password),
     );
     result.fold(
       (failure) {
@@ -158,6 +166,14 @@ class AuthCubit extends Cubit<AuthState> {
     result.fold(
       (failure) {
         _log('google_sign_in:error', data: {'message': failure.errorMessage});
+        if (_isAlreadyVerifiedError(failure.errorMessage)) {
+          emit(
+            const AuthError(
+              'Your account is already verified. Please sign in directly.',
+            ),
+          );
+          return;
+        }
         emit(AuthError(failure.errorMessage));
       },
       (user) {
@@ -171,7 +187,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> updateProfileInfo({
-    required String name,
+    String? nickname,
     required DateTime birthDate,
     required String gender,
     String? phoneNumber,
@@ -188,7 +204,7 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await updateProfileInfoUseCase(
       UpdateProfileInfoParams(
         userId: existingUser.id,
-        name: name,
+        nickname: nickname ?? existingUser.nickname,
         birthDate: birthDate,
         gender: gender,
         phoneNumber: phoneNumber ?? existingUser.phoneNumber ?? '',
@@ -286,22 +302,34 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<void> sendVerificationOtp(String email) async {
+  Future<void> sendVerificationOtp(
+    String email, {
+    UserAuthEntity? fallbackUser,
+  }) async {
     _log('send_verification_otp:start', data: {'email': email});
     emit(AuthLoading());
     final result = await requestEmailChangeOtpUseCase(
       RequestEmailChangeOtpParams(userId: email, newEmail: email),
     );
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         _log(
           'send_verification_otp:error',
           data: {'message': failure.errorMessage},
         );
+        if (fallbackUser != null &&
+            _isAlreadyVerifiedError(failure.errorMessage)) {
+          _log(
+            'send_verification_otp:already_verified_recover_login',
+            data: {'email': fallbackUser.email},
+          );
+          await _cacheAndEmitUser(fallbackUser.copyWith(isVerified: true));
+          return;
+        }
         emit(AuthError(failure.errorMessage));
       },
-      (message) {
+      (message) async {
         _log('send_verification_otp:success', data: {'message': message});
         emit(WaitingForOtpVerification(email));
       },
@@ -334,9 +362,9 @@ class AuthCubit extends Cubit<AuthState> {
                 username: _pendingSignupUser!.username.isNotEmpty
                     ? _pendingSignupUser!.username
                     : user.username,
-                name: _pendingSignupUser!.name.isNotEmpty
-                    ? _pendingSignupUser!.name
-                    : user.name,
+                nickname: (_pendingSignupUser?.nickname?.isNotEmpty ?? false)
+                    ? _pendingSignupUser!.nickname
+                    : user.nickname,
                 email: _pendingSignupUser!.email.isNotEmpty
                     ? _pendingSignupUser!.email
                     : user.email,
@@ -457,6 +485,12 @@ class AuthCubit extends Cubit<AuthState> {
     return errorMessage.toLowerCase().contains('already exists') ||
         errorMessage.toLowerCase().contains('user with this email') ||
         errorMessage.toLowerCase().contains('email already');
+  }
+
+  bool _isAlreadyVerifiedError(String errorMessage) {
+    final normalized = errorMessage.toLowerCase();
+    return normalized.contains('already verified') ||
+        normalized.contains('user is already verified');
   }
 
   void _log(String message, {Map<String, dynamic>? data}) {

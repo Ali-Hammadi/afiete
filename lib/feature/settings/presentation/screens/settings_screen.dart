@@ -171,7 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(profile.fullName, style: AppStyles.headingSmall),
+                Text(profile.nickName, style: AppStyles.headingSmall),
                 const SizedBox(height: 4),
                 Text(
                   SettingsStrings.usernameLabel,
@@ -356,7 +356,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (user == null) {
       return const UserSettingsProfileEntity(
-        fullName: '',
+        nickName: '',
         userId: '',
         email: '',
         phoneNumber: '',
@@ -366,7 +366,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     return UserSettingsProfileEntity(
-      fullName: user.name,
+      nickName: user.nickname,
       userId: user.username,
       email: user.email,
       phoneNumber: user.phoneNumber ?? '',

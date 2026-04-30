@@ -19,7 +19,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController nicknameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool obsecureText = true;
@@ -77,7 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         children: [
                           CustomTextFormFiled(
                             label: SettingsStrings.nicknameLabel,
-                            controller: nameController,
+                            controller: nicknameController,
                             obscureText: false,
                             keyboardType: TextInputType.text,
                             prefixIcon: Icons.text_fields,
@@ -165,11 +165,11 @@ class _SignupScreenState extends State<SignupScreen> {
                           ? null
                           : () {
                               if (formKey.currentState!.validate()) {
-                                final name = nameController.text.trim();
+                                final nickname = nicknameController.text.trim();
                                 final email = emailController.text.trim();
                                 final password = passwordController.text;
                                 context.read<AuthCubit>().signup(
-                                  name,
+                                  nickname,
                                   email,
                                   password,
                                 );
@@ -202,7 +202,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void dispose() {
-    nameController.dispose();
+    nicknameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();

@@ -57,9 +57,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
   Map<String, dynamic> _encodeUser(UserAuthEntity user) {
     return {
-      'id': user.id,
       'username': user.username,
-      'name': user.name,
+      'nickName': user.nickname,
       'email': user.email,
       'password': user.password,
       'token': user.token,
@@ -73,13 +72,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   UserAuthEntity _decodeUser(Map<String, dynamic> json) {
     return UserAuthEntity(
-      id: json['id']?.toString() ?? '',
       username: json['username']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
+
       email: json['email']?.toString() ?? '',
       password: json['password']?.toString() ?? '',
       token: json['token']?.toString() ?? '',
-      isVerified: json['isVerified'] == true ||
+      isVerified:
+          json['isVerified'] == true ||
           json['is_verified'] == true ||
           json['isVerified']?.toString().toLowerCase() == 'true',
       birthDate: json['birthDate'] != null
@@ -90,6 +89,7 @@ class AuthRepositoryImpl implements AuthRepository {
           : int.tryParse('${json['age'] ?? ''}'),
       gender: json['gender']?.toString(),
       phoneNumber: json['phoneNumber']?.toString(),
+      nickname: json['nickname']?.toString() ?? '',
     );
   }
 
@@ -125,12 +125,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, UserAuthEntity>> signup(
-    String name,
+    String nickname,
     String email,
     String password,
   ) async {
     try {
-      final remoteUser = await remoteDataSource.signup(name, email, password);
+      final remoteUser = await remoteDataSource.signup(
+        nickname,
+        email,
+        password,
+      );
       return Right(remoteUser.toEntity());
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));
@@ -154,7 +158,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserAuthEntity>> updateProfileInfo({
     required String userId,
-    required String name,
+    String? nickname,
     required DateTime birthDate,
     required String gender,
     required String phoneNumber,
@@ -162,7 +166,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final remoteUser = await remoteDataSource.updateProfileInfo(
         userId: userId,
-        name: name,
+        nickname: nickname,
         birthDate: birthDate,
         gender: gender,
         phoneNumber: phoneNumber,

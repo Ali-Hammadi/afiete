@@ -6,14 +6,15 @@ import 'package:dartz/dartz.dart';
 
 class UpdateProfileInfoParams {
   final String userId;
-  final String name;
+
+  final String nickname;
   final DateTime birthDate;
   final String gender;
   final String phoneNumber;
 
   const UpdateProfileInfoParams({
     required this.userId,
-    required this.name,
+    required this.nickname,
     required this.birthDate,
     required this.gender,
     required this.phoneNumber,
@@ -30,7 +31,8 @@ class UpdateProfileInfoUseCase
   Future<Either<Failure, UserAuthEntity>> call(UpdateProfileInfoParams params) {
     return repository.updateProfileInfo(
       userId: params.userId,
-      name: params.name,
+
+      nickname: params.nickname,
       birthDate: params.birthDate,
       gender: params.gender,
       phoneNumber: params.phoneNumber,

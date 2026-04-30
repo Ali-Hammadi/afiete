@@ -663,8 +663,6 @@ abstract class SettingsStrings {
   static String get resendCode => _t('Resend code', 'إعادة إرسال الرمز');
   static String get verify => _t('Verify', 'تحقق');
 
-  static String get changePasswordTitle =>
-      _t('Change Password', 'تغيير كلمة المرور');
   static String get changePasswordDescription => _t(
     'Change your password to keep your account secure.',
     'غيّر كلمة المرور للحفاظ على أمان حسابك.',

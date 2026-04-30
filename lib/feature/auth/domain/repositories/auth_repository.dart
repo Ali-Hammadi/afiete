@@ -8,7 +8,7 @@ abstract class AuthRepository {
   Future<UserAuthEntity?> getCachedSession();
   Future<void> clearCachedSession();
   Future<Either<Failure, UserAuthEntity>> signup(
-    String name,
+    String nickname,
     String email,
     String password,
   );
@@ -20,7 +20,7 @@ abstract class AuthRepository {
   Future<Either<Failure, UserAuthEntity>> googleSignIn();
   Future<Either<Failure, UserAuthEntity>> updateProfileInfo({
     required String userId,
-    required String name,
+    String? nickname,
     required DateTime birthDate,
     required String gender,
     required String phoneNumber,
@@ -31,10 +31,7 @@ abstract class AuthRepository {
     required String newEmail,
   });
 
-  Future<Either<Failure, UserAuthEntity>> verifyOtp(
-    String email,
-    String code,
-  );
+  Future<Either<Failure, UserAuthEntity>> verifyOtp(String email, String code);
 
   Future<Either<Failure, UserAuthEntity>> confirmEmailChange({
     required String userId,

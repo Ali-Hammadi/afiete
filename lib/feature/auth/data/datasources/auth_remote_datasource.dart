@@ -8,13 +8,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthRemoteDataSource {
   Future<UserModel> login(String email, String password);
-  Future<UserModel> signup(String name, String email, String password);
+  Future<UserModel> signup(String nickname, String email, String password);
   Future<UserModel> logout(String email, String password);
   Future<UserModel> deleteAccount(String email, String password);
   Future<UserModel> googleSignIn();
   Future<UserModel> updateProfileInfo({
     required String userId,
-    required String name,
+    String? nickname,
     required DateTime birthDate,
     required String gender,
     required String phoneNumber,
@@ -137,13 +137,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> signup(String name, String email, String password) async {
+  Future<UserModel> signup(
+    String nickname,
+    String email,
+    String password,
+  ) async {
     try {
-      _logInfo('signup:start', data: {'email': email, 'nickname': name});
+      _logInfo('signup:start', data: {'email': email, 'nickname': nickname});
       final response = await _dio.post(
         ApiEndpoints.signup,
         data: UserModel.signupRequestBody(
-          nickname: name,
+          nickname: nickname,
           email: email,
           password: password,
         ),
@@ -167,8 +171,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return parsedUser.copyWith(
         id: parsedUser.id.isNotEmpty ? parsedUser.id : email,
-        username: parsedUser.username.isNotEmpty ? parsedUser.username : name,
-        name: parsedUser.name.isNotEmpty ? parsedUser.name : name,
+        username: parsedUser.username.isNotEmpty
+            ? parsedUser.username
+            : nickname,
         email: parsedUser.email.isNotEmpty ? parsedUser.email : email,
         password: password,
         token: parsedUser.token,
@@ -214,7 +219,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _logInfo('logout:success', data: {'email': email});
       return UserModel(
         id: email,
-        name: 'Logged Out',
+        username: 'Logged Out',
+        nickname: 'Logged Out',
         email: email,
         password: '',
         token: '',
@@ -247,7 +253,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return UserModel(
           id: email,
           username: 'Deleted User',
-          name: 'Deleted User',
+          nickname: 'Deleted User',
           email: email,
           password: '',
           token: '',
@@ -350,7 +356,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> updateProfileInfo({
     required String userId,
-    required String name,
+    String? nickname,
     required DateTime birthDate,
     required String gender,
     required String phoneNumber,
@@ -360,7 +366,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'update_profile:start',
         data: {
           'userId': userId,
-          'name': name,
+          'nickname': nickname,
           'birthDate': birthDate.toIso8601String(),
           'gender': gender,
           'phoneNumber': phoneNumber,
@@ -370,6 +376,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiEndpoints.updateProfile,
         data: {
           'user': {
+            'nickname': nickname,
             'birth_date': birthDate.toIso8601String().split('T').first,
             'gender': gender.toLowerCase(),
             'phone': phoneNumber,
@@ -393,9 +400,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               (userMap['username'] ??
                       userMap['nickname'] ??
                       userMap['name'] ??
-                      name)
+                      '')
                   .toString(),
-          name: name,
+          nickname: userMap['nickname']?.toString() ?? nickname,
           email: userMap['email']?.toString() ?? '',
           password: '',
           token: accessToken ?? '',
@@ -502,7 +509,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return UserModel(
           id: userId,
           username: userId,
-          name: '',
+
           email: newEmail,
           password: '',
           token: accessToken ?? '',
@@ -574,6 +581,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'response': e.response?.data,
         },
       );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
       rethrow;
     } catch (e) {
       throw DioException(
@@ -638,11 +655,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
                       userData['name'] ??
                       email.split('@').first)
                   .toString(),
-          name:
-              (userData['name'] ??
-                      userData['nickname'] ??
-                      email.split('@').first)
-                  .toString(),
+
           email: (userData['email'] ?? email).toString(),
           password: '',
           token: accessToken,
@@ -865,16 +878,66 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   String? _extractMessage(dynamic data) {
     if (data is Map<String, dynamic>) {
       final message = data['message']?.toString();
-      if (message != null && message.isNotEmpty) {
+      if (message != null &&
+          message.isNotEmpty &&
+          !_isGenericMessage(message)) {
         return message;
       }
 
       final detail = data['detail']?.toString();
+      if (detail != null && detail.isNotEmpty && !_isGenericMessage(detail)) {
+        return detail;
+      }
+
+      // Prefer nested field-level messages like:
+      // {"email": "User is already verified"} or
+      // {"user": {"email": ["user with this email already exists."]}}
+      final fieldMessage = _extractFieldMessage(data);
+      if (fieldMessage != null && fieldMessage.isNotEmpty) {
+        return fieldMessage;
+      }
+
+      if (message != null && message.isNotEmpty) {
+        return message;
+      }
+
       if (detail != null && detail.isNotEmpty) {
         return detail;
       }
     }
     return _extractFirstText(data);
+  }
+
+  String? _extractFieldMessage(Map<String, dynamic> data) {
+    const reservedKeys = {'message', 'detail', 'error', 'status', 'code'};
+
+    for (final entry in data.entries) {
+      final key = entry.key.toLowerCase();
+      if (reservedKeys.contains(key)) {
+        continue;
+      }
+      final found = _extractFirstText(entry.value);
+      if (found != null && found.isNotEmpty) {
+        return found;
+      }
+    }
+
+    final errorValue = data['error'];
+    if (errorValue is Map<String, dynamic>) {
+      final found = _extractFirstText(errorValue['message'] ?? errorValue);
+      if (found != null && found.isNotEmpty) {
+        return found;
+      }
+    }
+
+    return null;
+  }
+
+  bool _isGenericMessage(String message) {
+    final normalized = message.trim().toLowerCase();
+    return normalized == 'invalid request. please check your input.' ||
+        normalized == 'invalid request' ||
+        normalized == 'bad request';
   }
 
   String? _extractFirstText(dynamic value) {

@@ -48,10 +48,10 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final authState = context.watch<AuthCubit>().state;
-    final currentName = authState is AuthLoaded
-        ? authState.user.name
+    final currentNickname = authState is AuthLoaded
+        ? authState.user.nickname
         : authState is AuthProfileUpdated
-        ? authState.user.name
+        ? authState.user.nickname
         : '';
 
     return Scaffold(
@@ -179,7 +179,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                   final saved = await context
                       .read<AuthCubit>()
                       .updateProfileInfo(
-                        name: currentName,
+                        nickname: currentNickname,
                         birthDate: selectedDate!,
                         gender: selectedGender!,
                         phoneNumber: phoneController.text.trim().isNotEmpty

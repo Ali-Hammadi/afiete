@@ -3,7 +3,6 @@ import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
-import 'package:afiete/feature/settings/presentation/widgets/info_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,25 +17,26 @@ class ProfileInfoScreen extends StatefulWidget {
 class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   static const String _genderMale = 'Male';
   static const String _genderFemale = 'Female';
-  static const String _genderOther = 'Other';
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
   DateTime _selectedBirthDate = DateTime.now();
   String _selectedGender = _genderMale;
   bool _isInitialized = false;
   bool _isSaving = false;
+  bool _isPasswordVisible = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_isInitialized) return;
     final user = _currentUser;
-    _nameController.text = user?.name ?? '';
+
+    _nicknameController.text = user?.nickname ?? '';
     _emailController.text = user?.email ?? '';
     _phoneController.text = user?.phoneNumber ?? '';
     _selectedBirthDate = user?.birthDate ?? DateTime.now();
@@ -50,16 +50,14 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     if (value == 'female' || value == 'أنثى' || value == 'انثى') {
       return _genderFemale;
     }
-    if (value == 'other' || value == 'آخر' || value == 'اخر') {
-      return _genderOther;
-    }
     return _genderMale;
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _nicknameController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
     _phoneController.dispose();
     super.dispose();
   }
@@ -69,7 +67,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final user = _currentUser;
-    final displayId = user?.username.isNotEmpty == true ? user!.username : '';
+    final displayUsername = user?.username.isNotEmpty == true
+        ? user!.username
+        : '';
+    final displayId = displayUsername;
     final displayAge = user?.age ?? 0;
 
     return Scaffold(
@@ -108,22 +109,8 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          _nameController.text.isNotEmpty
-                              ? _nameController.text
-                              : '—',
-                          style: AppStyles.headingSmall,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          SettingsStrings.usernameLabel,
-                          style: AppStyles.bodySmall.copyWith(
-                            color: colorScheme.onSurface.withValues(
-                              alpha: 0.65,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 6),
+
                         InkWell(
                           onTap: () => _copyUsername(context, displayId),
                           borderRadius: BorderRadius.circular(8),
@@ -143,6 +130,15 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 4),
+
+                        const SizedBox(height: 2),
+                        Text(
+                          user?.nickname?.isNotEmpty == true
+                              ? user!.nickname ?? '—'
+                              : '—',
+                          style: AppStyles.bodyMedium,
+                        ),
                       ],
                     ),
                   ),
@@ -157,13 +153,13 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               ),
               const SizedBox(height: 20),
               _buildField(
-                controller: _nameController,
-                label: SettingsStrings.fullNameTitle,
+                controller: _nicknameController,
+                label: 'Nickname',
                 icon: Icons.badge_outlined,
-                keyboardType: TextInputType.name,
+                keyboardType: TextInputType.text,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Name is required';
+                    return 'Nickname is required';
                   }
                   return null;
                 },
@@ -181,6 +177,22 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                   }
                   if (!text.contains('@')) {
                     return 'Enter a valid email address';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildField(
+                controller: _passwordController,
+                label: SettingsStrings.passwordTitle,
+                icon: Icons.lock_outline,
+                keyboardType: TextInputType.visiblePassword,
+                isPassword: true,
+                validator: (value) {
+                  if (value != null && value.isNotEmpty) {
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
                   }
                   return null;
                 },
@@ -234,10 +246,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                     value: _genderFemale,
                     child: Text(SettingsStrings.female),
                   ),
-                  DropdownMenuItem(
-                    value: _genderOther,
-                    child: Text(SettingsStrings.other),
-                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) {
@@ -250,12 +258,13 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
               const SizedBox(height: 18),
               _buildField(
                 controller: _phoneController,
-                label: SettingsStrings.phoneTitleProfile,
+                label:
+                    '${SettingsStrings.phoneTitleProfile} (with country code)',
                 icon: Icons.phone_outlined,
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
-                    if (value.length < 9) {
+                    if (value.length < 10) {
                       return SettingsStrings.invalidPhoneNumber;
                     }
                   }
@@ -278,6 +287,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                 ],
               ),
               const SizedBox(height: 24),
+
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
@@ -300,33 +310,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
                           ),
                         ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              CustomInfoRow(
-                icon: Icons.email,
-                leftText: _emailController.text.isNotEmpty
-                    ? _emailController.text
-                    : '—',
-                rightActionText: SettingsStrings.changeEmailTitle,
-                onActionPressed: _handleChangeEmail,
-              ),
-              const SizedBox(height: 20),
-              CustomInfoRow(
-                icon: Icons.phone,
-                leftText: _phoneController.text.isNotEmpty
-                    ? _phoneController.text
-                    : '—',
-                rightActionText: SettingsStrings.addNumberTitle,
-                onActionPressed: () {
-                  // Could implement phone number change functionality
-                },
-              ),
-              const SizedBox(height: 20),
-              CustomInfoRow(
-                icon: Icons.lock,
-                leftText: '************',
-                rightActionText: SettingsStrings.changePasswordTitle,
-                onActionPressed: _handleChangePassword,
               ),
               const SizedBox(height: 24),
               Center(
@@ -380,14 +363,30 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     required IconData icon,
     required TextInputType keyboardType,
     required String? Function(String?) validator,
+    bool isPassword = false,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      obscureText: isPassword && !_isPasswordVisible,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _isPasswordVisible
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+              )
+            : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       ),
       onChanged: (_) => setState(() {}),
@@ -399,7 +398,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       return;
     }
 
-    final name = _nameController.text.trim();
+    final nickname = _nicknameController.text.trim();
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -429,7 +428,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
 
     try {
       final saved = await context.read<AuthCubit>().updateProfileInfo(
-        name: name,
+        nickname: nickname,
         birthDate: _selectedBirthDate,
         gender: _selectedGender,
         phoneNumber: _phoneController.text.trim().isNotEmpty
@@ -449,20 +448,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
         });
       }
     }
-  }
-
-  Future<void> _handleChangeEmail() async {
-    await Navigator.pushNamed(context, MyRoutes.emailChangeScreen);
-    if (mounted) {
-      setState(() {
-        final user = _currentUser;
-        _emailController.text = user?.email ?? '';
-      });
-    }
-  }
-
-  Future<void> _handleChangePassword() async {
-    await Navigator.pushNamed(context, MyRoutes.passwordChangeScreen);
   }
 
   Future<void> _handleDeleteAccount() async {

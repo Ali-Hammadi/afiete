@@ -1,9 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 class UserAuthEntity extends Equatable {
-  final String id;
   final String username;
-  final String name;
+  final String nickname;
   final String email;
   final String password;
   final String token;
@@ -14,9 +13,8 @@ class UserAuthEntity extends Equatable {
   final String? phoneNumber;
 
   const UserAuthEntity({
-    required this.id,
     this.username = '',
-    required this.name,
+    required this.nickname,
     required this.email,
     required this.password,
     required this.token,
@@ -30,7 +28,7 @@ class UserAuthEntity extends Equatable {
   UserAuthEntity copyWith({
     String? id,
     String? username,
-    String? name,
+    String? nickname,
     String? email,
     String? password,
     String? token,
@@ -41,9 +39,8 @@ class UserAuthEntity extends Equatable {
     String? phoneNumber,
   }) {
     return UserAuthEntity(
-      id: id ?? this.id,
       username: username ?? this.username,
-      name: name ?? this.name,
+      nickname: nickname ?? this.nickname,
       email: email ?? this.email,
       password: password ?? this.password,
       token: token ?? this.token,
@@ -57,9 +54,8 @@ class UserAuthEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
     username,
-    name,
+    nickname,
     email,
     password,
     token,

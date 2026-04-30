@@ -5,12 +5,12 @@ import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 
 class SignupParams {
-  final String name;
+  final String nickname;
   final String email;
   final String password;
 
   const SignupParams({
-    required this.name,
+    required this.nickname,
     required this.email,
     required this.password,
   });
@@ -23,6 +23,10 @@ class SignupUseCase implements UseCase<UserAuthEntity, SignupParams> {
 
   @override
   Future<Either<Failure, UserAuthEntity>> call(SignupParams params) async {
-    return await repository.signup(params.name, params.email, params.password);
+    return await repository.signup(
+      params.nickname,
+      params.email,
+      params.password,
+    );
   }
 }

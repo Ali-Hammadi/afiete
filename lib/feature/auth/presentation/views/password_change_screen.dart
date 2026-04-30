@@ -43,7 +43,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         title: Text(
-          SettingsStrings.changePasswordTitle,
+          SettingsStrings.passwordTitle,
           style: AppStyles.headingMedium,
         ),
       ),
@@ -175,7 +175,7 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
                         ),
                       )
                     : Text(
-                        SettingsStrings.changePasswordTitle,
+                        SettingsStrings.passwordTitle,
                         style: AppStyles.headingSmall.copyWith(
                           color: colorScheme.onPrimary,
                         ),

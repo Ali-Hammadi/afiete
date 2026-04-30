@@ -4,7 +4,7 @@ import '../../domain/entities/auth_user_entity.dart';
 class UserModel extends Equatable {
   final String id;
   final String username;
-  final String name;
+  final String? nickname;
   final String email;
   final String password;
   final String token;
@@ -17,7 +17,7 @@ class UserModel extends Equatable {
   const UserModel({
     required this.id,
     this.username = '',
-    required this.name,
+    this.nickname,
     required this.email,
     required this.password,
     required this.token,
@@ -41,7 +41,7 @@ class UserModel extends Equatable {
   UserModel copyWith({
     String? id,
     String? username,
-    String? name,
+    String? nickname,
     String? email,
     String? password,
     String? token,
@@ -54,7 +54,7 @@ class UserModel extends Equatable {
     return UserModel(
       id: id ?? this.id,
       username: username ?? this.username,
-      name: name ?? this.name,
+      nickname: nickname ?? this.nickname,
       email: email ?? this.email,
       password: password ?? this.password,
       token: token ?? this.token,
@@ -90,6 +90,7 @@ class UserModel extends Equatable {
                   '${mergedJson['first_name'] ?? ''} ${mergedJson['last_name'] ?? ''}')
               .toString()
               .trim(),
+      nickname: mergedJson['nickname'] ?? "".toString(),
       email: (mergedJson['email'] ?? '').toString(),
       password: (mergedJson['password'] ?? '').toString(),
       token: (mergedJson['token'] ?? mergedJson['access'] ?? '').toString(),
@@ -111,7 +112,7 @@ class UserModel extends Equatable {
   UserAuthEntity toEntity() => UserAuthEntity(
     id: id,
     username: username,
-    name: name,
+    nickname: nickname,
     email: email,
     password: password,
     token: token,
@@ -126,7 +127,7 @@ class UserModel extends Equatable {
   List<Object?> get props => [
     id,
     username,
-    name,
+    nickname,
     email,
     password,
     token,
