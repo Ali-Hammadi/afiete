@@ -8,6 +8,8 @@ abstract class ApiEndpoints {
   static const String settings = '/api/settings';
   static const String assignments = '/api/assignments';
   static const String reports = '/api/reports';
+  static const String voice = '/voice';
+  static const String video = '/video';
   static const String users = '$api/users';
   static const String patients = '$api/patients';
   static const String token = '$api/token';
@@ -20,6 +22,8 @@ abstract class ApiEndpoints {
   static const String updateProfile = '$patients/profile/';
   static const String requestEmailChangeOtp = '$users/otp/resend';
   static const String confirmEmailChange = '$users/otp/verify';
+  static const String requestEmailChange = '$users/email-change/request';
+  static const String confirmEmailChangeNew = '$users/email-change/confirm';
   static const String changePassword = '$users/password/change/';
   static const String resetPassword = '$users/password/reset/';
   static const String tokenObtainPair = '$token/';
@@ -28,6 +32,11 @@ abstract class ApiEndpoints {
 
   static const String allDoctors = doctors;
   static String doctorById(String id) => '$doctors/$id';
+  static const String doctorRegister = '$doctors/register/';
+  static const String doctorProfileUpdate = '$doctors/profile/update';
+  static const String doctorEducation = '$doctors/profile/education/';
+  static String doctorEducationById(String id) =>
+      '$doctors/profile/education/$id/';
 
   // Articles endpoints
   static const String allArticles = '$articles/';
@@ -48,6 +57,8 @@ abstract class ApiEndpoints {
 
   static const String appointmentsList = '$appointments/list';
   static const String appointmentsCreate = '$appointments/create';
+  static const String appointmentsCancel = '$appointments/cancel';
+  static const String appointmentsReschedule = '$appointments/reschedule';
 
   static const String sessionsUpcoming = '$sessions/upcoming';
   static const String sessionsPast = '$sessions/past';
@@ -57,6 +68,10 @@ abstract class ApiEndpoints {
   static const String sessionsReview = '$sessions/review';
 
   static const String settingsMedicalProfile = '$settings/medical-profile';
+  static const String settingsMedicalProfileNotes =
+      '$settings/medical-profile/notes';
+  static const String settingsMedicalProfileNotesShare =
+      '$settings/medical-profile/notes/share';
   static const String settingsReports = '$settings/reports';
 
   static const String assignmentQuestions = '$assignments/questions';
@@ -65,4 +80,12 @@ abstract class ApiEndpoints {
   static const String reportsSubmit = '$reports/submit';
   static const String reportsHistory = '$reports/history';
   static const String reportsByType = '$reports/by-type';
+
+  static const String voiceCalls = '$voice/calls';
+  static const String voiceCallsStart = '$voice/calls/start';
+  static String voiceCallsEnd(String callId) => '$voice/calls/$callId/end';
+
+  static const String videoCalls = '$video/calls';
+  static const String videoCallsStart = '$video/calls/start';
+  static String videoCallsEnd(String callId) => '$video/calls/$callId/end';
 }

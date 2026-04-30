@@ -1,3 +1,4 @@
+import 'package:afiete/core/network/api_endpoints.dart';
 import 'package:afiete/feature/video/data/models/video_call_model.dart';
 import 'package:dio/dio.dart';
 
@@ -21,7 +22,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDataSource {
   @override
   Future<List<VideoCallModel>> getCallHistory(String patientId) async {
     final response = await dio.get(
-      '/video/calls',
+      ApiEndpoints.videoCalls,
       queryParameters: {'patientId': patientId},
     );
     final data = response.data as List<dynamic>;
@@ -37,7 +38,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDataSource {
     required String sessionId,
   }) async {
     final response = await dio.post(
-      '/video/calls/start',
+      ApiEndpoints.videoCallsStart,
       data: {
         'doctorId': doctorId,
         'patientId': patientId,
@@ -49,7 +50,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDataSource {
 
   @override
   Future<VideoCallModel> endCall(String callId) async {
-    final response = await dio.post('/video/calls/$callId/end');
+    final response = await dio.post(ApiEndpoints.videoCallsEnd(callId));
     return VideoCallModel.fromJson(response.data as Map<String, dynamic>);
   }
 }

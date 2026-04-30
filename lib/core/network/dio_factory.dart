@@ -89,7 +89,10 @@ abstract class DioFactory {
         data: {'refresh': refreshToken},
       );
 
-      final refreshedAccessToken = response.data?['access']?.toString() ?? '';
+      final refreshedAccessToken =
+          _extractAccessToken(response.data) ??
+          _extractAccessToken(response.data?['data']) ??
+          '';
       if (refreshedAccessToken.isEmpty) {
         return false;
       }
@@ -137,8 +140,14 @@ abstract class DioFactory {
     if (statusCode == 404) {
       return responseMessage ?? 'Requested resource was not found.';
     }
+    if (statusCode == 409) {
+      return responseMessage ?? 'A conflicting resource already exists.';
+    }
     if (statusCode == 422) {
       return responseMessage ?? 'Validation failed. Please review your input.';
+    }
+    if (statusCode == 429) {
+      return responseMessage ?? 'Too many requests. Please try again later.';
     }
     if (statusCode != null && statusCode >= 500) {
       return responseMessage ?? 'Server error. Please try again later.';
@@ -154,11 +163,52 @@ abstract class DioFactory {
         return directMessage;
       }
 
+      final detailMessage = data['detail']?.toString();
+      if (detailMessage != null && detailMessage.isNotEmpty) {
+        return detailMessage;
+      }
+
       final errorObj = data['error'];
       if (errorObj is Map<String, dynamic>) {
         final nestedMessage = errorObj['message']?.toString();
         if (nestedMessage != null && nestedMessage.isNotEmpty) {
           return nestedMessage;
+        }
+      }
+
+      final errors = data['errors'];
+      if (errors is Map<String, dynamic>) {
+        for (final value in errors.values) {
+          if (value is List && value.isNotEmpty) {
+            final first = value.first?.toString();
+            if (first != null && first.isNotEmpty) {
+              return first;
+            }
+          } else if (value != null) {
+            final text = value.toString();
+            if (text.isNotEmpty) {
+              return text;
+            }
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  static String? _extractAccessToken(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final directAccess = data['access']?.toString();
+      if (directAccess != null && directAccess.isNotEmpty) {
+        return directAccess;
+      }
+
+      final nestedData = data['data'];
+      if (nestedData is Map<String, dynamic>) {
+        final nestedAccess = nestedData['access']?.toString();
+        if (nestedAccess != null && nestedAccess.isNotEmpty) {
+          return nestedAccess;
         }
       }
     }

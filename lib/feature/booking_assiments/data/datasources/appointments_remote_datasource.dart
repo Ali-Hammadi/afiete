@@ -130,7 +130,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
   Future<void> cancelAppointment(String appointmentId) async {
     try {
       final response = await _dio.post(
-        '${ApiEndpoints.appointments}/cancel',
+        ApiEndpoints.appointmentsCancel,
         data: {'appointmentId': appointmentId},
       );
       if (response.statusCode != 200) {
@@ -144,9 +144,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(
-          path: '${ApiEndpoints.appointments}/cancel',
-        ),
+        requestOptions: RequestOptions(path: ApiEndpoints.appointmentsCancel),
         error: e,
         type: DioExceptionType.unknown,
       );
@@ -160,7 +158,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '${ApiEndpoints.appointments}/reschedule',
+        ApiEndpoints.appointmentsReschedule,
         data: {
           'appointmentId': appointmentId,
           'newScheduledAt': newScheduledAt.toIso8601String(),
@@ -186,7 +184,7 @@ class AppointmentsRemoteDataSourceImpl implements AppointmentsRemoteDataSource {
     } catch (e) {
       throw DioException(
         requestOptions: RequestOptions(
-          path: '${ApiEndpoints.appointments}/reschedule',
+          path: ApiEndpoints.appointmentsReschedule,
         ),
         error: e,
         type: DioExceptionType.unknown,

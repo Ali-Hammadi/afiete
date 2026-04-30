@@ -1,3 +1,4 @@
+import 'package:afiete/core/network/api_endpoints.dart';
 import 'package:afiete/feature/voice/data/models/voice_call_model.dart';
 import 'package:dio/dio.dart';
 
@@ -21,7 +22,7 @@ class VoiceRemoteDataSourceImpl implements VoiceRemoteDataSource {
   @override
   Future<List<VoiceCallModel>> getCallHistory(String patientId) async {
     final response = await dio.get(
-      '/voice/calls',
+      ApiEndpoints.voiceCalls,
       queryParameters: {'patientId': patientId},
     );
     final data = response.data as List<dynamic>;
@@ -37,7 +38,7 @@ class VoiceRemoteDataSourceImpl implements VoiceRemoteDataSource {
     required String sessionId,
   }) async {
     final response = await dio.post(
-      '/voice/calls/start',
+      ApiEndpoints.voiceCallsStart,
       data: {
         'doctorId': doctorId,
         'patientId': patientId,
@@ -49,7 +50,7 @@ class VoiceRemoteDataSourceImpl implements VoiceRemoteDataSource {
 
   @override
   Future<VoiceCallModel> endCall(String callId) async {
-    final response = await dio.post('/voice/calls/$callId/end');
+    final response = await dio.post(ApiEndpoints.voiceCallsEnd(callId));
     return VoiceCallModel.fromJson(response.data as Map<String, dynamic>);
   }
 }
