@@ -202,15 +202,15 @@ class AuthCubit extends Cubit<AuthState> {
         if (msg.contains('sign_in_cancelled') ||
             msg.contains('cancelled') ||
             msg.contains('cancel')) {
-          emit(
-            const AuthError('Google Sign-In was cancelled.'),
-          );
+          emit(const AuthError('Google Sign-In was cancelled.'));
           return;
         }
 
         if (msg.contains('play services') || msg.contains('google play')) {
           emit(
-            const AuthError('Please ensure Google Play Services is available on your device.'),
+            const AuthError(
+              'Please ensure Google Play Services is available on your device.',
+            ),
           );
           return;
         }
@@ -273,7 +273,8 @@ class AuthCubit extends Cubit<AuthState> {
           'update_profile:success',
           data: {'username': updatedUser.username, 'email': updatedUser.email},
         );
-        return _cacheAndEmitUser(updatedUser, asProfileUpdated: true);
+        final mergedUser = _mergeWithCurrentUser(currentState, updatedUser);
+        return _cacheAndEmitUser(mergedUser, asProfileUpdated: true);
       },
     );
   }
@@ -350,7 +351,8 @@ class AuthCubit extends Cubit<AuthState> {
           'confirm_email_change:success',
           data: {'username': updatedUser.username, 'email': updatedUser.email},
         );
-        emit(AuthProfileUpdated(updatedUser));
+        final mergedUser = _mergeWithCurrentUser(currentState, updatedUser);
+        emit(AuthProfileUpdated(mergedUser));
         return true;
       },
     );
@@ -559,5 +561,39 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthLoaded(user));
     }
     return true;
+  }
+
+  UserAuthEntity _mergeWithCurrentUser(
+    AuthState currentState,
+    UserAuthEntity updatedUser,
+  ) {
+    final currentUser = currentState is AuthLoaded
+        ? currentState.user
+        : currentState is AuthProfileUpdated
+        ? currentState.user
+        : updatedUser;
+
+    return updatedUser.copyWith(
+      username: updatedUser.username.isNotEmpty
+          ? updatedUser.username
+          : currentUser.username,
+      nickname: updatedUser.nickname.isNotEmpty
+          ? updatedUser.nickname
+          : currentUser.nickname,
+      email: updatedUser.email.isNotEmpty
+          ? updatedUser.email
+          : currentUser.email,
+      password: updatedUser.password.isNotEmpty
+          ? updatedUser.password
+          : currentUser.password,
+      token: updatedUser.token.isNotEmpty
+          ? updatedUser.token
+          : currentUser.token,
+      birthDate: updatedUser.birthDate ?? currentUser.birthDate,
+      age: updatedUser.age ?? currentUser.age,
+      gender: updatedUser.gender ?? currentUser.gender,
+      phoneNumber: updatedUser.phoneNumber ?? currentUser.phoneNumber,
+      isVerified: updatedUser.isVerified || currentUser.isVerified,
+    );
   }
 }
