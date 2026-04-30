@@ -482,9 +482,9 @@ Video call object keys:
 
 These are currently expected in app code but may return 404 or unsupported behavior:
 
-1. `POST /api/auth/google-login`
+1. `POST /api/patients/google/auth/`
 	- Body: `id_token`
-	- Needed to complete Google Sign-In flow.
+	- Needed to complete Google Sign-In/registration flow.
 
 2. `POST /api/auth/delete-account`
 	- Needed for account deletion flow.

@@ -21,21 +21,18 @@ class FeelingCubit extends Cubit<FeelingState> {
   Future<void> loadFeelingHub() async {
     emit(FeelingLoading());
 
-    final currentResult = await getCurrentFeelingUseCase(NoParams());
+    await getCurrentFeelingUseCase(NoParams());
     final historyResult = await getFeelingHistoryUseCase(
       const GetFeelingHistoryParams(limit: 30),
-    );
-
-    final selectedFeeling = currentResult.fold(
-      (_) => null,
-      (feeling) => feeling,
     );
     final history = historyResult.fold(
       (_) => <FeelingEntryEntity>[],
       (items) => items,
     );
 
-    emit(FeelingLoaded(selectedFeeling: selectedFeeling, history: history));
+    // Always start the hub with no preselected feeling so users can pick again
+    // after leaving the screen or reopening the app.
+    emit(FeelingLoaded(selectedFeeling: null, history: history));
   }
 
   Future<void> selectFeeling(FeelingType feeling, {int intensity = 3}) async {

@@ -142,7 +142,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserAuthResponse"
-  /api/auth/google-login:
+  /api/patients/google/auth/:
     post:
       tags: [Auth]
       operationId: googleLogin

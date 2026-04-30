@@ -108,13 +108,19 @@ import 'package:dio/dio.dart';
 final sl = GetIt.instance;
 const bool useMockDataSources = true;
 
+const String googleWebClientId =
+    '1003547921607-12juc731vap30cbmmfjtkf38tr09ck8b.apps.googleusercontent.com';
+
 Future<void> init() async {
   // Core network
   sl.registerLazySingleton<Dio>(() => DioFactory.create());
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(dio: sl<Dio>()),
+    () => AuthRemoteDataSourceImpl(
+      dio: sl<Dio>(),
+      serverClientId: googleWebClientId,
+    ),
   );
 
   // Repositories
