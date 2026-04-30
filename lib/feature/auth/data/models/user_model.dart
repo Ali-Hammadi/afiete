@@ -2,9 +2,8 @@ import 'package:equatable/equatable.dart';
 import '../../domain/entities/auth_user_entity.dart';
 
 class UserModel extends Equatable {
-  final String id;
   final String username;
-  final String? nickname;
+  final String nickname;
   final String email;
   final String password;
   final String token;
@@ -15,9 +14,8 @@ class UserModel extends Equatable {
   final String? phoneNumber;
 
   const UserModel({
-    required this.id,
     this.username = '',
-    this.nickname,
+    required this.nickname,
     required this.email,
     required this.password,
     required this.token,
@@ -52,7 +50,6 @@ class UserModel extends Equatable {
     String? phoneNumber,
   }) {
     return UserModel(
-      id: id ?? this.id,
       username: username ?? this.username,
       nickname: nickname ?? this.nickname,
       email: email ?? this.email,
@@ -76,7 +73,6 @@ class UserModel extends Equatable {
         : null;
 
     return UserModel(
-      id: (mergedJson['id'] ?? mergedJson['user_id'] ?? '').toString(),
       username:
           (mergedJson['username'] ??
                   mergedJson['nickname'] ??
@@ -84,12 +80,7 @@ class UserModel extends Equatable {
                   '')
               .toString()
               .trim(),
-      name:
-          (mergedJson['name'] ??
-                  mergedJson['nickname'] ??
-                  '${mergedJson['first_name'] ?? ''} ${mergedJson['last_name'] ?? ''}')
-              .toString()
-              .trim(),
+
       nickname: mergedJson['nickname'] ?? "".toString(),
       email: (mergedJson['email'] ?? '').toString(),
       password: (mergedJson['password'] ?? '').toString(),
@@ -110,7 +101,6 @@ class UserModel extends Equatable {
   }
 
   UserAuthEntity toEntity() => UserAuthEntity(
-    id: id,
     username: username,
     nickname: nickname,
     email: email,
@@ -125,7 +115,6 @@ class UserModel extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
     username,
     nickname,
     email,

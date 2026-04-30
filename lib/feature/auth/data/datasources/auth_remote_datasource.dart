@@ -98,7 +98,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final parsedUser = UserModel.fromJson(responseMap);
 
       return parsedUser.copyWith(
-        id: parsedUser.id.isNotEmpty ? parsedUser.id : email,
         email: parsedUser.email.isNotEmpty ? parsedUser.email : email,
         password: password,
         token: accessToken,
@@ -170,7 +169,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final parsedUser = UserModel.fromJson(responseMap);
 
       return parsedUser.copyWith(
-        id: parsedUser.id.isNotEmpty ? parsedUser.id : email,
         username: parsedUser.username.isNotEmpty
             ? parsedUser.username
             : nickname,
@@ -218,7 +216,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await TokenStorage.clearTokens();
       _logInfo('logout:success', data: {'email': email});
       return UserModel(
-        id: email,
         username: 'Logged Out',
         nickname: 'Logged Out',
         email: email,
@@ -251,7 +248,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.statusCode == 200 || response.statusCode == 204) {
         await TokenStorage.clearTokens();
         return UserModel(
-          id: email,
           username: 'Deleted User',
           nickname: 'Deleted User',
           email: email,
@@ -395,7 +391,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             (dataMap['user'] as Map<String, dynamic>?) ?? <String, dynamic>{};
 
         return UserModel(
-          id: userId,
           username:
               (userMap['username'] ??
                       userMap['nickname'] ??
@@ -507,9 +502,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.statusCode == 200) {
         final accessToken = await TokenStorage.getAccessToken();
         return UserModel(
-          id: userId,
           username: userId,
-
+          nickname: userId,
           email: newEmail,
           password: '',
           token: accessToken ?? '',
@@ -648,14 +642,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             };
 
         return UserModel(
-          id: email,
           username:
               (userData['username'] ??
                       userData['nickname'] ??
                       userData['name'] ??
                       email.split('@').first)
                   .toString(),
-
+          nickname: userData['nickname']?.toString() ?? email.split('@').first,
           email: (userData['email'] ?? email).toString(),
           password: '',
           token: accessToken,
