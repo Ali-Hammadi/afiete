@@ -169,7 +169,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          error: 'Signup failed: ${response.statusCode}',
+          error:
+              'Unable to complete sign-up. The server returned status code ${response.statusCode}.',
         );
       }
 
@@ -271,7 +272,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Delete account failed',
+        error: 'Unable to delete the account.',
       );
     } on DioException catch (e) {
       _logError(
@@ -309,18 +310,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final account = await _googleSignIn.signIn();
       if (account == null) {
         _logError('google_sign_in:cancelled');
-        throw Exception('Google Sign-In cancelled');
+        throw Exception('Google Sign-In was cancelled by the user.');
       }
       final auth = await account.authentication;
       if (auth.idToken == null || auth.idToken!.isEmpty) {
         _logError(
           'google_sign_in:id_token_missing',
-          error: 'idToken is null — configure GoogleSignIn with serverClientId',
+          error:
+              'idToken is missing. Configure GoogleSignIn with serverClientId so the provider can return an idToken.',
         );
         throw DioException(
           requestOptions: RequestOptions(path: ApiEndpoints.googleLogin),
           error:
-              'Google id_token is missing. Make sure you provide your OAuth Web client ID as `serverClientId` when creating GoogleSignIn so the plugin returns an id_token.',
+              'Google Sign-In could not be completed because the id_token is missing. Provide the OAuth Web client ID as serverClientId when creating GoogleSignIn so the provider can return an id_token.',
         );
       }
 
@@ -343,7 +345,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          error: 'Google login failed',
+          error: 'Google Sign-In could not be completed.',
         );
       }
     } on DioException catch (e) {
@@ -360,8 +362,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           requestOptions: e.requestOptions,
           response: e.response,
           type: e.type,
-          error: 'Google Sign-In is not available in backend yet.',
-          message: 'Google Sign-In is not available in backend yet.',
+          error: 'Google Sign-In is not available in the backend yet.',
+          message: 'Google Sign-In is not available in the backend yet.',
         );
       }
       rethrow;
@@ -445,7 +447,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Profile update failed',
+        error: 'Unable to update the profile information.',
       );
     } on DioException {
       rethrow;
@@ -473,12 +475,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'request_email_otp:success',
           data: {'statusCode': response.statusCode, 'body': response.data},
         );
-        return _extractMessage(response.data) ?? 'OTP sent successfully.';
+        return _extractMessage(response.data) ??
+            'Verification code sent successfully.';
       }
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Failed to request email OTP',
+        error: 'Unable to request a verification code for this email address.',
       );
     } on DioException catch (e) {
       _logError(
@@ -498,9 +501,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           response: e.response,
           type: e.type,
           error:
-              'Email change OTP is not supported by backend yet. The current endpoint only resends OTP for existing account email verification.',
+              'The backend does not currently support sending an OTP for email change. This endpoint only resends verification codes for the current account email.',
           message:
-              'Email change OTP is not supported by backend yet. The current endpoint only resends OTP for existing account email verification.',
+              'The backend does not currently support sending an OTP for email change. This endpoint only resends verification codes for the current account email.',
         );
       }
       rethrow;
@@ -525,9 +528,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'confirm_email_change:start',
         data: {'userId': userId, 'newEmail': newEmail, 'otpLength': otp.length},
       );
+      final requestData = {
+        ApiEndpoints.keyEmail: newEmail,
+        ApiEndpoints.keyCode: otp,
+      };
+      _logInfo('confirm_email_change:request', data: requestData);
       final response = await _dio.post(
         ApiEndpoints.confirmEmailChange,
-        data: {ApiEndpoints.keyEmail: newEmail, ApiEndpoints.keyCode: otp},
+        data: requestData,
       );
       _logInfo(
         'confirm_email_change:response',
@@ -546,7 +554,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Email confirmation failed',
+        error: 'Unable to confirm the email change.',
       );
     } on DioException catch (e) {
       _logError(
@@ -565,9 +573,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           response: e.response,
           type: e.type,
           error:
-              'Email change confirmation is not fully supported by backend yet for new emails.',
+              'The backend does not currently support confirming a new email address with this flow.',
           message:
-              'Email change confirmation is not fully supported by backend yet for new emails.',
+              'The backend does not currently support confirming a new email address with this flow.',
         );
       }
       rethrow;
@@ -597,7 +605,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Failed to send verification OTP',
+        error: 'Unable to send the verification code.',
       );
     } on DioException catch (e) {
       _logError(
@@ -637,9 +645,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'verify_otp:start',
         data: {'email': email, 'codeLength': code.length},
       );
+      final requestData = {
+        ApiEndpoints.keyEmail: email,
+        ApiEndpoints.keyCode: code,
+      };
+      _logInfo('verify_otp:request', data: requestData);
       final response = await _dio.post(
         ApiEndpoints.confirmEmailChange,
-        data: {ApiEndpoints.keyEmail: email, ApiEndpoints.keyCode: code},
+        data: requestData,
       );
       _logInfo(
         'verify_otp:response',
@@ -692,7 +705,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'OTP verification failed',
+        error: 'Unable to verify the one-time code.',
       );
     } on DioException catch (e) {
       _logError(
@@ -746,13 +759,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return _extractMessage(response.data) ??
-            'Password changed successfully.';
+            'Password updated successfully.';
       }
 
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Password change failed',
+        error: 'Unable to change the password.',
       );
     } on DioException catch (e) {
       _logError(
@@ -805,13 +818,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return _extractMessage(response.data) ?? 'Password reset successfully.';
+        return _extractMessage(response.data) ??
+            'Password reset completed successfully.';
       }
 
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Password reset failed',
+        error: 'Unable to reset the password.',
       );
     } on DioException catch (e) {
       _logError(

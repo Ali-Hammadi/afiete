@@ -59,7 +59,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Map<String, dynamic> _encodeUser(UserAuthEntity user) {
     return {
       'username': user.username,
-      'nickName': user.nickname,
+      'nickname': user.nickname,
       'email': user.email,
       'password': user.password,
       'token': user.token,
@@ -155,12 +155,21 @@ class AuthRepositoryImpl implements AuthRepository {
       final message = e.message ?? e.toString();
       return Left(
         ServerFailure(
-          'Google Sign-In failed: $message. Please check Google OAuth configuration (package name, SHA-1) and ensure Google Play Services are available.',
+          'Google Sign-In failed: $message. Verify the OAuth client configuration, package name, SHA-1 fingerprint, and Google Play Services availability.',
         ),
       );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_normalizeExceptionMessage(e)));
     }
+  }
+
+  String _normalizeExceptionMessage(Object error) {
+    final raw = error.toString().trim();
+    if (raw.isEmpty) {
+      return 'An unexpected authentication error occurred. Please try again.';
+    }
+
+    return raw.replaceFirst(RegExp(r'^(Exception|Error):\s*'), '').trim();
   }
 
   @override

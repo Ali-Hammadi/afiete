@@ -1,9 +1,6 @@
 abstract class ApiEndpoints {
   static const String api = '/api';
-  // Note: the backend OpenAPI exposes auth-related routes directly under
-  // `/api` (e.g. `/api/token/`, `/api/users/...`). Keep `auth` for
-  // backward compatibility but point it to `api` so concatenation yields
-  // `/api/...` paths.
+
   static const String auth = '/api';
   static const String doctors = '/api/doctors';
   static const String articles = '/api/articles';
@@ -20,26 +17,14 @@ abstract class ApiEndpoints {
 
   static const String login = '$users/login/';
   static const String signup = '$patients/register/';
-  // The OpenAPI available locally documents `login` and user OTP endpoints.
-  // Endpoints below (logout, deleteAccount, googleLogin) are kept for the
-  // app flow but are not listed in the OpenAPI; verify with backend if
-  // different paths are required.
   static const String logout = '$auth/logout';
-  // Backend provided delete account path
   static const String deleteAccount = '$users/account/delete/';
-  // Backend Google auth endpoint used for sign-in / registration with Google.
-  // Points to `/api/patients/google/auth/` as requested by backend team.
   static const String googleLogin = '$patients/google/auth/';
   static const String updateProfile = '$patients/profile/';
-  // OTP endpoints (present in OpenAPI)
+
   static const String requestEmailChangeOtp = '$users/otp/resend';
   static const String confirmEmailChange = '$users/otp/verify';
 
-  // The following endpoints are not present in the local OpenAPI file.
-  // Keep them here but verify path names with the backend team and update
-  // if the server exposes different routes.
-  // The backend uses the same endpoint for email reset (and password reset)
-  // per server info: /api/users/email/reset
   static const String requestEmailChange = '$users/email/reset';
   static const String confirmEmailChangeNew = '$users/email-change/confirm';
   static const String changePassword = '$users/password/change/';

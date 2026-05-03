@@ -89,9 +89,23 @@ class ServerFailure extends Failure {
 
     extractedMessage = _toUserFriendlyMessage(extractedMessage ?? '');
 
-    if (statusCode == 400 || statusCode == 401 || statusCode == 403) {
+    if (statusCode == 400) {
       return ServerFailure(
-        extractedMessage.isNotEmpty ? extractedMessage : 'Authentication error',
+        extractedMessage.isNotEmpty
+            ? extractedMessage
+            : 'Your request could not be processed. Please review the entered data and try again.',
+      );
+    } else if (statusCode == 401) {
+      return ServerFailure(
+        extractedMessage.isNotEmpty
+            ? extractedMessage
+            : 'Authentication failed. Please sign in again.',
+      );
+    } else if (statusCode == 403) {
+      return ServerFailure(
+        extractedMessage.isNotEmpty
+            ? extractedMessage
+            : 'Access is forbidden for this account or action.',
       );
     } else if (statusCode == 404) {
       return ServerFailure(
@@ -217,6 +231,13 @@ class ServerFailure extends Failure {
     }
 
     final normalized = trimmed.toLowerCase();
+    if (normalized.contains('inactive') ||
+        normalized.contains('disabled') ||
+        normalized.contains('blocked') ||
+        normalized.contains('suspended') ||
+        normalized.contains('deactivated')) {
+      return 'This account is inactive or restricted on the server, so sign-in is currently unavailable. Please contact support if you believe this is an error.';
+    }
     if (normalized.contains('already verified')) {
       return 'Your account is already verified. Please sign in directly.';
     }

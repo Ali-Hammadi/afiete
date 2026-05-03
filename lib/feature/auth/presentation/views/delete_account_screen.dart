@@ -1,7 +1,9 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DeleteAccountScreen extends StatefulWidget {
@@ -277,10 +279,24 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       });
 
       if (success) {
+        // Clear all local app data (SharedPreferences) to return app to fresh state
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.clear();
+        } catch (_) {}
+
+        if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(SettingsStrings.accountDeletedSuccess)),
         );
-        Navigator.pop(context);
+
+        // Clear navigation stack and go to signup so user can create a new account
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          MyRoutes.signup,
+          (route) => false,
+        );
       }
     } catch (e) {
       if (!mounted) return;

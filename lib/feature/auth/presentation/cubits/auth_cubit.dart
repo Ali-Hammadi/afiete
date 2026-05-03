@@ -52,6 +52,14 @@ class AuthCubit extends Cubit<AuthState> {
     result.fold(
       (failure) {
         _log('login:error', data: {'message': failure.errorMessage});
+        if (_isInactiveAccountError(failure.errorMessage)) {
+          emit(
+            const AuthError(
+              'This account is inactive or restricted on the server, so sign-in is currently unavailable. Please contact support if you believe this is an error.',
+            ),
+          );
+          return Future.value();
+        }
         if (_isNotVerifiedError(failure.errorMessage)) {
           _log('login:account_not_verified_send_otp', data: {'email': email});
           return sendVerificationOtp(email);
@@ -59,7 +67,7 @@ class AuthCubit extends Cubit<AuthState> {
         if (_isAlreadyVerifiedError(failure.errorMessage)) {
           emit(
             const AuthError(
-              'Your account is already verified. Please sign in again.',
+              'Your account is already verified. Please sign in directly.',
             ),
           );
           return Future.value();
@@ -182,7 +190,7 @@ class AuthCubit extends Cubit<AuthState> {
         if (msg.contains('id_token') || msg.contains('id token')) {
           emit(
             const AuthError(
-              'Google Sign-In failed: id_token is missing. Please ensure you provide the OAuth Web Client ID in the app settings.',
+              'Google Sign-In could not be completed because the id_token is missing. Configure the OAuth Web Client ID in the app settings so the provider can return an id_token.',
             ),
           );
           return;
@@ -193,7 +201,7 @@ class AuthCubit extends Cubit<AuthState> {
             msg.contains('developer_error')) {
           emit(
             const AuthError(
-              'Google Sign-In failed: Configuration error (ApiException 10). Ensure your Android OAuth client is configured in Google Cloud Console with the correct package name and SHA-1 fingerprint.',
+              'Google Sign-In failed due to an Android OAuth configuration error (ApiException 10). Verify the package name and SHA-1 fingerprint in Google Cloud Console.',
             ),
           );
           return;
@@ -202,14 +210,14 @@ class AuthCubit extends Cubit<AuthState> {
         if (msg.contains('sign_in_cancelled') ||
             msg.contains('cancelled') ||
             msg.contains('cancel')) {
-          emit(const AuthError('Google Sign-In was cancelled.'));
+          emit(const AuthError('Google Sign-In was cancelled by the user.'));
           return;
         }
 
         if (msg.contains('play services') || msg.contains('google play')) {
           emit(
             const AuthError(
-              'Please ensure Google Play Services is available on your device.',
+              'Google Sign-In requires Google Play Services on this device.',
             ),
           );
           return;
@@ -544,6 +552,15 @@ class AuthCubit extends Cubit<AuthState> {
     final normalized = errorMessage.toLowerCase();
     return normalized.contains('already verified') ||
         normalized.contains('user is already verified');
+  }
+
+  bool _isInactiveAccountError(String errorMessage) {
+    final normalized = errorMessage.toLowerCase();
+    return normalized.contains('inactive') ||
+        normalized.contains('disabled') ||
+        normalized.contains('blocked') ||
+        normalized.contains('suspended') ||
+        normalized.contains('deactivated');
   }
 
   void _log(String message, {Map<String, dynamic>? data}) {
