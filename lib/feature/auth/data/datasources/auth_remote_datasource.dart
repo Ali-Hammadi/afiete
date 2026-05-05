@@ -34,6 +34,9 @@ abstract class AuthRemoteDataSource {
     required String newEmail,
   });
 
+  /// Confirms email change by verifying OTP sent to new email address.
+  /// This is SEPARATE from login OTP verification.
+  /// Uses the email change OTP verification endpoint.
   Future<UserModel> confirmEmailChange({
     required String userId,
     required String newEmail,
@@ -42,6 +45,9 @@ abstract class AuthRemoteDataSource {
 
   Future<bool> sendVerificationOtp(String email);
 
+  /// Verifies OTP for authentication/login purposes.
+  /// This is SEPARATE from email change OTP verification.
+  /// Uses the authentication OTP verification endpoint.
   Future<UserModel> verifyOtp(String email, String otp);
 
   Future<String> changePassword({
@@ -718,6 +724,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Verifies OTP for email change (separate from login OTP verification).
+  /// Uses [usersOtpVerify] endpoint specifically for email change confirmation.
   @override
   Future<UserModel> confirmEmailChange({
     required String userId,
@@ -839,6 +847,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Verifies OTP for login (separate from email change OTP verification).
+  /// Uses [usersAuthVerifyOtp] endpoint specifically for authentication OTP verification.
   @override
   Future<UserModel> verifyOtp(String email, String otp) async {
     try {
@@ -853,7 +863,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       };
       _logInfo('verify_otp:request', data: requestData);
       final response = await _dio.post(
-        ApiEndpoints.confirmEmailChange,
+        ApiEndpoints.usersAuthVerifyOtp,
         data: requestData,
       );
       _logInfo(
@@ -932,7 +942,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.confirmEmailChange),
+        requestOptions: RequestOptions(path: ApiEndpoints.usersAuthVerifyOtp),
         error: e.toString(),
       );
     }

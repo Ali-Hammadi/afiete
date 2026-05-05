@@ -11,6 +11,8 @@ class VerifyOtpParams {
   const VerifyOtpParams({required this.email, required this.otp});
 }
 
+/// Usecase for verifying OTP during login (SEPARATE from email change verification).
+/// Used when user authenticates with OTP instead of password.
 class VerifyOtpUseCase implements UseCase<UserAuthEntity, VerifyOtpParams> {
   final AuthRepository repository;
 

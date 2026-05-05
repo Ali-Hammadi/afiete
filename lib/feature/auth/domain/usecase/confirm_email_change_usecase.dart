@@ -16,6 +16,8 @@ class ConfirmEmailChangeParams {
   });
 }
 
+/// Usecase for confirming email change by verifying OTP (SEPARATE from login verification).
+/// Used when user changes their email address and needs to verify the new email with OTP.
 class ConfirmEmailChangeUseCase
     implements UseCase<UserAuthEntity, ConfirmEmailChangeParams> {
   final AuthRepository repository;
