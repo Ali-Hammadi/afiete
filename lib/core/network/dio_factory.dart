@@ -138,7 +138,8 @@ abstract class DioFactory {
       return responseMessage ?? 'Authentication failed. Please sign in again.';
     }
     if (statusCode == 403) {
-      return responseMessage ?? 'Access is forbidden for this account or action.';
+      return responseMessage ??
+          'Access is forbidden for this account or action.';
     }
     if (statusCode == 404) {
       return responseMessage ?? 'Requested resource was not found.';

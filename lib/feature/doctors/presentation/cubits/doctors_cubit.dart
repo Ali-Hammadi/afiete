@@ -42,9 +42,7 @@ class DoctorsCubit extends Cubit<DoctorsState> {
 
   Future<void> loadDoctorById(String id) async {
     emit(const DoctorLoading());
-    final result = await getDoctorByIdUseCase(
-      GetDoctorByIdParams(id: id),
-    );
+    final result = await getDoctorByIdUseCase(GetDoctorByIdParams(id: id));
     result.fold(
       (failure) => emit(DoctorError(failure.errorMessage)),
       (doctor) => emit(DoctorLoaded(doctor)),

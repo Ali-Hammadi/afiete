@@ -4,7 +4,10 @@ abstract class ApiEndpoints {
   static const String auth = '/api';
   static const String doctors = '/api/doctors';
   static const String articles = '/api/articles';
-  static const String appointments = '/api/appointments';
+  // Swagger shows "appointmetns" (historic typo) — keep as primary to match server
+  static const String appointments = '$api/appointmetns';
+  // Legacy/alternate spelling preserved for local compat
+  static const String appointmentsLegacy = '/api/appointments';
   static const String sessions = '/api/sessions';
   static const String settings = '/api/settings';
   static const String assignments = '/api/assignments';
@@ -33,22 +36,48 @@ abstract class ApiEndpoints {
   static const String tokenRefresh = '$token/refresh/';
   static const String tokenVerify = '$token/verify/';
 
+  // Assessments (per Swagger)
+  static const String assessmentsForm = '$api/assessments/form/';
+  static const String assessmentsFormSubmit = '$api/assessments/form/submit/';
+
+  // Users auth endpoints (per Swagger)
+  static const String usersForgotPassword = '$users/auth/forgot-password/';
+  static const String usersAuthResetPassword = '$users/auth/reset-password/';
+  static const String usersAuthVerifyOtp = '$users/auth/verify-otp/';
+  static const String usersEmailResetPut = '$users/email/reset/';
+  static const String usersEmailResetPatch = '$users/email/reset/';
+  static const String usersOtpResend = '$users/otp/resend/';
+  static const String usersOtpVerify = '$users/otp/verify/';
+  static const String usersPasswordResetPut = '$users/password/reset/';
+  static const String usersPasswordResetPatch = '$users/password/reset/';
+
   // Auth request keys
   static const String keyEmail = 'email';
   static const String keyPassword = 'password';
   static const String keyCurrentPassword = 'current_password';
   static const String keyNewPassword = 'new_password';
   static const String keyOtp = 'otp';
-  static const String keyCode = 'code';
   static const String keyIdToken = 'id_token';
 
   static const String allDoctors = doctors;
   static String doctorById(String id) => '$doctors/$id';
   static const String doctorRegister = '$doctors/register/';
-  static const String doctorProfileUpdate = '$doctors/profile/update';
-  static const String doctorEducation = '$doctors/profile/education/';
-  static String doctorEducationById(String id) =>
-      '$doctors/profile/education/$id/';
+  // Align with Swagger paths: profile update at /doctors/profile/
+  static const String doctorProfileUpdate = '$doctors/profile/';
+  // Education endpoints per Swagger: add via /doctors/education/add
+  static const String doctorEducationAdd = '$doctors/education/add';
+  static String doctorEducationById(String id) => '$doctors/education/$id/';
+  // Doctor schedule endpoints (per Swagger)
+  static const String doctorScheduleList = '$doctors/schedule/';
+  static const String doctorScheduleCreate = '$doctors/schedule/';
+  static String doctorScheduleById(String id) => '$doctors/schedule/$id/';
+  static String doctorScheduleUpdate(String id) => '$doctors/schedule/$id/';
+  static String doctorScheduleDelete(String id) => '$doctors/schedule/$id/';
+  // Appointments -> doctors prices under the "appointmetns" base (Swagger)
+  static const String appointmentsDoctorsPrices =
+      '$appointments/dcotors/prices/';
+  static String appointmentsDoctorsPricesByType(String type) =>
+      '$appointments/dcotors/prices/$type/';
 
   // Articles endpoints
   static const String allArticles = '$articles/';

@@ -50,4 +50,3 @@ class WaitingForOtpVerification extends AuthState {
   @override
   List<Object> get props => [email];
 }
-

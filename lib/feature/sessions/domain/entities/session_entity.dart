@@ -28,7 +28,8 @@ class SessionEntity extends Equatable {
   DateTime get endAt => scheduledAt.add(Duration(minutes: durationMinutes));
 
   String get timeRange {
-    final start = '${scheduledAt.hour}:${scheduledAt.minute.toString().padLeft(2, '0')}';
+    final start =
+        '${scheduledAt.hour}:${scheduledAt.minute.toString().padLeft(2, '0')}';
     final end = '${endAt.hour}:${endAt.minute.toString().padLeft(2, '0')}';
     return '$start - $end';
   }

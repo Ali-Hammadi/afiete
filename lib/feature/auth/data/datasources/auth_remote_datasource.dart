@@ -530,7 +530,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       final requestData = {
         ApiEndpoints.keyEmail: newEmail,
-        ApiEndpoints.keyCode: otp,
+        ApiEndpoints.keyOtp: otp,
       };
       _logInfo('confirm_email_change:request', data: requestData);
       final response = await _dio.post(
@@ -647,7 +647,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       final requestData = {
         ApiEndpoints.keyEmail: email,
-        ApiEndpoints.keyCode: code,
+        ApiEndpoints.keyOtp: code,
       };
       _logInfo('verify_otp:request', data: requestData);
       final response = await _dio.post(

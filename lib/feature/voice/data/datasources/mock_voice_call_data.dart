@@ -170,7 +170,8 @@ class MockVoiceCallData {
       'callId': 'acall_001',
       'doctorId': 'doc_001',
       'patientId': 'user_001',
-      'content': 'Doctor: Hello Ahmed, how are you feeling today?\n'
+      'content':
+          'Doctor: Hello Ahmed, how are you feeling today?\n'
           'Patient: Good, but I have been having some trouble sleeping.\n'
           'Doctor: I see. Let me recommend some techniques...',
       'generatedAt': '2024-04-19T10:40:00Z',
@@ -181,7 +182,8 @@ class MockVoiceCallData {
       'callId': 'acall_002',
       'doctorId': 'doc_002',
       'patientId': 'user_001',
-      'content': 'Doctor: How are the anxiety exercises going?\n'
+      'content':
+          'Doctor: How are the anxiety exercises going?\n'
           'Patient: Much better! I have been practicing them daily.\n'
           'Doctor: Excellent! Keep up the good work.',
       'generatedAt': '2024-04-15T14:45:00Z',
@@ -225,7 +227,9 @@ class MockVoiceCallData {
 
   static List<Map<String, dynamic>> getMockVoiceCalls() => mockVoiceCalls;
 
-  static List<Map<String, dynamic>> getMockVoiceCallsByPatient(String patientId) {
+  static List<Map<String, dynamic>> getMockVoiceCallsByPatient(
+    String patientId,
+  ) {
     return mockVoiceCalls
         .where((call) => call['patientId'] == patientId)
         .toList();
@@ -238,9 +242,7 @@ class MockVoiceCallData {
   }
 
   static List<Map<String, dynamic>> getMockVoiceCallsByStatus(String status) {
-    return mockVoiceCalls
-        .where((call) => call['status'] == status)
-        .toList();
+    return mockVoiceCalls.where((call) => call['status'] == status).toList();
   }
 
   static Map<String, dynamic>? getMockVoiceCallById(String id) {
@@ -253,7 +255,9 @@ class MockVoiceCallData {
 
   static Map<String, dynamic>? getMockAudioMetricsById(String callId) {
     try {
-      return mockAudioMetrics.firstWhere((metric) => metric['callId'] == callId);
+      return mockAudioMetrics.firstWhere(
+        (metric) => metric['callId'] == callId,
+      );
     } catch (e) {
       return null;
     }
@@ -267,7 +271,9 @@ class MockVoiceCallData {
     }
   }
 
-  static List<Map<String, dynamic>> getMockVoiceCallFeedbackByCall(String callId) {
+  static List<Map<String, dynamic>> getMockVoiceCallFeedbackByCall(
+    String callId,
+  ) {
     return mockVoiceCallFeedback
         .where((feedback) => feedback['callId'] == callId)
         .toList();

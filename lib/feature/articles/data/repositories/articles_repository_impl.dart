@@ -62,8 +62,10 @@ class ArticlesRepositoryImpl implements ArticlesRepository {
     int pageSize = 10,
   }) async {
     try {
-      final articles =
-          await remoteDataSource.getAllArticles(page: page, pageSize: pageSize);
+      final articles = await remoteDataSource.getAllArticles(
+        page: page,
+        pageSize: pageSize,
+      );
       return Right(
         _onlyDoctorLinked(articles.map((model) => model.toEntity()).toList()),
       );

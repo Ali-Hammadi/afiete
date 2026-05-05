@@ -44,7 +44,8 @@ class MockSessionsData {
       'sessionType': 'voice_call',
       'status': 'completed',
       'isUpcoming': false,
-      'notes': 'Marriage counseling session - Both partners engaged positively.',
+      'notes':
+          'Marriage counseling session - Both partners engaged positively.',
     },
     {
       'id': 'session_004',
@@ -74,7 +75,8 @@ class MockSessionsData {
       'sessionType': 'voice_call',
       'status': 'completed',
       'isUpcoming': false,
-      'notes': 'Stress management techniques discussed. Patient to practice daily.',
+      'notes':
+          'Stress management techniques discussed. Patient to practice daily.',
     },
     {
       'id': 'session_006',
@@ -104,7 +106,8 @@ class MockSessionsData {
       'sessionType': 'video_call',
       'status': 'completed',
       'isUpcoming': false,
-      'notes': 'Medication adjustment discussed. Patient to monitor side effects.',
+      'notes':
+          'Medication adjustment discussed. Patient to monitor side effects.',
     },
     {
       'id': 'session_008',
@@ -129,7 +132,8 @@ class MockSessionsData {
       'id': 'review_001',
       'sessionId': 'session_002',
       'rating': 5,
-      'reviewText': 'Excellent session! Dr. Fatima was very professional and helpful. She provided clear guidance on anxiety management techniques.',
+      'reviewText':
+          'Excellent session! Dr. Fatima was very professional and helpful. She provided clear guidance on anxiety management techniques.',
       'doctorId': 'doc_002',
       'patientId': 'user_001',
       'createdAt': '2024-04-15T15:00:00Z',
@@ -138,7 +142,8 @@ class MockSessionsData {
       'id': 'review_002',
       'sessionId': 'session_003',
       'rating': 4,
-      'reviewText': 'Good session. Dr. Mohammed helped us understand our communication issues better. Would recommend.',
+      'reviewText':
+          'Good session. Dr. Mohammed helped us understand our communication issues better. Would recommend.',
       'doctorId': 'doc_003',
       'patientId': 'user_002',
       'createdAt': '2024-04-18T18:00:00Z',
@@ -147,7 +152,8 @@ class MockSessionsData {
       'id': 'review_003',
       'sessionId': 'session_005',
       'rating': 5,
-      'reviewText': 'Dr. Sarah is wonderful! Her stress management techniques are practical and easy to implement. Feeling much better already.',
+      'reviewText':
+          'Dr. Sarah is wonderful! Her stress management techniques are practical and easy to implement. Feeling much better already.',
       'doctorId': 'doc_005',
       'patientId': 'user_001',
       'createdAt': '2024-04-12T16:00:00Z',
@@ -156,7 +162,8 @@ class MockSessionsData {
       'id': 'review_004',
       'sessionId': 'session_007',
       'rating': 4,
-      'reviewText': 'Dr. Ahmed explained everything clearly. The medication adjustment makes sense. Looking forward to next session.',
+      'reviewText':
+          'Dr. Ahmed explained everything clearly. The medication adjustment makes sense. Looking forward to next session.',
       'doctorId': 'doc_001',
       'patientId': 'user_003',
       'createdAt': '2024-04-10T12:00:00Z',
@@ -165,7 +172,8 @@ class MockSessionsData {
       'id': 'review_005',
       'sessionId': 'session_002',
       'rating': 5,
-      'reviewText': 'Highly competent and empathetic therapist. Highly recommend Dr. Fatima to anyone seeking psychological support.',
+      'reviewText':
+          'Highly competent and empathetic therapist. Highly recommend Dr. Fatima to anyone seeking psychological support.',
       'doctorId': 'doc_002',
       'patientId': 'user_001',
       'createdAt': '2024-04-15T20:00:00Z',
@@ -178,28 +186,32 @@ class MockSessionsData {
       'id': 'note_001',
       'sessionId': 'session_002',
       'doctorId': 'doc_002',
-      'content': 'Patient reports improvement in anxiety levels. CBT techniques being applied well. Recommend continuing current approach.',
+      'content':
+          'Patient reports improvement in anxiety levels. CBT techniques being applied well. Recommend continuing current approach.',
       'createdAt': '2024-04-15T14:45:00Z',
     },
     {
       'id': 'note_002',
       'sessionId': 'session_003',
       'doctorId': 'doc_003',
-      'content': 'Marital communication improving. Both partners cooperating well in therapy. Continue weekly sessions.',
+      'content':
+          'Marital communication improving. Both partners cooperating well in therapy. Continue weekly sessions.',
       'createdAt': '2024-04-18T17:30:00Z',
     },
     {
       'id': 'note_003',
       'sessionId': 'session_005',
       'doctorId': 'doc_005',
-      'content': 'Patient learning stress management techniques. Positive attitude towards treatment. Good progress.',
+      'content':
+          'Patient learning stress management techniques. Positive attitude towards treatment. Good progress.',
       'createdAt': '2024-04-12T15:30:00Z',
     },
     {
       'id': 'note_004',
       'sessionId': 'session_007',
       'doctorId': 'doc_001',
-      'content': 'Medication adjustment approved. Patient to monitor for any adverse effects. Follow-up in 2 weeks.',
+      'content':
+          'Medication adjustment approved. Patient to monitor for any adverse effects. Follow-up in 2 weeks.',
       'createdAt': '2024-04-10T11:00:00Z',
     },
   ];

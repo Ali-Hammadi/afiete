@@ -227,7 +227,8 @@ class MockPaymentData {
     return mockPayments.where((p) => p['doctorId'] == doctorId).toList();
   }
 
-  static List<Map<String, dynamic>> getMockPaymentMethods() => mockPaymentMethods;
+  static List<Map<String, dynamic>> getMockPaymentMethods() =>
+      mockPaymentMethods;
 
   static List<Map<String, dynamic>> getMockPaymentMethodsByUser(String userId) {
     return mockPaymentMethods.where((m) => m['userId'] == userId).toList();
@@ -248,6 +249,9 @@ class MockPaymentData {
   }
 
   static double getTotalPaymentAmount(List<Map<String, dynamic>> payments) {
-    return payments.fold(0.0, (sum, p) => sum + (p['amount'] as num).toDouble());
+    return payments.fold(
+      0.0,
+      (sum, p) => sum + (p['amount'] as num).toDouble(),
+    );
   }
 }

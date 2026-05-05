@@ -8,13 +8,16 @@ class GoogleSignInParams {
   const GoogleSignInParams();
 }
 
-class GoogleSignInUseCase implements UseCase<UserAuthEntity, GoogleSignInParams> {
+class GoogleSignInUseCase
+    implements UseCase<UserAuthEntity, GoogleSignInParams> {
   final AuthRepository repository;
 
   const GoogleSignInUseCase(this.repository);
 
   @override
-  Future<Either<Failure, UserAuthEntity>> call(GoogleSignInParams params) async {
+  Future<Either<Failure, UserAuthEntity>> call(
+    GoogleSignInParams params,
+  ) async {
     return await repository.googleSignIn();
   }
 }

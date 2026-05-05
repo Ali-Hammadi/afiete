@@ -4,21 +4,24 @@ class MockSplashData {
     {
       'id': 'onboard_001',
       'title': 'Welcome to Afiete',
-      'description': 'Your personal mental health companion and therapy platform',
+      'description':
+          'Your personal mental health companion and therapy platform',
       'imageUrl': 'https://via.placeholder.com/400x300?text=Welcome',
       'backgroundColor': '#0493E2',
     },
     {
       'id': 'onboard_002',
       'title': 'Connect with Expert Doctors',
-      'description': 'Access qualified mental health professionals from the comfort of your home',
+      'description':
+          'Access qualified mental health professionals from the comfort of your home',
       'imageUrl': 'https://via.placeholder.com/400x300?text=Doctors',
       'backgroundColor': '#0051FF',
     },
     {
       'id': 'onboard_003',
       'title': 'Self-Assessment Tools',
-      'description': 'Track your mental health with scientifically-backed assessment tools',
+      'description':
+          'Track your mental health with scientifically-backed assessment tools',
       'imageUrl': 'https://via.placeholder.com/400x300?text=Assessment',
       'backgroundColor': '#00D4FF',
     },
@@ -58,28 +61,32 @@ class MockSplashData {
     {
       'id': 'tip_001',
       'title': 'Create Your Profile',
-      'description': 'Set up your profile with medical history for personalized recommendations',
+      'description':
+          'Set up your profile with medical history for personalized recommendations',
       'icon': 'profile',
       'order': 1,
     },
     {
       'id': 'tip_002',
       'title': 'Take Assessment',
-      'description': 'Complete our mental health assessment to identify your needs',
+      'description':
+          'Complete our mental health assessment to identify your needs',
       'icon': 'assessment',
       'order': 2,
     },
     {
       'id': 'tip_003',
       'title': 'Browse Doctors',
-      'description': 'Explore and connect with qualified mental health professionals',
+      'description':
+          'Explore and connect with qualified mental health professionals',
       'icon': 'doctors',
       'order': 3,
     },
     {
       'id': 'tip_004',
       'title': 'Start Sessions',
-      'description': 'Book your first consultation and begin your mental health journey',
+      'description':
+          'Book your first consultation and begin your mental health journey',
       'icon': 'calendar',
       'order': 4,
     },
@@ -107,7 +114,8 @@ class MockSplashData {
     'enableAIRecommendations': false, // Coming soon
   };
 
-  static List<Map<String, dynamic>> getMockOnboardingScreens() => mockOnboardingScreens;
+  static List<Map<String, dynamic>> getMockOnboardingScreens() =>
+      mockOnboardingScreens;
 
   static Map<String, dynamic> getMockAppInfo() => mockAppInfo;
 

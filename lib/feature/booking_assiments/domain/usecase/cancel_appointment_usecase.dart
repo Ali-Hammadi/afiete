@@ -9,7 +9,8 @@ class CancelAppointmentParams {
   const CancelAppointmentParams({required this.appointmentId});
 }
 
-class CancelAppointmentUseCase implements UseCase<void, CancelAppointmentParams> {
+class CancelAppointmentUseCase
+    implements UseCase<void, CancelAppointmentParams> {
   final AppointmentsRepository repository;
 
   const CancelAppointmentUseCase(this.repository);

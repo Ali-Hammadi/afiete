@@ -185,7 +185,9 @@ class MockVideoCallData {
 
   static List<Map<String, dynamic>> getMockVideoCalls() => mockVideoCalls;
 
-  static List<Map<String, dynamic>> getMockVideoCallsByPatient(String patientId) {
+  static List<Map<String, dynamic>> getMockVideoCallsByPatient(
+    String patientId,
+  ) {
     return mockVideoCalls
         .where((call) => call['patientId'] == patientId)
         .toList();
@@ -198,9 +200,7 @@ class MockVideoCallData {
   }
 
   static List<Map<String, dynamic>> getMockVideoCallsByStatus(String status) {
-    return mockVideoCalls
-        .where((call) => call['status'] == status)
-        .toList();
+    return mockVideoCalls.where((call) => call['status'] == status).toList();
   }
 
   static Map<String, dynamic>? getMockVideoCallById(String id) {

@@ -41,7 +41,8 @@ class GetDoctorByIdParams {
   const GetDoctorByIdParams({required this.id});
 }
 
-class GetDoctorByIdUseCase implements UseCase<DoctorEntity, GetDoctorByIdParams> {
+class GetDoctorByIdUseCase
+    implements UseCase<DoctorEntity, GetDoctorByIdParams> {
   final DoctorsRepository repository;
 
   const GetDoctorByIdUseCase(this.repository);
