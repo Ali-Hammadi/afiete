@@ -28,6 +28,12 @@ abstract class AuthRemoteDataSource {
     required String newEmail,
   });
 
+  Future<String> requestEmailChangeWithPassword({
+    required String email,
+    required String password,
+    required String newEmail,
+  });
+
   Future<UserModel> confirmEmailChange({
     required String userId,
     required String newEmail,
@@ -636,6 +642,69 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               'The backend does not currently support sending an OTP for email change. This endpoint only resends verification codes for the current account email.',
           message:
               'The backend does not currently support sending an OTP for email change. This endpoint only resends verification codes for the current account email.',
+        );
+      }
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(
+          path: ApiEndpoints.requestEmailChangeOtp,
+        ),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<String> requestEmailChangeWithPassword({
+    required String email,
+    required String password,
+    required String newEmail,
+  }) async {
+    try {
+      _logInfo(
+        'request_email_change:start',
+        data: {'email': email, 'newEmail': newEmail},
+      );
+      final response = await _dio.post(
+        ApiEndpoints.requestEmailChangeOtp,
+        data: {
+          ApiEndpoints.keyEmail: newEmail,
+          ApiEndpoints.keyPassword: password,
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _logInfo(
+          'request_email_change:success',
+          data: {'statusCode': response.statusCode, 'body': response.data},
+        );
+        return _extractMessage(response.data) ??
+            'Verification code sent successfully.';
+      }
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Unable to request email change verification.',
+      );
+    } on DioException catch (e) {
+      _logError(
+        'request_email_change:failed',
+        error: {
+          'email': email,
+          'newEmail': newEmail,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
         );
       }
       rethrow;

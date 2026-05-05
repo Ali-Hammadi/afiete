@@ -433,6 +433,128 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     );
   }
 
+  Future<(String, String)?> _showEmailChangeDialog(String currentEmail) async {
+    final formKey = GlobalKey<FormState>();
+    final passwordController = TextEditingController();
+    final emailController = TextEditingController();
+    bool showPassword = false;
+
+    final result = await showDialog<(String, String)>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              scrollable: true,
+              title: Text(SettingsStrings.changeEmailTitle),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Verify your password to change email address',
+                      style: AppStyles.bodySmall.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: passwordController,
+                      obscureText: !showPassword,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return SettingsStrings.currentPasswordRequired;
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: SettingsStrings.passwordTitle,
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            showPassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                          ),
+                          onPressed: () {
+                            setDialogState(() {
+                              showPassword = !showPassword;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        final text = value?.trim() ?? '';
+                        if (text.isEmpty) {
+                          return SettingsStrings.emailRequired;
+                        }
+                        if (!text.contains('@')) {
+                          return SettingsStrings.invalidEmailError;
+                        }
+                        if (text == currentEmail) {
+                          return 'New email must be different from current email.';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: SettingsStrings.emailAddressLabel,
+                        hintText: 'Enter new email address',
+                        prefixIcon: const Icon(Icons.email_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(SettingsStrings.cancel),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    if (!(formKey.currentState?.validate() ?? false)) {
+                      return;
+                    }
+                    Navigator.pop(dialogContext, (
+                      passwordController.text,
+                      emailController.text.trim(),
+                    ));
+                  },
+                  child: Text(SettingsStrings.saveChanges),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        passwordController.dispose();
+      } catch (_) {}
+      try {
+        emailController.dispose();
+      } catch (_) {}
+    });
+
+    return result;
+  }
+
   Future<({String currentPassword, String newPassword})?>
   _showPasswordEditor() async {
     final formKey = GlobalKey<FormState>();
@@ -714,29 +836,28 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final authCubit = context.read<AuthCubit>();
 
-    final newEmail = await _showTextEditor(
-      title: SettingsStrings.changeEmailTitle,
-      label: SettingsStrings.emailAddressLabel,
-      initialValue: user.email,
-      icon: Icons.email_outlined,
-      keyboardType: TextInputType.emailAddress,
-      validator: (value) {
-        final text = value?.trim() ?? '';
-        if (text.isEmpty) {
-          return SettingsStrings.emailRequired;
-        }
-        if (!text.contains('@')) {
-          return SettingsStrings.invalidEmailError;
-        }
-        return null;
-      },
-    );
-
-    if (newEmail == null || newEmail == user.email.trim()) {
+    // Step 1: Show password + new email dialog
+    final credentials = await _showEmailChangeDialog(user.email);
+    if (credentials == null) {
       return;
     }
 
-    final otpMessage = await authCubit.requestEmailChangeOtp(
+    final password = credentials.$1;
+    final newEmail = credentials.$2;
+
+    if (newEmail == user.email.trim()) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('New email must be different from current email.'),
+        ),
+      );
+      return;
+    }
+
+    // Step 2: Request OTP with password verification
+    final otpMessage = await authCubit.requestEmailChangeWithPassword(
+      currentEmail: user.email.trim(),
+      password: password,
       newEmail: newEmail,
     );
     if (!mounted) return;
@@ -750,6 +871,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       SnackBar(content: Text(SettingsStrings.otpSentToNewEmail)),
     );
 
+    // Step 3: Verify OTP
     final otp = await _showTextEditor(
       title: SettingsStrings.verifyNewEmailTitle,
       label: SettingsStrings.verify,

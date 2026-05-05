@@ -7,6 +7,7 @@ import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.
 import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/request_email_change_with_password_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -30,6 +31,8 @@ class AuthCubit extends Cubit<AuthState> {
   final FetchProfileUseCase fetchProfileUseCase;
   final UpdateProfileInfoUseCase updateProfileInfoUseCase;
   final RequestEmailChangeOtpUseCase requestEmailChangeOtpUseCase;
+  final RequestEmailChangeWithPasswordUseCase
+  requestEmailChangeWithPasswordUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
   final ConfirmEmailChangeUseCase confirmEmailChangeUseCase;
   final AuthRepository authRepository;
@@ -43,6 +46,7 @@ class AuthCubit extends Cubit<AuthState> {
     this.fetchProfileUseCase,
     this.updateProfileInfoUseCase,
     this.requestEmailChangeOtpUseCase,
+    this.requestEmailChangeWithPasswordUseCase,
     this.verifyOtpUseCase,
     this.confirmEmailChangeUseCase,
     this.authRepository,
@@ -322,6 +326,40 @@ class AuthCubit extends Cubit<AuthState> {
       },
       (message) {
         _log('request_email_otp:success', data: {'message': message});
+        return null;
+      },
+    );
+  }
+
+  Future<String?> requestEmailChangeWithPassword({
+    required String currentEmail,
+    required String password,
+    required String newEmail,
+  }) async {
+    _log(
+      'request_email_change:start',
+      data: {'currentEmail': currentEmail, 'newEmail': newEmail},
+    );
+
+    final result = await requestEmailChangeWithPasswordUseCase(
+      RequestEmailChangeWithPasswordParams(
+        email: currentEmail,
+        password: password,
+        newEmail: newEmail,
+      ),
+    );
+
+    return result.fold(
+      (failure) {
+        _log(
+          'request_email_change:error',
+          data: {'message': failure.errorMessage},
+        );
+        emit(AuthError(failure.errorMessage));
+        return failure.errorMessage;
+      },
+      (message) {
+        _log('request_email_change:success', data: {'message': message});
         return null;
       },
     );
