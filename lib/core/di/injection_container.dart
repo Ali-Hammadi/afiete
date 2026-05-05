@@ -13,6 +13,7 @@ import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_with_password_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/update_profile_info_usecase.dart';
 import 'package:afiete/feature/booking_assiments/data/datasources/appointments_mock_datasource.dart';
@@ -158,6 +159,9 @@ Future<void> init() async {
   sl.registerLazySingleton<RequestEmailChangeWithPasswordUseCase>(
     () => RequestEmailChangeWithPasswordUseCase(sl<AuthRepository>()),
   );
+  sl.registerLazySingleton<RequestForgotPasswordOtpUseCase>(
+    () => RequestForgotPasswordOtpUseCase(sl<AuthRepository>()),
+  );
   sl.registerLazySingleton<VerifyOtpUseCase>(
     () => VerifyOtpUseCase(sl<AuthRepository>()),
   );
@@ -177,6 +181,7 @@ Future<void> init() async {
       sl<UpdateProfileInfoUseCase>(),
       sl<RequestEmailChangeOtpUseCase>(),
       sl<RequestEmailChangeWithPasswordUseCase>(),
+      sl<RequestForgotPasswordOtpUseCase>(),
       sl<VerifyOtpUseCase>(),
       sl<ConfirmEmailChangeUseCase>(),
       sl<AuthRepository>(),

@@ -2,6 +2,7 @@ import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
+import 'package:afiete/feature/auth/presentation/widgets/custom_text_form_field.dart';
 import 'package:afiete/feature/auth/presentation/widgets/auth_verification_pin_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,11 +16,13 @@ class EmailChangeScreen extends StatefulWidget {
 
 class _EmailChangeScreenState extends State<EmailChangeScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _newEmailController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
 
   String _currentStep = 'email_input'; // email_input -> otp_verification
   bool _isLoading = false;
+  bool _obscurePassword = true;
   String? _currentUserEmail;
 
   @override
@@ -35,6 +38,7 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
 
   @override
   void dispose() {
+    _passwordController.dispose();
     _newEmailController.dispose();
     _otpController.dispose();
     super.dispose();
@@ -75,26 +79,56 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
               const SizedBox(height: 24),
               Form(
                 key: _formKey,
-                child: TextFormField(
-                  controller: _newEmailController,
-                  decoration: InputDecoration(
-                    labelText: SettingsStrings.emailAddressLabel,
-                    hintText: SettingsStrings.newEmailHint,
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                child: Column(
+                  children: [
+                    CustomTextFormFiled(
+                      label: SettingsStrings.oldPasswordLabel,
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      keyboardType: TextInputType.visiblePassword,
+                      prefixIcon: Icons.lock,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return SettingsStrings.currentPasswordRequired;
+                        }
+                        return null;
+                      },
                     ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return SettingsStrings.emailRequired;
-                    }
-                    if (!value.contains('@')) {
-                      return SettingsStrings.invalidEmailError;
-                    }
-                    return null;
-                  },
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _newEmailController,
+                      decoration: InputDecoration(
+                        labelText: SettingsStrings.emailAddressLabel,
+                        hintText: SettingsStrings.newEmailHint,
+                        prefixIcon: const Icon(Icons.email_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return SettingsStrings.emailRequired;
+                        }
+                        if (!value.contains('@')) {
+                          return SettingsStrings.invalidEmailError;
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 32),
@@ -189,9 +223,24 @@ class _EmailChangeScreenState extends State<EmailChangeScreen> {
     });
 
     try {
-      final message = await context.read<AuthCubit>().requestEmailChangeOtp(
-        newEmail: _newEmailController.text.trim(),
-      );
+      final currentEmail = _currentUserEmail?.trim() ?? '';
+      if (currentEmail.isEmpty) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(SettingsStrings.couldNotRetrieveUserEmail)),
+        );
+        return;
+      }
+
+      final message = await context
+          .read<AuthCubit>()
+          .requestEmailChangeWithPassword(
+            currentEmail: currentEmail,
+            password: _passwordController.text,
+            newEmail: _newEmailController.text.trim(),
+          );
 
       if (!mounted) return;
 

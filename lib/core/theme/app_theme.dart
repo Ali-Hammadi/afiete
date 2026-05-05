@@ -44,7 +44,7 @@ abstract class AppTheme {
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: AppColors.primaryColor,
         contentTextStyle: TextStyle(color: AppColors.whiteColor),
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -127,7 +127,7 @@ abstract class AppTheme {
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.primaryColor,
         contentTextStyle: const TextStyle(color: AppColors.whiteColor),
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,

@@ -85,7 +85,12 @@ class AppRouter {
           ),
         );
       case MyRoutes.forgotPasswordScreen:
-        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+        final initialEmail = settings.arguments is String
+            ? settings.arguments as String
+            : '';
+        return MaterialPageRoute(
+          builder: (_) => ForgotPasswordScreen(initialEmail: initialEmail),
+        );
       case MyRoutes.doctorInfoScreen:
         final args = settings.arguments;
         return MaterialPageRoute(

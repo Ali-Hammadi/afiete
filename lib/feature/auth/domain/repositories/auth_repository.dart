@@ -38,6 +38,10 @@ abstract class AuthRepository {
     required String newEmail,
   });
 
+  Future<Either<Failure, String>> requestForgotPasswordOtp({
+    required String email,
+  });
+
   /// Verifies OTP for authentication/login purposes (SEPARATE from email change verification).
   /// Used when user logs in with OTP instead of password.
   Future<Either<Failure, UserAuthEntity>> verifyOtp(String email, String otp);

@@ -8,6 +8,7 @@ import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_with_password_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -33,6 +34,7 @@ class AuthCubit extends Cubit<AuthState> {
   final RequestEmailChangeOtpUseCase requestEmailChangeOtpUseCase;
   final RequestEmailChangeWithPasswordUseCase
   requestEmailChangeWithPasswordUseCase;
+  final RequestForgotPasswordOtpUseCase requestForgotPasswordOtpUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
   final ConfirmEmailChangeUseCase confirmEmailChangeUseCase;
   final AuthRepository authRepository;
@@ -47,6 +49,7 @@ class AuthCubit extends Cubit<AuthState> {
     this.updateProfileInfoUseCase,
     this.requestEmailChangeOtpUseCase,
     this.requestEmailChangeWithPasswordUseCase,
+    this.requestForgotPasswordOtpUseCase,
     this.verifyOtpUseCase,
     this.confirmEmailChangeUseCase,
     this.authRepository,
@@ -291,7 +294,12 @@ class AuthCubit extends Cubit<AuthState> {
           data: {'username': updatedUser.username, 'email': updatedUser.email},
         );
         final mergedUser = _mergeWithCurrentUser(currentState, updatedUser);
-        return _cacheAndEmitUser(mergedUser, asProfileUpdated: true);
+        _cacheAndEmitUser(mergedUser, asProfileUpdated: true);
+
+        // Refresh profile from backend to ensure complete sync
+        refreshProfileFromBackend();
+
+        return true;
       },
     );
   }
@@ -397,13 +405,14 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(failure.errorMessage));
         return false;
       },
-      (updatedUser) {
+      (updatedUser) async {
         _log(
           'confirm_email_change:success',
           data: {'username': updatedUser.username, 'email': updatedUser.email},
         );
         final mergedUser = _mergeWithCurrentUser(currentState, updatedUser);
-        emit(AuthProfileUpdated(mergedUser));
+        await _cacheAndEmitUser(mergedUser, asProfileUpdated: true);
+        await refreshProfileFromBackend();
         return true;
       },
     );
@@ -553,7 +562,7 @@ class AuthCubit extends Cubit<AuthState> {
       newPassword: newPassword,
     );
 
-    return result.fold(
+    final success = result.fold(
       (failure) {
         _log('change_password:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
@@ -561,15 +570,37 @@ class AuthCubit extends Cubit<AuthState> {
       },
       (message) {
         _log('change_password:success', data: {'message': message});
+
+        // Update cached user with new password
+        final currentState = state;
+        if (currentState is AuthLoaded || currentState is AuthProfileUpdated) {
+          final currentUser = currentState is AuthLoaded
+              ? currentState.user
+              : (currentState as AuthProfileUpdated).user;
+
+          final updatedUser = currentUser.copyWith(password: newPassword);
+          _cacheAndEmitUser(
+            updatedUser,
+            asProfileUpdated: currentState is AuthProfileUpdated,
+          );
+        }
+
         return true;
       },
     );
+
+    if (success) {
+      // Refresh profile from backend to ensure sync
+      await refreshProfileFromBackend();
+    }
+
+    return success;
   }
 
   Future<String?> requestForgotPasswordOtp({required String email}) async {
     _log('forgot_password_otp:start', data: {'email': email});
-    final result = await requestEmailChangeOtpUseCase(
-      RequestEmailChangeOtpParams(username: email, newEmail: email),
+    final result = await requestForgotPasswordOtpUseCase(
+      RequestForgotPasswordOtpParams(email: email),
     );
 
     return result.fold(

@@ -34,6 +34,8 @@ abstract class AuthRemoteDataSource {
     required String newEmail,
   });
 
+  Future<String> requestForgotPasswordOtp(String email);
+
   /// Confirms email change by verifying OTP sent to new email address.
   /// This is SEPARATE from login OTP verification.
   /// Uses the email change OTP verification endpoint.
@@ -724,6 +726,58 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  @override
+  Future<String> requestForgotPasswordOtp(String email) async {
+    try {
+      _logInfo('forgot_password_otp:start', data: {'email': email});
+      final response = await _dio.post(
+        ApiEndpoints.usersForgotPassword,
+        data: {ApiEndpoints.keyEmail: email},
+      );
+      _logInfo(
+        'forgot_password_otp:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return _extractMessage(response.data) ??
+            'Verification code sent successfully.';
+      }
+
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Unable to request a password reset code.',
+      );
+    } on DioException catch (e) {
+      _logError(
+        'forgot_password_otp:failed',
+        error: {
+          'email': email,
+          'statusCode': e.response?.statusCode,
+          'message': e.message,
+          'response': e.response?.data,
+        },
+      );
+      final message = _extractMessage(e.response?.data);
+      if (message != null && message.isNotEmpty) {
+        throw DioException(
+          requestOptions: e.requestOptions,
+          response: e.response,
+          type: e.type,
+          error: message,
+          message: message,
+        );
+      }
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.usersForgotPassword),
+        error: e.toString(),
+      );
+    }
+  }
+
   /// Verifies OTP for email change (separate from login OTP verification).
   /// Uses [usersOtpVerify] endpoint specifically for email change confirmation.
   @override
@@ -1017,9 +1071,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       _logInfo('reset_password:start', data: {'email': email});
       final response = await _dio.post(
-        ApiEndpoints.resetPassword,
+        ApiEndpoints.usersAuthResetPassword,
         data: {
           ApiEndpoints.keyEmail: email,
+          'code': otp,
           ApiEndpoints.keyOtp: otp,
           ApiEndpoints.keyNewPassword: newPassword,
         },
@@ -1062,7 +1117,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.resetPassword),
+        requestOptions: RequestOptions(
+          path: ApiEndpoints.usersAuthResetPassword,
+        ),
         error: e.toString(),
       );
     }

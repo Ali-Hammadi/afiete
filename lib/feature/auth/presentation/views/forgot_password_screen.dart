@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+  final String initialEmail;
+
+  const ForgotPasswordScreen({super.key, this.initialEmail = ''});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -22,6 +24,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _isLoading = false;
   bool _showNewPassword = false;
   bool _showConfirmPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.text = widget.initialEmail.trim();
+  }
 
   @override
   void dispose() {
