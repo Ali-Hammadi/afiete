@@ -1,5 +1,6 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:flutter/material.dart';
@@ -269,22 +270,55 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
 
     try {
-      final success = await context.read<AuthCubit>().resetPassword(
-        email: _emailController.text.trim(),
-        otp: _otpController.text,
-        newPassword: _newPasswordController.text,
+      final authCubit = context.read<AuthCubit>();
+      final email = _emailController.text.trim();
+      final newPassword = _newPasswordController.text;
+
+      final success = await authCubit.resetPassword(
+        email: email,
+        otp: _otpController.text.trim(),
+        newPassword: newPassword,
       );
 
       if (!mounted) return;
+
+      if (!success) {
+        setState(() {
+          _isLoading = false;
+        });
+        final state = authCubit.state;
+        final message = state is AuthError
+            ? state.message
+            : SettingsStrings.errorWith('Unable to reset the password.');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+        return;
+      }
+
+      await authCubit.login(email, newPassword);
+      await authCubit.refreshProfileFromBackend();
+
+      if (!mounted) return;
+
       setState(() {
         _isLoading = false;
       });
 
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(SettingsStrings.passwordChanged)),
+      final state = authCubit.state;
+      if (state is AuthLoaded || state is AuthProfileUpdated) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          MyRoutes.homeScreen,
+          (route) => false,
         );
-        Navigator.pop(context);
+        return;
+      }
+
+      if (state is AuthError) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(state.message)));
       }
     } catch (e) {
       if (!mounted) return;
