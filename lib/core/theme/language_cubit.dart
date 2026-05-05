@@ -40,4 +40,12 @@ class LanguageCubit extends Cubit<Locale> {
     SettingsStrings.setLanguageCode(normalized);
     emit(Locale(normalized));
   }
+
+  Future<void> resetToDefault() async {
+    await _prefs.remove(_languageCodeKey);
+    SettingsStrings.setLanguageCode('en');
+    if (state.languageCode != 'en') {
+      emit(const Locale('en'));
+    }
+  }
 }

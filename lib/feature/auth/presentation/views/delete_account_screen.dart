@@ -1,6 +1,9 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
+import 'package:afiete/core/network/token_storage.dart';
 import 'package:afiete/core/routes/app_route.dart';
+import 'package:afiete/core/theme/language_cubit.dart';
+import 'package:afiete/core/theme/theme_cubit.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -279,11 +282,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       });
 
       if (success) {
-        // Clear all local app data (SharedPreferences) to return app to fresh state
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.clear();
-        } catch (_) {}
+        await _resetAppToFirstInstallState();
 
         if (!mounted) return;
 
@@ -291,11 +290,19 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           SnackBar(content: Text(SettingsStrings.accountDeletedSuccess)),
         );
 
-        // Clear navigation stack and go to signup so user can create a new account
+        // Clear navigation stack and restart from splash.
         Navigator.pushNamedAndRemoveUntil(
           context,
-          MyRoutes.signup,
+          MyRoutes.splashScreen,
           (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not delete account. Please check your details.',
+            ),
+          ),
         );
       }
     } catch (e) {
@@ -307,5 +314,21 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
       );
     }
+  }
+
+  Future<void> _resetAppToFirstInstallState() async {
+    final themeCubit = context.read<ThemeCubit>();
+    final languageCubit = context.read<LanguageCubit>();
+
+    await TokenStorage.clearTokens();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    await prefs.reload();
+
+    if (!mounted) return;
+
+    await themeCubit.resetToDefault();
+    await languageCubit.resetToDefault();
   }
 }

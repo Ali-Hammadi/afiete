@@ -1,5 +1,6 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
+import 'package:afiete/core/network/token_storage.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/theme/language_cubit.dart';
 import 'package:afiete/core/theme/theme_cubit.dart';
@@ -11,6 +12,7 @@ import 'package:afiete/feature/settings/presentation/widgets/setting_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -334,15 +336,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (!context.mounted || !loggedOut) return;
 
+    await _resetAppToFirstInstallState();
+    if (!context.mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(SettingsStrings.logoutSuccess)));
 
     Navigator.pushNamedAndRemoveUntil(
       context,
-      MyRoutes.signup,
+      MyRoutes.splashScreen,
       (route) => false,
     );
+  }
+
+  Future<void> _resetAppToFirstInstallState() async {
+    final themeCubit = context.read<ThemeCubit>();
+    final languageCubit = context.read<LanguageCubit>();
+
+    await TokenStorage.clearTokens();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    await prefs.reload();
+
+    if (!mounted) return;
+
+    await themeCubit.resetToDefault();
+    await languageCubit.resetToDefault();
   }
 
   UserSettingsProfileEntity _resolveProfile(AuthState authState) {

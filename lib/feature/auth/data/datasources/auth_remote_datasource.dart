@@ -258,7 +258,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         data: {'statusCode': response.statusCode, 'body': response.data},
       );
 
-      if (response.statusCode == 200 || response.statusCode == 204) {
+      final statusCode = response.statusCode;
+      final responseBody = response.data;
+
+      if (statusCode == 204 ||
+          (statusCode == 200 && _isDeleteAccountSuccess(responseBody))) {
         await TokenStorage.clearTokens();
         return UserModel(
           username: 'Deleted User',
@@ -272,7 +276,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Unable to delete the account.',
+        error:
+            _extractDeleteAccountFailureMessage(responseBody) ??
+            _extractMessage(responseBody) ??
+            'Unable to delete the account.',
       );
     } on DioException catch (e) {
       _logError(
@@ -301,6 +308,100 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         error: e.toString(),
       );
     }
+  }
+
+  bool _isDeleteAccountSuccess(dynamic data) {
+    if (data == null) {
+      return true;
+    }
+
+    if (data is! Map<String, dynamic>) {
+      final text = data.toString().toLowerCase();
+      return text.contains('deleted') || text.contains('success');
+    }
+
+    final explicitSuccess = _readBoolLike(data['success']);
+    if (explicitSuccess != null) {
+      return explicitSuccess;
+    }
+
+    final explicitOk = _readBoolLike(data['ok']);
+    if (explicitOk != null) {
+      return explicitOk;
+    }
+
+    final statusText = data['status']?.toString().toLowerCase().trim();
+    if (statusText != null && statusText.isNotEmpty) {
+      if (statusText == 'success' || statusText == 'ok') {
+        return true;
+      }
+      if (statusText == 'failed' ||
+          statusText == 'error' ||
+          statusText == 'failure') {
+        return false;
+      }
+    }
+
+    final hasErrors = _extractFirstText(data['errors'])?.isNotEmpty == true;
+    if (hasErrors) {
+      return false;
+    }
+
+    final hasError = _extractFirstText(data['error'])?.isNotEmpty == true;
+    if (hasError) {
+      return false;
+    }
+
+    final message = _extractMessage(data)?.toLowerCase();
+    if (message != null && message.isNotEmpty) {
+      if (message.contains('deleted') ||
+          message.contains('removed') ||
+          message.contains('success')) {
+        return true;
+      }
+      if (message.contains('fail') ||
+          message.contains('invalid') ||
+          message.contains('error') ||
+          message.contains('unable') ||
+          message.contains('not allowed') ||
+          message.contains('incorrect')) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  String? _extractDeleteAccountFailureMessage(dynamic data) {
+    if (data is! Map<String, dynamic>) {
+      return null;
+    }
+
+    final explicitMessage = _extractMessage(data);
+    if (explicitMessage != null && explicitMessage.isNotEmpty) {
+      return explicitMessage;
+    }
+
+    return _extractFirstText(data['errors']) ?? _extractFirstText(data['error']);
+  }
+
+  bool? _readBoolLike(dynamic value) {
+    if (value is bool) {
+      return value;
+    }
+    if (value is num) {
+      return value != 0;
+    }
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      if (normalized == 'true' || normalized == '1' || normalized == 'yes') {
+        return true;
+      }
+      if (normalized == 'false' || normalized == '0' || normalized == 'no') {
+        return false;
+      }
+    }
+    return null;
   }
 
   @override
