@@ -12,12 +12,13 @@ class ServerFailure extends Failure {
   factory ServerFailure.fromDioError(DioException dioError) {
     final cleanError = dioError.error?.toString().trim();
     if (cleanError != null && cleanError.isNotEmpty) {
-      if (_isGenericMessage(cleanError)) {
+      if (_isGenericMessage(cleanError) || _looksLikeHtml(cleanError)) {
         final statusCode = dioError.response?.statusCode;
         final responseData = dioError.response?.data;
         final parsed = ServerFailure.fromResponse(statusCode, responseData);
         if (parsed.errorMessage.isNotEmpty &&
-            !_isGenericMessage(parsed.errorMessage)) {
+            !_isGenericMessage(parsed.errorMessage) &&
+            !_looksLikeHtml(parsed.errorMessage)) {
           return parsed;
         }
       }
@@ -224,10 +225,23 @@ class ServerFailure extends Failure {
         normalized == 'ops there was an error, please try again';
   }
 
+  static bool _looksLikeHtml(String message) {
+    final normalized = message.trim().toLowerCase();
+    return normalized.startsWith('<!doctype html') ||
+        normalized.startsWith('<html') ||
+        normalized.contains('<head>') ||
+        normalized.contains('<body>') ||
+        normalized.contains('</html>');
+  }
+
   static String _toUserFriendlyMessage(String message) {
     final trimmed = message.trim();
     if (trimmed.isEmpty) {
       return trimmed;
+    }
+
+    if (_looksLikeHtml(trimmed)) {
+      return 'Your request could not be processed. Please try again.';
     }
 
     final normalized = trimmed.toLowerCase();

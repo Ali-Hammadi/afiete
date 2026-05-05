@@ -61,100 +61,103 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
         child: Padding(
           padding: EdgeInsets.all(AppStyles.padding),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Column(
-                children: [
-                  Text(
-                    SettingsStrings.letsGetToKnowYou,
-                    textAlign: TextAlign.center,
-                    style: AppStyles.headingLarge,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    SettingsStrings.personalizeExperienceHint,
-                    textAlign: TextAlign.center,
-                    style: AppStyles.bodyLarge.copyWith(
-                      color: colorScheme.onSurface.withValues(alpha: 0.75),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  InkWell(
-                    onTap: _selectDate,
-                    child: AbsorbPointer(
-                      child: CustomTextFormFiled(
-                        label: SettingsStrings.birthdateLabel,
-                        controller: birthdateController,
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text(
+                        SettingsStrings.letsGetToKnowYou,
+                        textAlign: TextAlign.center,
+                        style: AppStyles.headingLarge,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        SettingsStrings.personalizeExperienceHint,
+                        textAlign: TextAlign.center,
+                        style: AppStyles.bodyLarge.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.75),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      InkWell(
+                        onTap: _selectDate,
+                        child: AbsorbPointer(
+                          child: CustomTextFormFiled(
+                            label: SettingsStrings.birthdateLabel,
+                            controller: birthdateController,
+                            obscureText: false,
+                            keyboardType: TextInputType.text,
+                            prefixIcon: Icons.calendar_today,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedGender,
+                        decoration: InputDecoration(
+                          labelText: SettingsStrings.genderTitle,
+                          labelStyle: AppStyles.bodyMedium,
+                          prefixIcon: Icon(
+                            Icons.person,
+                            color: colorScheme.primary,
+                          ),
+                          suffixIcon: Icon(
+                            Icons.arrow_drop_down,
+                            color: colorScheme.primary,
+                          ),
+                          fillColor: colorScheme.primaryContainer.withValues(
+                            alpha: 0.45,
+                          ),
+                          filled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: colorScheme.outline),
+                            borderRadius: BorderRadius.circular(
+                              AppStyles.borderRadius,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: colorScheme.outline),
+                            borderRadius: BorderRadius.circular(
+                              AppStyles.borderRadius,
+                            ),
+                          ),
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: SettingsStrings.male,
+                            child: Text(SettingsStrings.male),
+                          ),
+                          DropdownMenuItem(
+                            value: SettingsStrings.female,
+                            child: Text(SettingsStrings.female),
+                          ),
+                        ],
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedGender = newValue;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      CustomTextFormFiled(
+                        label: SettingsStrings.phoneNumberTitle,
+                        controller: phoneController,
                         obscureText: false,
-                        keyboardType: TextInputType.text,
-                        prefixIcon: Icons.calendar_today,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedGender,
-                    decoration: InputDecoration(
-                      labelText: SettingsStrings.genderTitle,
-                      labelStyle: AppStyles.bodyMedium,
-                      prefixIcon: Icon(
-                        Icons.person,
-                        color: colorScheme.primary,
-                      ),
-                      suffixIcon: Icon(
-                        Icons.arrow_drop_down,
-                        color: colorScheme.primary,
-                      ),
-                      fillColor: colorScheme.primaryContainer.withValues(
-                        alpha: 0.45,
-                      ),
-                      filled: true,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.outline),
-                        borderRadius: BorderRadius.circular(
-                          AppStyles.borderRadius,
-                        ),
-                      ),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.outline),
-                        borderRadius: BorderRadius.circular(
-                          AppStyles.borderRadius,
-                        ),
-                      ),
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: SettingsStrings.male,
-                        child: Text(SettingsStrings.male),
-                      ),
-                      DropdownMenuItem(
-                        value: SettingsStrings.female,
-                        child: Text(SettingsStrings.female),
+                        keyboardType: TextInputType.phone,
+                        prefixIcon: Icons.phone,
+                        validator: (value) {
+                          if (value != null && value.isNotEmpty) {
+                            if (value.length < 9) {
+                              return SettingsStrings.invalidPhoneNumber;
+                            }
+                          }
+                          return null;
+                        },
                       ),
                     ],
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedGender = newValue;
-                      });
-                    },
                   ),
-                  const SizedBox(height: 20),
-                  CustomTextFormFiled(
-                    label: SettingsStrings.phoneNumberTitle,
-                    controller: phoneController,
-                    obscureText: false,
-                    keyboardType: TextInputType.phone,
-                    prefixIcon: Icons.phone,
-                    validator: (value) {
-                      if (value != null && value.isNotEmpty) {
-                        if (value.length < 9) {
-                          return SettingsStrings.invalidPhoneNumber;
-                        }
-                      }
-                      return null;
-                    },
-                  ),
-                ],
+                ),
               ),
               SizedBox(height: 20),
               CustomButton(
@@ -167,10 +170,12 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                   ),
                 ),
                 onPressed: () async {
-                  if (selectedDate == null || selectedGender == null) {
+                  if (selectedDate == null ||
+                      selectedGender == null ||
+                      phoneController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(SettingsStrings.enterBirthdateAndGender),
+                        content: Text(SettingsStrings.fillAllFieldsError),
                       ),
                     );
                     return;
@@ -190,7 +195,6 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                   Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
                 },
               ),
-              SizedBox(height: 70),
             ],
           ),
         ),
