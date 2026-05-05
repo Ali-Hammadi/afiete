@@ -11,10 +11,6 @@ class FetchProfileUseCase implements UseCase<UserAuthEntity, NoParams> {
 
   @override
   Future<Either<Failure, UserAuthEntity>> call(NoParams params) async {
-    final cachedUser = await repository.getCachedSession();
-    if (cachedUser == null) {
-      return Left(ServerFailure('No cached auth session found.'));
-    }
-    return Right(cachedUser);
+    return repository.fetchProfile();
   }
 }

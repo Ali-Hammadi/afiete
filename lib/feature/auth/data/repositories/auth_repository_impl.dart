@@ -31,6 +31,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, UserAuthEntity>> fetchProfile() async {
+    try {
+      final remoteUser = await remoteDataSource.fetchProfile();
+      return Right(remoteUser.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<void> cacheSession(UserAuthEntity user) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_cachedUserKey, jsonEncode(_encodeUser(user)));

@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthRemoteDataSource {
   Future<UserModel> login(String email, String password);
+  Future<UserModel> fetchProfile();
   Future<UserModel> signup(String nickname, String email, String password);
   Future<UserModel> logout(String email, String password);
   Future<UserModel> deleteAccount(String email, String password);
@@ -139,6 +140,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       throw DioException(
         requestOptions: RequestOptions(path: ApiEndpoints.login),
+        error: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<UserModel> fetchProfile() async {
+    try {
+      _logInfo('fetch_profile:start');
+      final response = await _dio.get(ApiEndpoints.updateProfile);
+      _logInfo(
+        'fetch_profile:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
+
+      if (response.statusCode == 200) {
+        return _resolveUserFromAuthResponse(response.data);
+      }
+
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        error: 'Unable to load the current profile information.',
+      );
+    } on DioException {
+      rethrow;
+    } catch (e) {
+      throw DioException(
+        requestOptions: RequestOptions(path: ApiEndpoints.updateProfile),
         error: e.toString(),
       );
     }
@@ -382,7 +412,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return explicitMessage;
     }
 
-    return _extractFirstText(data['errors']) ?? _extractFirstText(data['error']);
+    return _extractFirstText(data['errors']) ??
+        _extractFirstText(data['error']);
   }
 
   bool? _readBoolLike(dynamic value) {
@@ -748,6 +779,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       final requestData = {
         ApiEndpoints.keyEmail: email,
+        'code': otp,
         ApiEndpoints.keyOtp: otp,
       };
       _logInfo('verify_otp:request', data: requestData);
@@ -958,14 +990,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   UserModel _resolveUserFromAuthResponse(dynamic responseData) {
-    final dataMap = responseData as Map<String, dynamic>;
+    final dataMap = responseData is Map<String, dynamic>
+        ? responseData
+        : <String, dynamic>{};
+    final rootData = (dataMap['data'] as Map<String, dynamic>?) ?? dataMap;
     final userJson =
-        (dataMap['user'] as Map<String, dynamic>?) ??
-        Map<String, dynamic>.from(dataMap);
+        (rootData['user'] as Map<String, dynamic>?) ??
+        Map<String, dynamic>.from(rootData);
 
     if ((userJson['token'] == null || '${userJson['token']}'.isEmpty) &&
-        dataMap['token'] != null) {
-      userJson['token'] = dataMap['token'];
+        (rootData['token'] != null || dataMap['token'] != null)) {
+      userJson['token'] = rootData['token'] ?? dataMap['token'];
     }
 
     return UserModel.fromJson(userJson);

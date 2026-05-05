@@ -4,6 +4,7 @@ import 'package:afiete/core/network/token_storage.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/theme/language_cubit.dart';
 import 'package:afiete/core/theme/theme_cubit.dart';
+import 'package:afiete/core/utils/age_utils.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/settings/domin/entity/setting_entity.dart';
@@ -22,6 +23,15 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<AuthCubit>().refreshProfileFromBackend();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.select<ThemeCubit, bool>(
@@ -392,7 +402,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       email: user.email,
       phoneNumber: user.phoneNumber ?? '',
       gender: user.gender ?? '',
-      age: user.age ?? 0,
+      age: user.age ?? calculateAge(user.birthDate) ?? 0,
     );
   }
 }

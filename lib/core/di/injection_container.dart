@@ -8,6 +8,7 @@ import 'package:afiete/feature/assignments/domain/usecase/submit_assignment_usec
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
@@ -144,6 +145,9 @@ Future<void> init() async {
   sl.registerLazySingleton<GoogleSignInUseCase>(
     () => GoogleSignInUseCase(sl<AuthRepository>()),
   );
+  sl.registerLazySingleton<FetchProfileUseCase>(
+    () => FetchProfileUseCase(sl<AuthRepository>()),
+  );
   sl.registerLazySingleton<UpdateProfileInfoUseCase>(
     () => UpdateProfileInfoUseCase(sl<AuthRepository>()),
   );
@@ -165,6 +169,7 @@ Future<void> init() async {
       sl<LogoutUseCase>(),
       sl<DeleteAccountUseCase>(),
       sl<GoogleSignInUseCase>(),
+      sl<FetchProfileUseCase>(),
       sl<UpdateProfileInfoUseCase>(),
       sl<RequestEmailChangeOtpUseCase>(),
       sl<VerifyOtpUseCase>(),

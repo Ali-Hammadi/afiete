@@ -1,6 +1,7 @@
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
+import 'package:afiete/core/utils/age_utils.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,15 @@ class ProfileInfoScreen extends StatefulWidget {
 class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   static const String _genderMale = 'Male';
   static const String _genderFemale = 'Female';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<AuthCubit>().refreshProfileFromBackend();
+    });
+  }
 
   String _normalizeGenderValue(String? raw) {
     final value = (raw ?? '').trim().toLowerCase();
@@ -48,7 +58,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
         final username = user?.username.trim().isNotEmpty == true
             ? user!.username.trim()
             : '—';
-        final displayAge = user?.age ?? 0;
+        final displayAge = user?.age ?? calculateAge(user?.birthDate) ?? 0;
         final displayGender = _displayGender(user?.gender);
         final displayBirthDate = _displayBirthDate(user?.birthDate);
         final displayPhone = user?.phoneNumber?.trim().isNotEmpty == true

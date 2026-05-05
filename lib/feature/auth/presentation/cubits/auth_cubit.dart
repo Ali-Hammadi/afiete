@@ -1,7 +1,10 @@
 import 'dart:developer' as developer;
 
+import 'package:afiete/core/usecases/usecase.dart';
+import 'package:afiete/core/utils/age_utils.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
@@ -24,6 +27,7 @@ class AuthCubit extends Cubit<AuthState> {
   final LogoutUseCase logoutUseCase;
   final DeleteAccountUseCase deleteAccountUseCase;
   final GoogleSignInUseCase googleSignInUseCase;
+  final FetchProfileUseCase fetchProfileUseCase;
   final UpdateProfileInfoUseCase updateProfileInfoUseCase;
   final RequestEmailChangeOtpUseCase requestEmailChangeOtpUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
@@ -36,6 +40,7 @@ class AuthCubit extends Cubit<AuthState> {
     this.logoutUseCase,
     this.deleteAccountUseCase,
     this.googleSignInUseCase,
+    this.fetchProfileUseCase,
     this.updateProfileInfoUseCase,
     this.requestEmailChangeOtpUseCase,
     this.verifyOtpUseCase,
@@ -460,7 +465,41 @@ class AuthCubit extends Cubit<AuthState> {
       data: {'username': cachedUser.username, 'email': cachedUser.email},
     );
     emit(AuthLoaded(cachedUser));
+    await refreshProfileFromBackend();
     return true;
+  }
+
+  Future<bool> refreshProfileFromBackend() async {
+    final currentState = state;
+    final currentUser = currentState is AuthLoaded
+        ? currentState.user
+        : currentState is AuthProfileUpdated
+        ? currentState.user
+        : await authRepository.getCachedSession();
+
+    if (currentUser == null) {
+      _log('refresh_profile:skipped', data: {'reason': 'no_current_user'});
+      return false;
+    }
+
+    final result = await fetchProfileUseCase(NoParams());
+    return result.fold(
+      (failure) {
+        _log('refresh_profile:error', data: {'message': failure.errorMessage});
+        return false;
+      },
+      (remoteUser) {
+        _log(
+          'refresh_profile:success',
+          data: {'username': remoteUser.username, 'email': remoteUser.email},
+        );
+        final mergedUser = _mergeWithCurrentUser(currentState, remoteUser);
+        return _cacheAndEmitUser(
+          mergedUser,
+          asProfileUpdated: currentState is AuthProfileUpdated,
+        );
+      },
+    );
   }
 
   Future<bool> changePassword({
@@ -607,7 +646,10 @@ class AuthCubit extends Cubit<AuthState> {
           ? updatedUser.token
           : currentUser.token,
       birthDate: updatedUser.birthDate ?? currentUser.birthDate,
-      age: updatedUser.age ?? currentUser.age,
+      age:
+          updatedUser.age ??
+          currentUser.age ??
+          calculateAge(updatedUser.birthDate ?? currentUser.birthDate),
       gender: updatedUser.gender ?? currentUser.gender,
       phoneNumber: updatedUser.phoneNumber ?? currentUser.phoneNumber,
       isVerified: updatedUser.isVerified || currentUser.isVerified,
