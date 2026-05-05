@@ -400,11 +400,11 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<void> verifyOtpCode(String email, String code) async {
-    _log('verify_otp:start', data: {'email': email, 'codeLength': code.length});
+  Future<void> verifyOtp(String email, String otp) async {
+    _log('verify_otp:start', data: {'email': email, 'otpLength': otp.length});
     emit(AuthLoading());
     final result = await verifyOtpUseCase(
-      VerifyOtpParams(email: email, code: code),
+      VerifyOtpParams(email: email, otp: otp),
     );
 
     result.fold(

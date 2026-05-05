@@ -35,7 +35,7 @@ abstract class AuthRemoteDataSource {
 
   Future<bool> sendVerificationOtp(String email);
 
-  Future<UserModel> verifyOtp(String email, String code);
+  Future<UserModel> verifyOtp(String email, String otp);
 
   Future<String> changePassword({
     required String email,
@@ -639,15 +639,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> verifyOtp(String email, String code) async {
+  Future<UserModel> verifyOtp(String email, String otp) async {
     try {
       _logInfo(
         'verify_otp:start',
-        data: {'email': email, 'codeLength': code.length},
+        data: {'email': email, 'otpLength': otp.length},
       );
       final requestData = {
         ApiEndpoints.keyEmail: email,
-        ApiEndpoints.keyOtp: code,
+        ApiEndpoints.keyOtp: otp,
       };
       _logInfo('verify_otp:request', data: requestData);
       final response = await _dio.post(

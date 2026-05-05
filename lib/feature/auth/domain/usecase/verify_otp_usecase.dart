@@ -6,9 +6,9 @@ import 'package:dartz/dartz.dart';
 
 class VerifyOtpParams {
   final String email;
-  final String code;
+  final String otp;
 
-  const VerifyOtpParams({required this.email, required this.code});
+  const VerifyOtpParams({required this.email, required this.otp});
 }
 
 class VerifyOtpUseCase implements UseCase<UserAuthEntity, VerifyOtpParams> {
@@ -18,6 +18,6 @@ class VerifyOtpUseCase implements UseCase<UserAuthEntity, VerifyOtpParams> {
 
   @override
   Future<Either<Failure, UserAuthEntity>> call(VerifyOtpParams params) {
-    return repository.verifyOtp(params.email, params.code);
+    return repository.verifyOtp(params.email, params.otp);
   }
 }

@@ -31,7 +31,7 @@ abstract class AuthRepository {
     required String newEmail,
   });
 
-  Future<Either<Failure, UserAuthEntity>> verifyOtp(String email, String code);
+  Future<Either<Failure, UserAuthEntity>> verifyOtp(String email, String otp);
 
   Future<Either<Failure, UserAuthEntity>> confirmEmailChange({
     required String userId,

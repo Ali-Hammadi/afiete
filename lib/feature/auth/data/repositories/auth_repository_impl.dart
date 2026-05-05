@@ -217,10 +217,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserAuthEntity>> verifyOtp(
     String email,
-    String code,
+    String otp,
   ) async {
     try {
-      final remoteUser = await remoteDataSource.verifyOtp(email, code);
+      final remoteUser = await remoteDataSource.verifyOtp(email, otp);
       return Right(remoteUser.toEntity());
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));

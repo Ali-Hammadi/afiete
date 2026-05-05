@@ -25,8 +25,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
 
   bool get isFormValid => _pinPutController.text.length == 4;
 
-  void _verifyOTP(String pin) {
-    context.read<AuthCubit>().verifyOtpCode(widget.email, pin);
+  void _verifyOTP(String otp) {
+    context.read<AuthCubit>().verifyOtp(widget.email, otp);
   }
 
   @override
