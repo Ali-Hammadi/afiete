@@ -257,7 +257,13 @@ class ServerFailure extends Failure {
     }
     if (normalized.contains('already exists') ||
         normalized.contains('user with this email')) {
-      return 'This email is already registered. Please sign in or use another email.';
+      return 'This email is already registered. If sign-in says your account is not verified, complete verification first.';
+    }
+    if (normalized.contains(
+          'no active account found with the given credentials',
+        ) ||
+        normalized.contains('given credentials')) {
+      return 'Email or password is incorrect. If you recently signed up, verify your account before signing in.';
     }
     if (normalized.contains('does not exist') ||
         normalized.contains('not found')) {

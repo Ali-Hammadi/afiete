@@ -84,62 +84,88 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> login(String email, String password) async {
+    final normalizedEmail = email.trim().toLowerCase();
     try {
-      _logInfo('login:start', data: {'email': email});
+      _logInfo(
+        'login:start',
+        data: {
+          'email': normalizedEmail,
+          'endpoint': ApiEndpoints.login,
+          'method': 'POST',
+          'passwordLength': password.length,
+        },
+      );
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.login,
-        data: {'email': email, 'password': password},
+        data: {'email': normalizedEmail, 'password': password},
       );
       _logInfo(
         'login:response',
-        data: {'statusCode': response.statusCode, 'body': response.data},
+        data: {
+          'statusCode': response.statusCode,
+          'body': response.data,
+          'endpoint': ApiEndpoints.login,
+          'hasAccessToken': response.data?.containsKey('access') ?? false,
+          'hasRefreshToken': response.data?.containsKey('refresh') ?? false,
+        },
       );
 
-      final data = response.data ?? <String, dynamic>{};
-      final accessToken =
-          data['access']?.toString() ??
-          data['token']?.toString() ??
-          data['access_token']?.toString() ??
-          '';
-      final refreshToken =
-          data['refresh']?.toString() ??
-          data['refresh_token']?.toString() ??
-          '';
+      final responseMap = response.data ?? <String, dynamic>{};
+      final parsedUser = UserModel.fromJson(responseMap);
+      final accessToken = _extractToken(responseMap);
+      final refreshToken = _extractRefreshToken(responseMap);
 
-      if (accessToken.isNotEmpty && refreshToken.isNotEmpty) {
-        await TokenStorage.saveTokens(
-          accessToken: accessToken,
-          refreshToken: refreshToken,
+      if (accessToken.isNotEmpty || refreshToken.isNotEmpty) {
+        if (accessToken.isNotEmpty && refreshToken.isNotEmpty) {
+          await TokenStorage.saveTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          );
+          _logInfo('login:token_saved', data: {'type': 'access+refresh'});
+        } else if (accessToken.isNotEmpty) {
+          await TokenStorage.saveToken(accessToken);
+          _logInfo('login:token_saved', data: {'type': 'access_only'});
+        }
+
+        return parsedUser.copyWith(
+          email: parsedUser.email.isNotEmpty
+              ? parsedUser.email
+              : normalizedEmail,
+          password: password,
+          token: accessToken,
+          isVerified:
+              parsedUser.isVerified ||
+              responseMap['is_verified'] == true ||
+              responseMap['isVerified'] == true,
         );
-        _logInfo('login:token_saved', data: {'type': 'access+refresh'});
-      } else if (accessToken.isNotEmpty) {
-        await TokenStorage.saveToken(accessToken);
-        _logInfo('login:token_saved', data: {'type': 'access_only'});
       }
 
-      // Parse user data from response - same as signup
-      final responseMap = data;
-      final parsedUser = UserModel.fromJson(responseMap);
-
-      return parsedUser.copyWith(
-        email: parsedUser.email.isNotEmpty ? parsedUser.email : email,
+      _logInfo('login:token_fallback', data: {'email': normalizedEmail});
+      return await _loginWithTokenEndpoint(
+        email: normalizedEmail,
         password: password,
-        token: accessToken,
-        isVerified:
-            parsedUser.isVerified ||
-            responseMap['is_verified'] == true ||
-            responseMap['isVerified'] == true,
+        fallbackUser: parsedUser,
       );
     } on DioException catch (e) {
       _logError(
         'login:failed',
         error: {
-          'email': email,
+          'email': normalizedEmail,
           'statusCode': e.response?.statusCode,
           'message': e.message,
           'response': e.response?.data,
         },
       );
+      if (_shouldFallbackToTokenEndpoint(e)) {
+        _logInfo(
+          'login:token_fallback_after_error',
+          data: {'email': normalizedEmail},
+        );
+        return await _loginWithTokenEndpoint(
+          email: normalizedEmail,
+          password: password,
+        );
+      }
       final message = _extractMessage(e.response?.data);
       if (message != null && message.isNotEmpty) {
         throw DioException(
@@ -157,6 +183,95 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         error: e.toString(),
       );
     }
+  }
+
+  Future<UserModel> _loginWithTokenEndpoint({
+    required String email,
+    required String password,
+    UserModel? fallbackUser,
+  }) async {
+    final tokenResponse = await _dio.post<Map<String, dynamic>>(
+      ApiEndpoints.tokenObtainPair,
+      data: {ApiEndpoints.keyEmail: email, ApiEndpoints.keyPassword: password},
+    );
+    _logInfo(
+      'login:token_response',
+      data: {
+        'statusCode': tokenResponse.statusCode,
+        'body': tokenResponse.data,
+      },
+    );
+
+    final tokenMap = tokenResponse.data ?? <String, dynamic>{};
+    final accessToken = _extractToken(tokenMap);
+    final refreshToken = _extractRefreshToken(tokenMap);
+
+    if (accessToken.isNotEmpty && refreshToken.isNotEmpty) {
+      await TokenStorage.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+      _logInfo('login:token_saved', data: {'type': 'access+refresh'});
+    } else if (accessToken.isNotEmpty) {
+      await TokenStorage.saveToken(accessToken);
+      _logInfo('login:token_saved', data: {'type': 'access_only'});
+    }
+
+    try {
+      final profileUser = await fetchProfile();
+      return profileUser.copyWith(
+        email: profileUser.email.isNotEmpty
+            ? profileUser.email
+            : (fallbackUser?.email.isNotEmpty == true
+                  ? fallbackUser!.email
+                  : email),
+        password: password,
+        token: accessToken.isNotEmpty ? accessToken : profileUser.token,
+        isVerified:
+            profileUser.isVerified || (fallbackUser?.isVerified ?? false),
+      );
+    } catch (_) {
+      final baseUser =
+          fallbackUser ??
+          UserModel(
+            nickname: email.split('@').first,
+            email: email,
+            password: password,
+            token: accessToken,
+          );
+      return baseUser.copyWith(
+        email: baseUser.email.isNotEmpty ? baseUser.email : email,
+        password: password,
+        token: accessToken.isNotEmpty ? accessToken : baseUser.token,
+        isVerified: baseUser.isVerified,
+      );
+    }
+  }
+
+  bool _shouldFallbackToTokenEndpoint(DioException error) {
+    final statusCode = error.response?.statusCode;
+    if (statusCode == 404) {
+      return true;
+    }
+
+    final message = _extractMessage(error.response?.data)?.toLowerCase() ?? '';
+    return message.contains('no account') ||
+        message.contains('account not found') ||
+        message.contains('user not found') ||
+        message.contains('invalid credentials');
+  }
+
+  String _extractToken(Map<String, dynamic> data) {
+    return data['access']?.toString() ??
+        data['token']?.toString() ??
+        data['access_token']?.toString() ??
+        '';
+  }
+
+  String _extractRefreshToken(Map<String, dynamic> data) {
+    return data['refresh']?.toString() ??
+        data['refresh_token']?.toString() ??
+        '';
   }
 
   @override
@@ -194,19 +309,33 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String email,
     String password,
   ) async {
+    final normalizedEmail = email.trim().toLowerCase();
     try {
-      _logInfo('signup:start', data: {'email': email, 'nickname': nickname});
+      _logInfo(
+        'signup:start',
+        data: {
+          'email': normalizedEmail,
+          'nickname': nickname,
+          'endpoint': ApiEndpoints.signup,
+          'method': 'POST',
+        },
+      );
       final response = await _dio.post(
         ApiEndpoints.signup,
         data: UserModel.signupRequestBody(
           nickname: nickname,
-          email: email,
+          email: normalizedEmail,
           password: password,
         ),
       );
       _logInfo(
         'signup:response',
-        data: {'statusCode': response.statusCode, 'body': response.data},
+        data: {
+          'statusCode': response.statusCode,
+          'body': response.data,
+          'endpoint': ApiEndpoints.signup,
+          'isVerified': response.data?['is_verified'] ?? false,
+        },
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -226,7 +355,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         username: parsedUser.username.isNotEmpty
             ? parsedUser.username
             : nickname,
-        email: parsedUser.email.isNotEmpty ? parsedUser.email : email,
+        email: parsedUser.email.isNotEmpty ? parsedUser.email : normalizedEmail,
         password: password,
         token: parsedUser.token,
         isVerified:
@@ -238,7 +367,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _logError(
         'signup:failed',
         error: {
-          'email': email,
+          'email': normalizedEmail,
           'statusCode': e.response?.statusCode,
           'message': e.message,
           'response': e.response?.data,
@@ -267,6 +396,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> logout(String email, String password) async {
     try {
       _logInfo('logout:start', data: {'email': email});
+      final response = await _dio.post(ApiEndpoints.logout);
+      _logInfo(
+        'logout:response',
+        data: {'statusCode': response.statusCode, 'body': response.data},
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          error: 'Unable to complete logout.',
+        );
+      }
+
       await TokenStorage.clearTokens();
       _logInfo('logout:success', data: {'email': email});
       return UserModel(
@@ -610,11 +753,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String userId,
     required String newEmail,
   }) async {
+    final targetEmail = newEmail.trim().toLowerCase();
     try {
-      _logInfo('request_email_otp:start', data: {'newEmail': newEmail});
-      final response = await _dio.post(
-        ApiEndpoints.requestEmailChangeOtp,
-        data: {ApiEndpoints.keyEmail: newEmail},
+      _logInfo(
+        'request_email_otp:start',
+        data: {
+          'userId': userId,
+          'targetEmail': targetEmail,
+          'endpoint': ApiEndpoints.otpResend,
+        },
+      );
+      final response = await _postWithTrailingSlashFallback(
+        ApiEndpoints.otpResend,
+        data: {ApiEndpoints.keyEmail: targetEmail},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         _logInfo(
@@ -633,31 +784,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _logError(
         'request_email_otp:failed',
         error: {
-          'newEmail': newEmail,
+          'userId': userId,
+          'targetEmail': targetEmail,
           'statusCode': e.response?.statusCode,
           'message': e.message,
           'response': e.response?.data,
+          'endpoint': ApiEndpoints.otpResend,
         },
       );
-      final message = _extractMessage(e.response?.data);
-      if (e.response?.statusCode == 400 &&
-          message == 'User with this email does not exist') {
-        throw DioException(
-          requestOptions: e.requestOptions,
-          response: e.response,
-          type: e.type,
-          error:
-              'The backend does not currently support sending an OTP for email change. This endpoint only resends verification codes for the current account email.',
-          message:
-              'The backend does not currently support sending an OTP for email change. This endpoint only resends verification codes for the current account email.',
-        );
-      }
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(
-          path: ApiEndpoints.requestEmailChangeOtp,
-        ),
+        requestOptions: RequestOptions(path: ApiEndpoints.otpResend),
         error: e.toString(),
       );
     }
@@ -674,11 +812,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'request_email_change:start',
         data: {'email': email, 'newEmail': newEmail},
       );
-      final response = await _dio.post(
-        ApiEndpoints.requestEmailChangeOtp,
+      final response = await _dio.put(
+        ApiEndpoints.emailChangeRequest,
         data: {
-          ApiEndpoints.keyEmail: newEmail,
+          ApiEndpoints.keyEmail: email,
           ApiEndpoints.keyPassword: password,
+          ApiEndpoints.keyNewEmail: newEmail,
         },
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -718,9 +857,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(
-          path: ApiEndpoints.requestEmailChangeOtp,
-        ),
+        requestOptions: RequestOptions(path: ApiEndpoints.emailChangeRequest),
         error: e.toString(),
       );
     }
@@ -729,9 +866,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<String> requestForgotPasswordOtp(String email) async {
     try {
-      _logInfo('forgot_password_otp:start', data: {'email': email});
+      _logInfo(
+        'forgot_password_otp:start',
+        data: {'email': email, 'endpoint': ApiEndpoints.forgotPasswordOtp},
+      );
       final response = await _dio.post(
-        ApiEndpoints.usersForgotPassword,
+        ApiEndpoints.forgotPasswordOtp,
         data: {ApiEndpoints.keyEmail: email},
       );
       _logInfo(
@@ -772,14 +912,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.usersForgotPassword),
+        requestOptions: RequestOptions(path: ApiEndpoints.forgotPasswordOtp),
         error: e.toString(),
       );
     }
   }
 
   /// Verifies OTP for email change (separate from login OTP verification).
-  /// Uses [usersOtpVerify] endpoint specifically for email change confirmation.
+  /// Uses [emailChangeVerify] endpoint specifically for email change confirmation.
   @override
   Future<UserModel> confirmEmailChange({
     required String userId,
@@ -789,15 +929,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       _logInfo(
         'confirm_email_change:start',
-        data: {'userId': userId, 'newEmail': newEmail, 'otpLength': otp.length},
+        data: {
+          'userId': userId,
+          'newEmail': newEmail,
+          'otpLength': otp.length,
+          'endpoint': ApiEndpoints.emailChangeVerify,
+        },
       );
       final requestData = {
         ApiEndpoints.keyEmail: newEmail,
         ApiEndpoints.keyOtp: otp,
       };
-      _logInfo('confirm_email_change:request', data: requestData);
+      _logInfo('confirm_email_change:request_data', data: requestData);
       final response = await _dio.post(
-        ApiEndpoints.confirmEmailChange,
+        ApiEndpoints.emailChangeVerify,
         data: requestData,
       );
       _logInfo(
@@ -806,12 +951,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       if (response.statusCode == 200) {
         final accessToken = await TokenStorage.getAccessToken();
-        return UserModel(
-          username: userId,
-          nickname: userId,
-          email: newEmail,
-          password: '',
-          token: accessToken ?? '',
+        final user = _resolveUserFromAuthResponse(response.data);
+        return user.copyWith(
+          username: user.username.isNotEmpty ? user.username : userId,
+          nickname: (user.nickname?.isNotEmpty ?? false)
+              ? user.nickname
+              : userId,
+          email: user.email.isNotEmpty ? user.email : newEmail,
+          token: user.token.isNotEmpty ? user.token : (accessToken ?? ''),
+          isVerified: true,
         );
       }
       throw DioException(
@@ -844,7 +992,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.confirmEmailChange),
+        requestOptions: RequestOptions(path: ApiEndpoints.emailChangeVerify),
         error: e.toString(),
       );
     }
@@ -853,15 +1001,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<bool> sendVerificationOtp(String email) async {
     try {
-      _logInfo('send_verification_otp:start', data: {'email': email});
+      _logInfo(
+        'send_verification_otp:start',
+        data: {
+          'email': email,
+          'endpoint': ApiEndpoints.otpResend,
+          'method': 'POST',
+          'purpose': 'signup_or_login_verification',
+        },
+      );
       final response = await _dio.post(
-        ApiEndpoints.requestEmailChangeOtp,
+        ApiEndpoints.otpResend,
         data: {ApiEndpoints.keyEmail: email},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         _logInfo(
           'send_verification_otp:success',
-          data: {'statusCode': response.statusCode, 'body': response.data},
+          data: {
+            'statusCode': response.statusCode,
+            'body': response.data,
+            'endpoint': ApiEndpoints.otpResend,
+          },
         );
         return true;
       }
@@ -893,31 +1053,33 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(
-          path: ApiEndpoints.requestEmailChangeOtp,
-        ),
+        requestOptions: RequestOptions(path: ApiEndpoints.otpResend),
         error: e.toString(),
       );
     }
   }
 
   /// Verifies OTP for login (separate from email change OTP verification).
-  /// Uses [usersAuthVerifyOtp] endpoint specifically for authentication OTP verification.
+  /// Uses [otpVerify] endpoint specifically for authentication OTP verification.
   @override
   Future<UserModel> verifyOtp(String email, String otp) async {
     try {
       _logInfo(
         'verify_otp:start',
-        data: {'email': email, 'otpLength': otp.length},
+        data: {
+          'email': email,
+          'otpLength': otp.length,
+          'endpoint': ApiEndpoints.otpVerify,
+        },
       );
       final requestData = {
         ApiEndpoints.keyEmail: email,
         'code': otp,
         ApiEndpoints.keyOtp: otp,
       };
-      _logInfo('verify_otp:request', data: requestData);
+      _logInfo('verify_otp:request_data', data: requestData);
       final response = await _dio.post(
-        ApiEndpoints.usersAuthVerifyOtp,
+        ApiEndpoints.otpVerify,
         data: requestData,
       );
       _logInfo(
@@ -981,6 +1143,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'statusCode': e.response?.statusCode,
           'message': e.message,
           'response': e.response?.data,
+          'endpoint': ApiEndpoints.otpVerify,
         },
       );
       final message = _extractMessage(e.response?.data);
@@ -996,7 +1159,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.usersAuthVerifyOtp),
+        requestOptions: RequestOptions(path: ApiEndpoints.otpVerify),
         error: e.toString(),
       );
     }
@@ -1010,8 +1173,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       _logInfo('change_password:start', data: {'email': email});
-      final response = await _dio.post(
-        ApiEndpoints.changePassword,
+      final response = await _dio.put(
+        ApiEndpoints.passwordChange,
         data: {
           ApiEndpoints.keyEmail: email,
           ApiEndpoints.keyCurrentPassword: currentPassword,
@@ -1056,7 +1219,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(path: ApiEndpoints.changePassword),
+        requestOptions: RequestOptions(path: ApiEndpoints.passwordChange),
         error: e.toString(),
       );
     }
@@ -1071,7 +1234,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       _logInfo('reset_password:start', data: {'email': email});
       final response = await _dio.post(
-        ApiEndpoints.usersAuthResetPassword,
+        ApiEndpoints.passwordReset,
         data: {
           ApiEndpoints.keyEmail: email,
           'code': otp,
@@ -1117,9 +1280,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       rethrow;
     } catch (e) {
       throw DioException(
-        requestOptions: RequestOptions(
-          path: ApiEndpoints.usersAuthResetPassword,
-        ),
+        requestOptions: RequestOptions(path: ApiEndpoints.passwordReset),
         error: e.toString(),
       );
     }
@@ -1249,6 +1410,34 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
 
     return null;
+  }
+
+  Future<Response<dynamic>> _postWithTrailingSlashFallback(
+    String path, {
+    Object? data,
+  }) async {
+    try {
+      return await _dio.post(path, data: data);
+    } on DioException catch (e) {
+      if (e.response?.statusCode != 404) {
+        rethrow;
+      }
+
+      final alternatePath = path.endsWith('/')
+          ? path.substring(0, path.length - 1)
+          : '$path/';
+
+      if (alternatePath == path || alternatePath.isEmpty) {
+        rethrow;
+      }
+
+      _logInfo(
+        'endpoint_retry_without_or_with_slash',
+        data: {'primary': path, 'fallback': alternatePath},
+      );
+
+      return _dio.post(alternatePath, data: data);
+    }
   }
 
   bool _isGenericMessage(String message) {

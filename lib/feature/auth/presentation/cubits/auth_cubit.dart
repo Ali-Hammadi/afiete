@@ -24,6 +24,8 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   static const String _logName = 'AuthCubit';
   UserAuthEntity? _pendingSignupUser;
+  String _pendingLoginPassword = ''; // Store password for auto-login after OTP
+
   final LoginUseCase loginUseCase;
   final SignupUseCase signupUseCase;
   final LogoutUseCase logoutUseCase;
@@ -64,6 +66,8 @@ class AuthCubit extends Cubit<AuthState> {
     result.fold(
       (failure) {
         _log('login:error', data: {'message': failure.errorMessage});
+
+        // Check if account is inactive/restricted
         if (_isInactiveAccountError(failure.errorMessage)) {
           emit(
             const AuthError(
@@ -72,33 +76,35 @@ class AuthCubit extends Cubit<AuthState> {
           );
           return Future.value();
         }
+
+        // Check if account is not verified
         if (_isNotVerifiedError(failure.errorMessage)) {
-          _log('login:account_not_verified_send_otp', data: {'email': email});
+          _log('login:account_not_verified_from_error', data: {'email': email});
+          _pendingLoginPassword =
+              password; // Store password for OTP verification
           return sendVerificationOtp(email);
         }
-        if (_isAlreadyVerifiedError(failure.errorMessage)) {
-          emit(
-            const AuthError(
-              'Your account is already verified. Please sign in directly.',
-            ),
-          );
-          return Future.value();
-        }
+
+        // Any other error
         emit(AuthError(failure.errorMessage));
       },
       (user) {
         _log(
           'login:success',
-          data: {'username': user.username, 'email': user.email},
+          data: {'email': user.email, 'isVerified': user.isVerified},
         );
-        // If account is not verified, send OTP instead of rejecting
+
+        // If account is NOT verified, require OTP verification
         if (!user.isVerified) {
           _log(
-            'login:account_not_verified_send_otp',
-            data: {'email': user.email},
+            'login:account_not_verified_response',
+            data: {'email': user.email, 'reason': 'is_verified_false'},
           );
+          _pendingLoginPassword = password; // Store for auto-login after OTP
           return sendVerificationOtp(user.email, fallbackUser: user);
         }
+
+        // Account is verified - proceed with login
         return _cacheAndEmitUser(user);
       },
     );
@@ -158,6 +164,8 @@ class AuthCubit extends Cubit<AuthState> {
           data: {'username': user.username, 'email': user.email},
         );
         await authRepository.clearCachedSession();
+        _pendingSignupUser = null;
+        _pendingLoginPassword = '';
         emit(const AuthInitial());
         return true;
       },
@@ -182,6 +190,8 @@ class AuthCubit extends Cubit<AuthState> {
           data: {'username': user.username, 'email': user.email},
         );
         await authRepository.clearCachedSession();
+        _pendingSignupUser = null;
+        _pendingLoginPassword = '';
         emit(const AuthInitial());
         return true;
       },
@@ -467,35 +477,67 @@ class AuthCubit extends Cubit<AuthState> {
       (user) {
         _log(
           'verify_otp:success',
-          data: {'username': user.username, 'email': user.email},
+          data: {
+            'email': email,
+            'emailVerified': user.isVerified,
+            'hasToken': user.token.isNotEmpty,
+          },
         );
-        final mergedUser = _pendingSignupUser == null
-            ? user.copyWith(isVerified: true)
-            : user.copyWith(
-                username: _pendingSignupUser!.username.isNotEmpty
-                    ? _pendingSignupUser!.username
-                    : user.username,
-                nickname: (_pendingSignupUser?.nickname.isNotEmpty ?? false)
-                    ? _pendingSignupUser!.nickname
-                    : user.nickname,
-                email: _pendingSignupUser!.email.isNotEmpty
-                    ? _pendingSignupUser!.email
-                    : user.email,
-                password: _pendingSignupUser!.password.isNotEmpty
-                    ? _pendingSignupUser!.password
-                    : user.password,
-                token: user.token,
-                isVerified: true,
-                birthDate: user.birthDate ?? _pendingSignupUser!.birthDate,
-                age: user.age ?? _pendingSignupUser!.age,
-                gender: user.gender ?? _pendingSignupUser!.gender,
-                phoneNumber:
-                    user.phoneNumber ?? _pendingSignupUser!.phoneNumber,
-              );
-        _pendingSignupUser = null;
-        return _cacheAndEmitUser(mergedUser);
+
+        // Build verified user from signup or login flow
+        final verifiedUser = _buildVerifiedUser(user);
+
+        // Determine next step based on flow
+        if (_pendingSignupUser != null) {
+          // SIGNUP FLOW: Account is verified via email, proceed to profile completion
+          _log('verify_otp:signup_flow', data: {'email': email});
+          _pendingSignupUser = null;
+          _pendingLoginPassword = '';
+
+          // Navigate to profile completion form
+          return _cacheAndEmitUser(verifiedUser);
+        } else if (_pendingLoginPassword.isNotEmpty) {
+          // LOGIN FLOW: Attempt to login now that email is verified
+          _log('verify_otp:login_flow', data: {'email': email});
+          final password = _pendingLoginPassword;
+          _pendingLoginPassword = '';
+
+          // Try login with stored password
+          return login(email, password);
+        } else {
+          // FALLBACK: No flow context, just proceed with verified user
+          _log('verify_otp:no_flow_context', data: {'email': email});
+          return _cacheAndEmitUser(verifiedUser);
+        }
       },
     );
+  }
+
+  /// Build user entity with verified status from both signup and login contexts
+  UserAuthEntity _buildVerifiedUser(UserAuthEntity backendUser) {
+    // If from signup flow, merge with stored signup data
+    if (_pendingSignupUser != null) {
+      return backendUser.copyWith(
+        username: _pendingSignupUser!.username.isNotEmpty
+            ? _pendingSignupUser!.username
+            : backendUser.username,
+        nickname: _pendingSignupUser!.nickname.isNotEmpty
+            ? _pendingSignupUser!.nickname
+            : backendUser.nickname,
+        email: _pendingSignupUser!.email.isNotEmpty
+            ? _pendingSignupUser!.email
+            : backendUser.email,
+        password: _pendingSignupUser!.password,
+        isVerified: true,
+        birthDate: backendUser.birthDate ?? _pendingSignupUser!.birthDate,
+        age: backendUser.age ?? _pendingSignupUser!.age,
+        gender: backendUser.gender ?? _pendingSignupUser!.gender,
+        phoneNumber: backendUser.phoneNumber ?? _pendingSignupUser!.phoneNumber,
+      );
+    }
+
+    // From login flow, just mark as verified
+    return backendUser.copyWith(isVerified: true);
   }
 
   Future<bool> restoreSession() async {

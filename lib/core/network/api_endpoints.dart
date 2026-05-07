@@ -18,41 +18,41 @@ abstract class ApiEndpoints {
   static const String patients = '$api/patients';
   static const String token = '$api/token';
 
+  // === Core Auth Endpoints ===
   static const String login = '$users/login/';
   static const String signup = '$patients/register/';
-  static const String logout = '$auth/logout';
+  static const String logout = '$users/logout/';
   static const String deleteAccount = '$users/account/delete/';
   static const String googleLogin = '$patients/google/auth/';
+
+  // === User Profile ===
   static const String updateProfile = '$patients/profile/';
 
-  static const String requestEmailChangeOtp = '$users/otp/resend';
-  static const String confirmEmailChange = '$users/otp/verify';
+  // === OTP Verification (Signup/Login Flow) ===
+  static const String otpResend = '$users/otp/resend/';
+  static const String otpVerify = '$users/auth/verify-otp/';
 
-  static const String requestEmailChange = '$users/email/reset';
-  static const String confirmEmailChangeNew = '$users/email-change/confirm';
-  static const String changePassword = '$users/password/change/';
-  static const String resetPassword = '$users/password/reset';
+  // === Email Change (Settings) ===
+  static const String emailChangeRequest = '$users/email/reset/';
+  static const String emailChangeVerify = '$users/otp/verify/';
+
+  // === Password Management ===
+  static const String passwordReset = '$users/auth/reset-password/';
+  static const String passwordChange = '$users/password/reset/';
+  static const String forgotPasswordOtp = '$users/auth/forgot-password/';
+
+  // === Token Management ===
   static const String tokenObtainPair = '$token/';
   static const String tokenRefresh = '$token/refresh/';
   static const String tokenVerify = '$token/verify/';
 
-  // Assessments (per Swagger)
+  // === Assessments ===
   static const String assessmentsForm = '$api/assessments/form/';
   static const String assessmentsFormSubmit = '$api/assessments/form/submit/';
 
-  // Users auth endpoints (per Swagger)
-  static const String usersForgotPassword = '$users/auth/forgot-password/';
-  static const String usersAuthResetPassword = '$users/auth/reset-password/';
-  static const String usersAuthVerifyOtp = '$users/auth/verify-otp/';
-  static const String usersEmailResetPut = '$users/email/reset/';
-  static const String usersEmailResetPatch = '$users/email/reset/';
-  static const String usersOtpResend = '$users/otp/resend/';
-  static const String usersOtpVerify = '$users/otp/verify/';
-  static const String usersPasswordResetPut = '$users/password/reset/';
-  static const String usersPasswordResetPatch = '$users/password/reset/';
-
   // Auth request keys
   static const String keyEmail = 'email';
+  static const String keyNewEmail = 'new_email';
   static const String keyPassword = 'password';
   static const String keyCurrentPassword = 'current_password';
   static const String keyNewPassword = 'new_password';
