@@ -46,8 +46,25 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthLoaded) {
-            // OTP verification successful, continue to profile completion
-            Navigator.pushReplacementNamed(context, MyRoutes.authInfoScreens);
+            // OTP verification successful
+            // Check if user profile is incomplete (signup flow)
+            // If birthDate, age, gender, or phoneNumber are missing, it's a signup flow
+            final user = state.user;
+            final isProfileIncomplete =
+                user.birthDate == null ||
+                user.age == null ||
+                user.gender == null ||
+                user.gender?.isEmpty == true ||
+                user.phoneNumber == null ||
+                user.phoneNumber?.isEmpty == true;
+
+            if (isProfileIncomplete) {
+              // Signup flow: complete profile information
+              Navigator.pushReplacementNamed(context, MyRoutes.authInfoScreens);
+            } else {
+              // Login flow: proceed to home
+              Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
+            }
           } else if (state is AuthError) {
             // Show error message
             ScaffoldMessenger.of(
