@@ -52,10 +52,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
         final user = _currentUser(state);
-        final nickname = user?.nickname.trim().isNotEmpty == true
-            ? user!.nickname.trim()
+        final nickname = (user?.nickname?.trim().isNotEmpty ?? false)
+            ? user!.nickname!.trim()
             : '—';
-        final username = user?.username.trim().isNotEmpty == true
+        final username = (user?.username.trim().isNotEmpty ?? false)
             ? user!.username.trim()
             : '—';
         final displayAge = user?.age ?? calculateAge(user?.birthDate) ?? 0;
@@ -720,7 +720,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     final newNickname = await _showTextEditor(
       title: SettingsStrings.editProfileTitle,
       label: SettingsStrings.nicknameLabel,
-      initialValue: user.nickname,
+      initialValue: user.nickname ?? '',
       icon: Icons.badge_outlined,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
@@ -730,7 +730,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
       },
     );
 
-    if (newNickname == null || newNickname == user.nickname.trim()) {
+    if (newNickname == null || newNickname == (user.nickname?.trim() ?? '')) {
       return;
     }
 
@@ -817,7 +817,6 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     }
 
     final success = await authCubit.changePassword(
-      email: user.email.trim(),
       currentPassword: credentials.currentPassword,
       newPassword: credentials.newPassword,
     );

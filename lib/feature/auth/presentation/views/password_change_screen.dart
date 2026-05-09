@@ -221,7 +221,6 @@ class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
       }
 
       final success = await authCubit.changePassword(
-        email: email,
         currentPassword: _oldPasswordController.text,
         newPassword: _newPasswordController.text,
       );

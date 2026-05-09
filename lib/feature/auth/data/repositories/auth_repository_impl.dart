@@ -1,46 +1,240 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
-
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:afiete/core/error/failure.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
+import 'package:afiete/feature/auth/domain/entities/otp_entity.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
+/// Implementation of [AuthRepository] that wraps [AuthRemoteDataSource] with error handling.
+/// All DioException are caught and converted to ServerFailure.
 class AuthRepositoryImpl implements AuthRepository {
-  static const String _cachedUserKey = 'auth_cached_user';
-  final AuthRemoteDataSource remoteDataSource;
+  final AuthRemoteDataSource _remoteDataSource;
 
-  const AuthRepositoryImpl({required this.remoteDataSource});
+  const AuthRepositoryImpl({required AuthRemoteDataSource remoteDataSource})
+    : _remoteDataSource = remoteDataSource;
+
+  // ==================== SIGNUP FLOW ====================
 
   @override
-  Future<Either<Failure, UserAuthEntity>> login(
-    String email,
-    String password,
-  ) async {
+  Future<Either<Failure, OtpEntity>> signup({
+    required String nickname,
+    required String email,
+    required String password,
+  }) async {
     try {
-      final remoteUser = await remoteDataSource.login(email, password);
-      return Right(remoteUser.toEntity());
+      final model = await _remoteDataSource.signup(nickname, email, password);
+      return Right(model.toEntity());
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> verifySignupOtp({
+    required String email,
+    required String otpCode,
+  }) async {
+    try {
+      final model = await _remoteDataSource.verifySignupOtp(email, otpCode);
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  // ==================== LOGIN ====================
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final model = await _remoteDataSource.login(email, password);
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  // ==================== PROFILE ====================
 
   @override
   Future<Either<Failure, UserAuthEntity>> fetchProfile() async {
     try {
-      final remoteUser = await remoteDataSource.fetchProfile();
-      return Right(remoteUser.toEntity());
+      final model = await _remoteDataSource.fetchProfile();
+      return Right(model.toEntity());
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> updateProfileInfo({
+    String? dateOfBirth,
+    String? gender,
+    String? phoneNumber,
+  }) async {
+    try {
+      final model = await _remoteDataSource.updateProfileInfo(
+        dateOfBirth: dateOfBirth,
+        gender: gender,
+        phoneNumber: phoneNumber,
+      );
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  // ==================== PASSWORD RECOVERY ====================
+
+  @override
+  Future<Either<Failure, OtpEntity>> requestForgotPasswordOtp({
+    required String email,
+  }) async {
+    try {
+      final model = await _remoteDataSource.requestForgotPasswordOtp(email);
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OtpEntity>> verifyForgotPasswordOtp({
+    required String email,
+    required String otpCode,
+    required String newPassword,
+  }) async {
+    try {
+      final model = await _remoteDataSource.verifyForgotPasswordOtp(
+        email,
+        otpCode,
+        newPassword,
+      );
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  // ==================== SESSION MANAGEMENT ====================
+
+  @override
+  Future<Either<Failure, void>> logout() async {
+    try {
+      await _remoteDataSource.logout();
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteAccount({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _remoteDataSource.deleteAccount(email, password);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OtpEntity>> requestEmailChangeOtp() async {
+    try {
+      final model = await _remoteDataSource.requestEmailChangeOtp();
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OtpEntity>> requestEmailChangeWithPassword({
+    required String email,
+    required String password,
+    required String newEmail,
+  }) async {
+    try {
+      final model = await _remoteDataSource.requestEmailChangeWithPassword(
+        email: email,
+        password: password,
+        newEmail: newEmail,
+      );
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserAuthEntity>> verifyOtp({
+    required String email,
+    required String otpCode,
+  }) async {
+    try {
+      final model = await _remoteDataSource.verifyOtp(email, otpCode);
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OtpEntity>> resetPassword({
+    required String email,
+    required String otpCode,
+    required String newPassword,
+  }) async {
+    try {
+      final model = await _remoteDataSource.verifyForgotPasswordOtp(
+        email,
+        otpCode,
+        newPassword,
+      );
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  // ==================== LOCAL CACHE HELPERS ====================
+
+  static const String _cachedUserKey = 'auth_cached_user';
 
   @override
   Future<void> cacheSession(UserAuthEntity user) async {
@@ -53,7 +247,6 @@ class AuthRepositoryImpl implements AuthRepository {
     final preferences = await SharedPreferences.getInstance();
     final cached = preferences.getString(_cachedUserKey);
     if (cached == null || cached.isEmpty) return null;
-
     try {
       final decoded = jsonDecode(cached) as Map<String, dynamic>;
       return _decodeUser(decoded);
@@ -73,152 +266,43 @@ class AuthRepositoryImpl implements AuthRepository {
       'username': user.username,
       'nickname': user.nickname,
       'email': user.email,
-      'password': user.password,
-      'token': user.token,
-      'isVerified': user.isVerified,
       'birthDate': user.birthDate?.toIso8601String(),
-      'age': user.age,
       'gender': user.gender,
       'phoneNumber': user.phoneNumber,
+      'isVerified': user.isVerified,
+      'accessToken': user.accessToken,
+      'refreshToken': user.refreshToken,
+      'password': user.password,
     };
   }
 
   UserAuthEntity _decodeUser(Map<String, dynamic> json) {
     return UserAuthEntity(
       username: json['username']?.toString() ?? '',
-
+      nickname: json['nickname']?.toString(),
       email: json['email']?.toString() ?? '',
-      password: json['password']?.toString() ?? '',
-      token: json['token']?.toString() ?? '',
-      isVerified:
-          json['isVerified'] == true ||
-          json['is_verified'] == true ||
-          json['isVerified']?.toString().toLowerCase() == 'true',
       birthDate: json['birthDate'] != null
           ? DateTime.tryParse(json['birthDate'].toString())
           : null,
-      age: json['age'] is int
-          ? json['age'] as int
-          : int.tryParse('${json['age'] ?? ''}'),
       gender: json['gender']?.toString(),
       phoneNumber: json['phoneNumber']?.toString(),
-      nickname: json['nickname']?.toString() ?? '',
+      isVerified: json['isVerified'] == true || json['is_verified'] == true,
+      accessToken: json['accessToken']?.toString(),
+      refreshToken: json['refreshToken']?.toString(),
+      password: json['password']?.toString(),
     );
   }
 
-  @override
-  Future<Either<Failure, UserAuthEntity>> deleteAccount(
-    String email,
-    String password,
-  ) async {
-    try {
-      final remoteUser = await remoteDataSource.deleteAccount(email, password);
-      return Right(remoteUser.toEntity());
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
+  // ==================== SENSITIVE UPDATES ====================
 
   @override
-  Future<Either<Failure, UserAuthEntity>> logout(
-    String email,
-    String password,
-  ) async {
-    try {
-      final remoteUser = await remoteDataSource.logout(email, password);
-      return Right(remoteUser.toEntity());
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserAuthEntity>> signup(
-    String nickname,
-    String email,
-    String password,
-  ) async {
-    try {
-      final remoteUser = await remoteDataSource.signup(
-        nickname,
-        email,
-        password,
-      );
-      return Right(remoteUser.toEntity());
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserAuthEntity>> googleSignIn() async {
-    try {
-      final remoteUser = await remoteDataSource.googleSignIn();
-      return Right(remoteUser.toEntity());
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } on PlatformException catch (e) {
-      final message = e.message ?? e.toString();
-      return Left(
-        ServerFailure(
-          'Google Sign-In failed: $message. Verify the OAuth client configuration, package name, SHA-1 fingerprint, and Google Play Services availability.',
-        ),
-      );
-    } catch (e) {
-      return Left(ServerFailure(_normalizeExceptionMessage(e)));
-    }
-  }
-
-  String _normalizeExceptionMessage(Object error) {
-    final raw = error.toString().trim();
-    if (raw.isEmpty) {
-      return 'An unexpected authentication error occurred. Please try again.';
-    }
-
-    return raw.replaceFirst(RegExp(r'^(Exception|Error):\s*'), '').trim();
-  }
-
-  @override
-  Future<Either<Failure, UserAuthEntity>> updateProfileInfo({
-    required String userId,
-    String? nickname,
-    required DateTime birthDate,
-    required String gender,
-    required String phoneNumber,
-  }) async {
-    try {
-      final remoteUser = await remoteDataSource.updateProfileInfo(
-        userId: userId,
-        nickname: nickname,
-        birthDate: birthDate,
-        gender: gender,
-        phoneNumber: phoneNumber,
-      );
-      return Right(remoteUser.toEntity());
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, String>> requestEmailChangeOtp({
-    required String userId,
+  Future<Either<Failure, void>> confirmEmailChange({
     required String newEmail,
+    required String otpCode,
   }) async {
     try {
-      final result = await remoteDataSource.requestEmailChangeOtp(
-        userId: userId,
-        newEmail: newEmail,
-      );
-      return Right(result);
+      await _remoteDataSource.confirmEmailChange(newEmail, otpCode);
+      return const Right(null);
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));
     } catch (e) {
@@ -227,87 +311,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> requestEmailChangeWithPassword({
-    required String email,
-    required String password,
-    required String newEmail,
-  }) async {
-    try {
-      final result = await remoteDataSource.requestEmailChangeWithPassword(
-        email: email,
-        password: password,
-        newEmail: newEmail,
-      );
-      return Right(result);
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, String>> requestForgotPasswordOtp({
-    required String email,
-  }) async {
-    try {
-      final result = await remoteDataSource.requestForgotPasswordOtp(email);
-      return Right(result);
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserAuthEntity>> verifyOtp(
-    String email,
-    String otp,
-  ) async {
-    try {
-      final remoteUser = await remoteDataSource.verifyOtp(email, otp);
-      return Right(remoteUser.toEntity());
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserAuthEntity>> confirmEmailChange({
-    required String userId,
-    required String newEmail,
-    required String otp,
-  }) async {
-    try {
-      final remoteUser = await remoteDataSource.confirmEmailChange(
-        userId: userId,
-        newEmail: newEmail,
-        otp: otp,
-      );
-      return Right(remoteUser.toEntity());
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, String>> changePassword({
-    required String email,
+  Future<Either<Failure, UserAuthEntity>> updatePassword({
     required String currentPassword,
     required String newPassword,
   }) async {
     try {
-      final message = await remoteDataSource.changePassword(
-        email: email,
-        currentPassword: currentPassword,
-        newPassword: newPassword,
+      final model = await _remoteDataSource.updatePassword(
+        currentPassword,
+        newPassword,
       );
-      return Right(message);
+      return Right(model.toEntity());
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));
     } catch (e) {
@@ -315,19 +328,15 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  // ==================== OAUTH ====================
+
   @override
-  Future<Either<Failure, String>> resetPassword({
-    required String email,
-    required String otp,
-    required String newPassword,
+  Future<Either<Failure, UserAuthEntity>> googleSignIn({
+    required String idToken,
   }) async {
     try {
-      final message = await remoteDataSource.resetPassword(
-        email: email,
-        otp: otp,
-        newPassword: newPassword,
-      );
-      return Right(message);
+      final model = await _remoteDataSource.googleSignIn(idToken);
+      return Right(model.toEntity());
     } on DioException catch (e) {
       return Left(ServerFailure.fromDioError(e));
     } catch (e) {

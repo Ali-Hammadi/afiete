@@ -1,5 +1,6 @@
 import 'package:afiete/core/error/failure.dart';
 import 'package:afiete/core/usecases/usecase.dart';
+import 'package:afiete/feature/auth/domain/entities/otp_entity.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
@@ -16,13 +17,13 @@ class RequestEmailChangeWithPasswordParams {
 }
 
 class RequestEmailChangeWithPasswordUseCase
-    implements UseCase<String, RequestEmailChangeWithPasswordParams> {
+    implements UseCase<OtpEntity, RequestEmailChangeWithPasswordParams> {
   final AuthRepository repository;
 
   const RequestEmailChangeWithPasswordUseCase(this.repository);
 
   @override
-  Future<Either<Failure, String>> call(
+  Future<Either<Failure, OtpEntity>> call(
     RequestEmailChangeWithPasswordParams params,
   ) {
     return repository.requestEmailChangeWithPassword(

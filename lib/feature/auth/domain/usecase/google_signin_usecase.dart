@@ -5,7 +5,9 @@ import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 
 class GoogleSignInParams {
-  const GoogleSignInParams();
+  final String idToken;
+
+  const GoogleSignInParams({required this.idToken});
 }
 
 class GoogleSignInUseCase
@@ -18,6 +20,6 @@ class GoogleSignInUseCase
   Future<Either<Failure, UserAuthEntity>> call(
     GoogleSignInParams params,
   ) async {
-    return await repository.googleSignIn();
+    return await repository.googleSignIn(idToken: params.idToken);
   }
 }

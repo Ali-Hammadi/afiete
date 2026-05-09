@@ -17,9 +17,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     String userName = '';
     if (authState is AuthLoaded) {
-      userName = authState.user.nickname;
+      userName = authState.user.nickname ?? '';
     } else if (authState is AuthProfileUpdated) {
-      userName = authState.user.nickname;
+      userName = authState.user.nickname ?? '';
     }
 
     final greetingText = userName.isNotEmpty

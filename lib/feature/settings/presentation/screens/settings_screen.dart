@@ -397,7 +397,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     return UserSettingsProfileEntity(
-      nickName: user.nickname,
+      nickName: user.nickname ?? '',
       userId: user.username,
       email: user.email,
       phoneNumber: user.phoneNumber ?? '',

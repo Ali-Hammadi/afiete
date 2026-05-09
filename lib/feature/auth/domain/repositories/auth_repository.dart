@@ -1,68 +1,150 @@
 import 'package:dartz/dartz.dart';
 import 'package:afiete/core/error/failure.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
+import 'package:afiete/feature/auth/domain/entities/otp_entity.dart';
 
+/// Abstract repository defining all authentication operations.
+/// All methods return `Either<Failure, T>` for functional error handling.
 abstract class AuthRepository {
-  Future<Either<Failure, UserAuthEntity>> login(String email, String password);
+  // ===== SIGNUP FLOW (MULTI-STEP) =====
+
+  /// Step 1: Initiate signup, request OTP to be sent to email.
+  /// Backend validates email uniqueness, generates OTP, sends email.
+  Future<Either<Failure, OtpEntity>> signup({
+    required String nickname,
+    required String email,
+    required String password,
+  });
+
+  /// Step 2: Verify signup OTP code (returned from email).
+  /// Backend validates OTP, sets is_verified=true, returns user with access_token.
+  /// **CRITICAL**: This method returns user with token; token must be cached immediately.
+  Future<Either<Failure, UserAuthEntity>> verifySignupOtp({
+    required String email,
+    required String otpCode,
+  });
+
+  // ===== LOGIN FLOW =====
+
+  /// Login with email and password.
+  /// Returns user entity with access_token and full profile data.
+  /// Check [UserAuthEntity.isProfileComplete] to determine if profile completion is needed.
+  Future<Either<Failure, UserAuthEntity>> login({
+    required String email,
+    required String password,
+  });
+
+  // ===== PROFILE MANAGEMENT =====
+
+  /// Fetch current authenticated user's profile.
+  /// Requires valid access token in Authorization header (managed by Dio interceptor).
   Future<Either<Failure, UserAuthEntity>> fetchProfile();
-  Future<void> cacheSession(UserAuthEntity user);
-  Future<UserAuthEntity?> getCachedSession();
-  Future<void> clearCachedSession();
-  Future<Either<Failure, UserAuthEntity>> signup(
-    String nickname,
-    String email,
-    String password,
-  );
-  Future<Either<Failure, UserAuthEntity>> logout(String email, String password);
-  Future<Either<Failure, UserAuthEntity>> deleteAccount(
-    String email,
-    String password,
-  );
-  Future<Either<Failure, UserAuthEntity>> googleSignIn();
+
+  /// Update user profile (partially or fully).
+  /// All fields are optional; only provided fields are updated.
+  /// Requires access token; returns updated user entity.
   Future<Either<Failure, UserAuthEntity>> updateProfileInfo({
-    required String userId,
-    String? nickname,
-    required DateTime birthDate,
-    required String gender,
-    required String phoneNumber,
+    String? dateOfBirth,
+    String? gender,
+    String? phoneNumber,
   });
 
-  Future<Either<Failure, String>> requestEmailChangeOtp({
-    required String userId,
+  // ===== PASSWORD RECOVERY FLOW =====
+
+  /// Request OTP for password reset.
+  /// Public endpoint (no auth required).
+  Future<Either<Failure, OtpEntity>> requestForgotPasswordOtp({
+    required String email,
+  });
+
+  /// Verify forgot password OTP and set new password.
+  /// Backend validates OTP, updates password, returns status.
+  /// After success, user should call [login] to get new access_token.
+  Future<Either<Failure, OtpEntity>> verifyForgotPasswordOtp({
+    required String email,
+    required String otpCode,
+    required String newPassword,
+  });
+
+  // ===== SESSION MANAGEMENT =====
+
+  /// Logout current user.
+  /// Requires access token; server invalidates token.
+  /// Note: Logout failures should still clear local tokens (done in cubit).
+  Future<Either<Failure, void>> logout();
+
+  /// Delete user account permanently.
+  /// Requires email + password verification for security.
+  /// Hard delete from database; cannot be recovered.
+  /// Backend should clear all associated data.
+  Future<Either<Failure, void>> deleteAccount({
+    required String email,
+    required String password,
+  });
+
+  // ===== GOOGLE SIGN-IN =====
+
+  /// Google Sign-In OAuth flow.
+  /// Requires idToken from Google Sign-In plugin.
+  /// Backend validates token with Google servers, creates/updates user, returns access_token.
+  /// Returns user with token; check [UserAuthEntity.isProfileComplete] for profile completion.
+  Future<Either<Failure, UserAuthEntity>> googleSignIn({
+    required String idToken,
+  });
+
+  // ===== SENSITIVE PROFILE UPDATES (PASSWORD-PROTECTED) =====
+
+  /// Change user's password.
+  /// Requires current password verification for security.
+  /// Requires access token.
+  Future<Either<Failure, UserAuthEntity>> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  /// Request OTP for email change.
+  /// OTP will be sent to current email address.
+  /// Requires access token.
+  Future<Either<Failure, OtpEntity>> requestEmailChangeOtp();
+
+  /// Confirm email change by verifying OTP sent to new email.
+  /// After successful verification, email is changed in backend.
+  /// Requires access token.
+  Future<Either<Failure, void>> confirmEmailChange({
     required String newEmail,
+    required String otpCode,
   });
 
-  Future<Either<Failure, String>> requestEmailChangeWithPassword({
+  // ===== LOCAL SESSION CACHE HELPERS =====
+
+  /// Cache the authenticated user session locally.
+  Future<void> cacheSession(UserAuthEntity user);
+
+  /// Retrieve cached user session if available.
+  Future<UserAuthEntity?> getCachedSession();
+
+  /// Clear cached session locally.
+  Future<void> clearCachedSession();
+
+  // ===== ADDITIONAL UTILS REFERENCED BY PRESENTATION =====
+
+  /// Verify generic/authentication OTP (login via OTP flow).
+  Future<Either<Failure, UserAuthEntity>> verifyOtp({
+    required String email,
+    required String otpCode,
+  });
+
+  /// Request an email-change OTP by providing current password (unauthenticated path).
+  Future<Either<Failure, OtpEntity>> requestEmailChangeWithPassword({
     required String email,
     required String password,
     required String newEmail,
   });
 
-  Future<Either<Failure, String>> requestForgotPasswordOtp({
+  /// Change password using a reset flow (server-side reset).
+  Future<Either<Failure, OtpEntity>> resetPassword({
     required String email,
-  });
-
-  /// Verifies OTP for authentication/login purposes (SEPARATE from email change verification).
-  /// Used when user logs in with OTP instead of password.
-  Future<Either<Failure, UserAuthEntity>> verifyOtp(String email, String otp);
-
-  /// Confirms email change by verifying OTP (SEPARATE from login verification).
-  /// Used when user changes their email address.
-  Future<Either<Failure, UserAuthEntity>> confirmEmailChange({
-    required String userId,
-    required String newEmail,
-    required String otp,
-  });
-
-  Future<Either<Failure, String>> changePassword({
-    required String email,
-    required String currentPassword,
-    required String newPassword,
-  });
-
-  Future<Either<Failure, String>> resetPassword({
-    required String email,
-    required String otp,
+    required String otpCode,
     required String newPassword,
   });
 }

@@ -4,36 +4,27 @@ import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class UpdateProfileInfoParams {
-  final String username;
+class UpdateProfileParams {
+  final String? dateOfBirth;
+  final String? gender;
+  final String? phoneNumber;
 
-  final String nickname;
-  final DateTime birthDate;
-  final String gender;
-  final String phoneNumber;
-
-  const UpdateProfileInfoParams({
-    required this.username,
-    required this.nickname,
-    required this.birthDate,
-    required this.gender,
-    required this.phoneNumber,
-  });
+  const UpdateProfileParams({this.dateOfBirth, this.gender, this.phoneNumber});
 }
 
+/// Usecase for updating user profile information (partially or fully).
+/// All fields are optional; only provided fields are updated.
+/// Requires access token (authenticated request).
 class UpdateProfileInfoUseCase
-    implements UseCase<UserAuthEntity, UpdateProfileInfoParams> {
+    implements UseCase<UserAuthEntity, UpdateProfileParams> {
   final AuthRepository repository;
 
   const UpdateProfileInfoUseCase(this.repository);
 
   @override
-  Future<Either<Failure, UserAuthEntity>> call(UpdateProfileInfoParams params) {
+  Future<Either<Failure, UserAuthEntity>> call(UpdateProfileParams params) {
     return repository.updateProfileInfo(
-      userId: params.username,
-
-      nickname: params.nickname,
-      birthDate: params.birthDate,
+      dateOfBirth: params.dateOfBirth,
       gender: params.gender,
       phoneNumber: params.phoneNumber,
     );

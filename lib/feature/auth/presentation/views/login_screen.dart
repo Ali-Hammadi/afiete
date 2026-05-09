@@ -34,17 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthLoaded) {
-            // Only navigate to home if user is verified
-            if (state.user.isVerified) {
-              Navigator.pushNamed(context, MyRoutes.homeScreen);
-            }
-          } else if (state is WaitingForOtpVerification) {
-            // Account exists but not verified, redirect to OTP
-            Navigator.pushNamed(
-              context,
-              MyRoutes.verifyAccountScreen,
-              arguments: state.email,
-            );
+            Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(
               context,
