@@ -3,11 +3,10 @@ import 'dart:developer' as developer;
 import 'package:afiete/core/usecases/usecase.dart';
 import 'package:afiete/core/utils/age_utils.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
-import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
+
 import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
-import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
-import 'package:afiete/feature/auth/domain/usecase/request_email_change_with_password_usecase.dart';
+
 import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,12 +31,10 @@ class AuthCubit extends Cubit<AuthState> {
   final GoogleSignInUseCase googleSignInUseCase;
   final FetchProfileUseCase fetchProfileUseCase;
   final UpdateProfileInfoUseCase updateProfileInfoUseCase;
-  final RequestEmailChangeOtpUseCase requestEmailChangeOtpUseCase;
-  final RequestEmailChangeWithPasswordUseCase
-  requestEmailChangeWithPasswordUseCase;
+
   final RequestForgotPasswordOtpUseCase requestForgotPasswordOtpUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
-  final ConfirmEmailChangeUseCase confirmEmailChangeUseCase;
+
   final AuthRepository authRepository;
 
   AuthCubit(
@@ -48,11 +45,10 @@ class AuthCubit extends Cubit<AuthState> {
     this.googleSignInUseCase,
     this.fetchProfileUseCase,
     this.updateProfileInfoUseCase,
-    this.requestEmailChangeOtpUseCase,
-    this.requestEmailChangeWithPasswordUseCase,
+
     this.requestForgotPasswordOtpUseCase,
     this.verifyOtpUseCase,
-    this.confirmEmailChangeUseCase,
+
     this.authRepository,
   ) : super(AuthInitial());
 
@@ -113,7 +109,7 @@ class AuthCubit extends Cubit<AuthState> {
 
             isVerified: false,
           );
-          return sendVerificationOtp(email, fallbackUser: _pendingSignupUser);
+          return sendVerificationOtp(email);
         } else {
           emit(AuthError(failure.errorMessage));
         }
@@ -129,7 +125,7 @@ class AuthCubit extends Cubit<AuthState> {
 
           isVerified: false,
         );
-        return sendVerificationOtp(email, fallbackUser: _pendingSignupUser);
+        return sendVerificationOtp(email, userAuthEntity: _pendingSignupUser);
       },
     );
   }
@@ -154,11 +150,11 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<bool> deleteAccount(String email, String password) async {
-    _log('delete_account:start', data: {'email': email});
+  Future<bool> deleteAccount(String password) async {
+    _log('delete_account:start', data: {'passwordLength': password});
     emit(AuthLoading());
     final result = await deleteAccountUseCase(
-      DeleteAccountParams(email: email, password: password),
+      DeleteAccountParams(password: password),
     );
     return result.fold(
       (failure) {
@@ -292,126 +288,36 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<String?> requestEmailChangeOtp({required String newEmail}) async {
-    _log('request_email_otp:start', data: {'newEmail': newEmail});
-    final currentState = state;
-    if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
-      _log('request_email_otp:skipped', data: {'reason': 'invalid_state'});
-      return null;
-    }
-
-    final result = await requestEmailChangeOtpUseCase(NoParams());
-
-    return result.fold(
-      (failure) {
-        _log(
-          'request_email_otp:error',
-          data: {'message': failure.errorMessage},
-        );
-        emit(AuthError(failure.errorMessage));
-        return failure.errorMessage;
-      },
-      (message) {
-        _log('request_email_otp:success', data: {'message': message});
-        return null;
-      },
-    );
-  }
-
-  Future<String?> requestEmailChangeWithPassword({
-    required String currentEmail,
-    required String password,
-    required String newEmail,
-  }) async {
-    _log(
-      'request_email_change:start',
-      data: {'currentEmail': currentEmail, 'newEmail': newEmail},
-    );
-
-    final result = await requestEmailChangeWithPasswordUseCase(
-      RequestEmailChangeWithPasswordParams(
-        email: currentEmail,
-        password: password,
-        newEmail: newEmail,
-      ),
-    );
-
-    return result.fold(
-      (failure) {
-        _log(
-          'request_email_change:error',
-          data: {'message': failure.errorMessage},
-        );
-        emit(AuthError(failure.errorMessage));
-        return failure.errorMessage;
-      },
-      (message) {
-        _log('request_email_change:success', data: {'message': message});
-        return null;
-      },
-    );
-  }
-
-  Future<bool> confirmEmailChange({
-    required String newEmail,
-    required String otp,
-  }) async {
-    _log('confirm_email_change:start', data: {'newEmail': newEmail});
-    final currentState = state;
-    if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
-      _log('confirm_email_change:skipped', data: {'reason': 'invalid_state'});
-      return false;
-    }
-
-    final result = await confirmEmailChangeUseCase(
-      ConfirmEmailChangeParams(newEmail: newEmail, otpCode: otp),
-    );
-
-    return result.fold(
-      (failure) {
-        _log(
-          'confirm_email_change:error',
-          data: {'message': failure.errorMessage},
-        );
-        emit(AuthError(failure.errorMessage));
-        return false;
-      },
-      (_) async {
-        _log('confirm_email_change:success');
-        // Email has been changed; refresh profile from backend
-        await refreshProfileFromBackend();
-        return true;
-      },
-    );
-  }
-
   Future<void> sendVerificationOtp(
     String email, {
-    UserAuthEntity? fallbackUser,
+    VerifyOtpParams? params,
+    UserAuthEntity? userAuthEntity,
   }) async {
     _log('send_verification_otp:start', data: {'email': email});
     emit(AuthLoading());
-    final result = await requestEmailChangeOtpUseCase(NoParams());
+    final result = await verifyOtpUseCase(
+      VerifyOtpParams(email: email, otp: params!.otp),
+    );
 
     await result.fold(
       (failure) async {
-        _log(
-          'send_verification_otp:error',
-          data: {'message': failure.errorMessage},
-        );
-        if (fallbackUser != null &&
+        // _log(
+        //   'send_verification_otp:error',
+        //   data: {'message': failure.errorMessage},
+        // );
+        if (userAuthEntity != null &&
             _isAlreadyVerifiedError(failure.errorMessage)) {
-          _log(
-            'send_verification_otp:already_verified_recover_login',
-            data: {'email': fallbackUser.email},
-          );
-          await _cacheAndEmitUser(fallbackUser.copyWith(isVerified: true));
+          // _log(
+          //   'send_verification_otp:already_verified_recover_login',
+          //   data: {'email': fallbackUser.email},
+          // );
+          await _cacheAndEmitUser(userAuthEntity.copyWith(isVerified: true));
           return;
         }
         emit(AuthError(failure.errorMessage));
       },
       (message) async {
-        _log('send_verification_otp:success', data: {'message': message});
+        // _log('send_verification_otp:success', data: {'message': message});
         emit(WaitingForOtpVerification(email));
       },
     );
@@ -593,6 +499,7 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await authRepository.updatePassword(
       currentPassword: currentPassword,
       newPassword: newPassword,
+      confirmPassword: newPassword,
     );
 
     final success = result.fold(
@@ -652,6 +559,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String otp,
     required String newPassword,
+    required String confirmPassword,
   }) async {
     _log('reset_password:start', data: {'email': email});
 
@@ -659,6 +567,7 @@ class AuthCubit extends Cubit<AuthState> {
       email: email,
       otpCode: otp,
       newPassword: newPassword,
+      confirmPassword: confirmPassword,
     );
 
     return result.fold(

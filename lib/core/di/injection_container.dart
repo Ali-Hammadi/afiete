@@ -7,12 +7,10 @@ import 'package:afiete/feature/assignments/domain/usecase/get_assignment_questio
 import 'package:afiete/feature/assignments/domain/usecase/submit_assignment_usecase.dart';
 import 'package:afiete/feature/assignments/presentation/cubits/assignments_cubit.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
-import 'package:afiete/feature/auth/domain/usecase/confirm_email_change_usecase.dart';
+
 import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
-import 'package:afiete/feature/auth/domain/usecase/request_email_change_otp_usecase.dart';
-import 'package:afiete/feature/auth/domain/usecase/request_email_change_with_password_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/update_profile_info_usecase.dart';
@@ -153,20 +151,12 @@ Future<void> init() async {
   sl.registerLazySingleton<UpdateProfileInfoUseCase>(
     () => UpdateProfileInfoUseCase(sl<AuthRepository>()),
   );
-  sl.registerLazySingleton<RequestEmailChangeOtpUseCase>(
-    () => RequestEmailChangeOtpUseCase(sl<AuthRepository>()),
-  );
-  sl.registerLazySingleton<RequestEmailChangeWithPasswordUseCase>(
-    () => RequestEmailChangeWithPasswordUseCase(sl<AuthRepository>()),
-  );
+
   sl.registerLazySingleton<RequestForgotPasswordOtpUseCase>(
     () => RequestForgotPasswordOtpUseCase(sl<AuthRepository>()),
   );
   sl.registerLazySingleton<VerifyOtpUseCase>(
     () => VerifyOtpUseCase(sl<AuthRepository>()),
-  );
-  sl.registerLazySingleton<ConfirmEmailChangeUseCase>(
-    () => ConfirmEmailChangeUseCase(sl<AuthRepository>()),
   );
 
   // Cubits
@@ -179,11 +169,10 @@ Future<void> init() async {
       sl<GoogleSignInUseCase>(),
       sl<FetchProfileUseCase>(),
       sl<UpdateProfileInfoUseCase>(),
-      sl<RequestEmailChangeOtpUseCase>(),
-      sl<RequestEmailChangeWithPasswordUseCase>(),
+
       sl<RequestForgotPasswordOtpUseCase>(),
       sl<VerifyOtpUseCase>(),
-      sl<ConfirmEmailChangeUseCase>(),
+
       sl<AuthRepository>(),
     ),
   );

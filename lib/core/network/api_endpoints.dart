@@ -26,7 +26,7 @@ abstract class ApiEndpoints {
   static const String googleLogin = '$patients/google/auth/';
 
   // === User Profile ===
-  static const String updateProfile = '$patients/profile/';
+  static const String profile = '$patients/profile/';
 
   // === OTP Verification (Signup/Login Flow) ===
   static const String otpResend = '$users/otp/resend/';
@@ -38,7 +38,7 @@ abstract class ApiEndpoints {
 
   // === Password Management ===
   static const String passwordReset = '$users/auth/reset-password/';
-  static const String passwordChange = '$users/password/reset/';
+  static const String passwordChange = '$users/password/change/';
   static const String forgotPasswordOtp = '$users/auth/forgot-password/';
 
   // === Token Management ===

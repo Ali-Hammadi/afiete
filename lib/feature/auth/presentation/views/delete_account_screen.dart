@@ -271,10 +271,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     });
 
     try {
-      final success = await authCubit.deleteAccount(
-        emailInput,
-        _passwordController.text,
-      );
+      final success = await authCubit.deleteAccount(_passwordController.text);
 
       if (!mounted) return;
       setState(() {

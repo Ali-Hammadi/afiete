@@ -64,6 +64,7 @@ abstract class AuthRepository {
     required String email,
     required String otpCode,
     required String newPassword,
+    required String confirmPassword,
   });
 
   // ===== SESSION MANAGEMENT =====
@@ -77,10 +78,7 @@ abstract class AuthRepository {
   /// Requires email + password verification for security.
   /// Hard delete from database; cannot be recovered.
   /// Backend should clear all associated data.
-  Future<Either<Failure, void>> deleteAccount({
-    required String email,
-    required String password,
-  });
+  Future<Either<Failure, void>> deleteAccount({required String password});
 
   // ===== GOOGLE SIGN-IN =====
 
@@ -100,19 +98,7 @@ abstract class AuthRepository {
   Future<Either<Failure, UserAuthEntity>> updatePassword({
     required String currentPassword,
     required String newPassword,
-  });
-
-  /// Request OTP for email change.
-  /// OTP will be sent to current email address.
-  /// Requires access token.
-  Future<Either<Failure, OtpEntity>> requestEmailChangeOtp();
-
-  /// Confirm email change by verifying OTP sent to new email.
-  /// After successful verification, email is changed in backend.
-  /// Requires access token.
-  Future<Either<Failure, void>> confirmEmailChange({
-    required String newEmail,
-    required String otpCode,
+    required String confirmPassword,
   });
 
   // ===== LOCAL SESSION CACHE HELPERS =====
@@ -135,16 +121,12 @@ abstract class AuthRepository {
   });
 
   /// Request an email-change OTP by providing current password (unauthenticated path).
-  Future<Either<Failure, OtpEntity>> requestEmailChangeWithPassword({
-    required String email,
-    required String password,
-    required String newEmail,
-  });
 
   /// Change password using a reset flow (server-side reset).
   Future<Either<Failure, OtpEntity>> resetPassword({
     required String email,
     required String otpCode,
     required String newPassword,
+    required String confirmPassword,
   });
 }

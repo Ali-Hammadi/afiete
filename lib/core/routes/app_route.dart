@@ -4,7 +4,7 @@ import 'package:afiete/feature/assignments/presentation/screens/assignment_resul
 import 'package:afiete/feature/assignments/presentation/screens/assignment_test_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/auth_info_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/delete_account_screen.dart';
-import 'package:afiete/feature/auth/presentation/views/email_change_screen.dart';
+
 import 'package:afiete/feature/auth/presentation/views/forgot_password_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/password_change_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/verify_account_screen.dart';
@@ -68,13 +68,7 @@ class AppRouter {
         );
       case MyRoutes.authInfoScreens:
         return MaterialPageRoute(builder: (_) => const AuthInfoScreen());
-      case MyRoutes.emailChangeScreen:
-        return MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: context.read<AuthCubit>(),
-            child: const EmailChangeScreen(),
-          ),
-        );
+
       case MyRoutes.passwordChangeScreen:
         return MaterialPageRoute(builder: (_) => const PasswordChangeScreen());
       case MyRoutes.deleteAccountScreen:
@@ -301,7 +295,7 @@ class MyRoutes {
   static const String welcomeScreens = "/welcomeScreens";
   static const String verifyAccountScreen = "/verifyAccountScreen";
   static const String authInfoScreens = "/authInfoScreens";
-  static const String emailChangeScreen = "/emailChangeScreen";
+
   static const String passwordChangeScreen = "/passwordChangeScreen";
   static const String deleteAccountScreen = "/deleteAccountScreen";
   static const String forgotPasswordScreen = "/forgotPasswordScreen";

@@ -7,10 +7,12 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 class UpdatePasswordParams {
   final String currentPassword;
   final String newPassword;
+  final String confirmPassword;
 
   const UpdatePasswordParams({
     required this.currentPassword,
     required this.newPassword,
+    required this.confirmPassword,
   });
 }
 
@@ -30,6 +32,7 @@ class UpdatePasswordUseCase
     return await repository.updatePassword(
       currentPassword: params.currentPassword,
       newPassword: params.newPassword,
+      confirmPassword: params.confirmPassword,
     );
   }
 }

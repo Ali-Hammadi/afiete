@@ -8,11 +8,13 @@ class VerifyForgotPasswordOtpParams {
   final String email;
   final String otpCode;
   final String newPassword;
+  final String confirmPassword;
 
   const VerifyForgotPasswordOtpParams({
     required this.email,
     required this.otpCode,
     required this.newPassword,
+    required this.confirmPassword,
   });
 }
 
@@ -33,6 +35,7 @@ class VerifyForgotPasswordOtpUseCase
       email: params.email,
       otpCode: params.otpCode,
       newPassword: params.newPassword,
+      confirmPassword: params.confirmPassword,
     );
   }
 }

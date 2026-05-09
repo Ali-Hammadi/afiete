@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:afiete/core/network/api_endpoints.dart';
 import '../models/models.dart';
 
 /// Abstract interface for remote authentication data source.
@@ -52,6 +53,7 @@ abstract class AuthRemoteDataSource {
     String email,
     String otpCode,
     String newPassword,
+    String confirmPassword,
   );
 
   // Session management (3 endpoints)
@@ -61,34 +63,19 @@ abstract class AuthRemoteDataSource {
 
   /// Delete account permanently (hard delete with verification).
   /// Requires: access_token (via interceptor) + password in body
-  Future<void> deleteAccount(String email, String password);
-
-  /// Request OTP for email change.
-  /// OTP sent to current email address.
-  /// Returns OtpModel with expiration info.
-  /// Requires: access_token (via interceptor)
-  Future<OtpModel> requestEmailChangeOtp();
-
-  /// Request email change by providing current password (unauthenticated path).
-  Future<OtpModel> requestEmailChangeWithPassword({
-    required String email,
-    required String password,
-    required String newEmail,
-  });
+  Future<void> deleteAccount(String password);
 
   /// Verify OTP for authentication/login purposes (OTP login flow).
   Future<UserModel> verifyOtp(String email, String otp);
 
-  // Sensitive updates (3 endpoints)
-  /// Confirm email change by verifying OTP.
-  /// Returns void on success.
-  /// Requires: access_token (via interceptor)
-  Future<void> confirmEmailChange(String newEmail, String otpCode);
-
   /// Change password with current password verification.
   /// Returns updated UserModel.
   /// Requires: access_token (via interceptor)
-  Future<UserModel> updatePassword(String currentPassword, String newPassword);
+  Future<UserModel> updatePassword(
+    String currentPassword,
+    String newPassword,
+    String confirmPassword,
+  );
 
   // OAuth (1 endpoint)
   /// Sign in with Google OAuth token.
@@ -102,10 +89,8 @@ abstract class AuthRemoteDataSource {
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio _dio;
 
-  // Base URL for auth endpoints: /api/auth/
-  static const String _baseUrl = '/api/auth';
-
-  AuthRemoteDataSourceImpl({required Dio dio, String? serverClientId}) : _dio = dio;
+  AuthRemoteDataSourceImpl({required Dio dio, String? serverClientId})
+    : _dio = dio;
 
   // ==================== SIGNUP FLOW ====================
 
@@ -117,7 +102,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   ) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/signup',
+        ApiEndpoints.signup,
         data: {'nickname': nickname, 'email': email, 'password': password},
       );
       return OtpModel.fromJson(response.data ?? {});
@@ -130,7 +115,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> verifySignupOtp(String email, String otpCode) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/verify-signup-otp',
+        ApiEndpoints.otpVerify,
         data: {'email': email, 'otp_code': otpCode},
       );
       return UserModel.fromJson(response.data ?? {});
@@ -145,7 +130,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> login(String email, String password) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/login',
+        ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
       return UserModel.fromJson(response.data ?? {});
@@ -160,7 +145,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> fetchProfile() async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
-        '$_baseUrl/profile',
+        ApiEndpoints.profile,
       );
       return UserModel.fromJson(response.data ?? {});
     } on DioException {
@@ -181,7 +166,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (phoneNumber != null) data['phone_number'] = phoneNumber;
 
       final response = await _dio.patch<Map<String, dynamic>>(
-        '$_baseUrl/profile',
+        ApiEndpoints.profile,
         data: data,
       );
       return UserModel.fromJson(response.data ?? {});
@@ -196,7 +181,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<OtpModel> requestForgotPasswordOtp(String email) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/request-password-reset-otp',
+        ApiEndpoints.forgotPasswordOtp,
         data: {'email': email},
       );
       return OtpModel.fromJson(response.data ?? {});
@@ -210,14 +195,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String email,
     String otpCode,
     String newPassword,
+    String confirmPassword,
   ) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/verify-password-reset-otp',
+        ApiEndpoints.otpVerify,
         data: {
           'email': email,
           'otp_code': otpCode,
           'new_password': newPassword,
+          'confirm_password': confirmPassword,
         },
       );
       return OtpModel.fromJson(response.data ?? {});
@@ -231,50 +218,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> logout() async {
     try {
-      await _dio.post<Map<String, dynamic>>('$_baseUrl/logout');
+      await _dio.post<Map<String, dynamic>>(ApiEndpoints.logout);
     } on DioException {
       rethrow;
     }
   }
 
   @override
-  Future<void> deleteAccount(String email, String password) async {
+  Future<void> deleteAccount(String password) async {
     try {
       await _dio.delete<Map<String, dynamic>>(
-        '$_baseUrl/delete-account',
-        data: {'email': email, 'password': password},
+        ApiEndpoints.deleteAccount,
+        data: {'password': password},
       );
-    } on DioException {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<OtpModel> requestEmailChangeOtp() async {
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/request-email-change-otp',
-      );
-      return OtpModel.fromJson(response.data ?? {});
-    } on DioException {
-      rethrow;
-    }
-  }
-
-  /// Request email change by providing current password (unauthenticated path).
-  /// Returns OtpModel with expiration info.
-  @override
-  Future<OtpModel> requestEmailChangeWithPassword({
-    required String email,
-    required String password,
-    required String newEmail,
-  }) async {
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/request-email-change-with-password',
-        data: {'email': email, 'password': password, 'new_email': newEmail},
-      );
-      return OtpModel.fromJson(response.data ?? {});
     } on DioException {
       rethrow;
     }
@@ -285,7 +241,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> verifyOtp(String email, String otp) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/verify-otp',
+        ApiEndpoints.otpVerify,
         data: {'email': email, 'otp_code': otp},
       );
       return UserModel.fromJson(response.data ?? {});
@@ -297,25 +253,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // ==================== SENSITIVE UPDATES ====================
 
   @override
-  Future<void> confirmEmailChange(String newEmail, String otpCode) async {
-    try {
-      await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/confirm-email-change',
-        data: {'new_email': newEmail, 'otp_code': otpCode},
-      );
-    } on DioException {
-      rethrow;
-    }
-  }
-
-  @override
   Future<UserModel> updatePassword(
     String currentPassword,
     String newPassword,
+    String confirmPassword,
   ) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/update-password',
+        ApiEndpoints.passwordChange,
         data: {
           'current_password': currentPassword,
           'new_password': newPassword,
@@ -333,7 +278,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> googleSignIn(String idToken) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '$_baseUrl/google-signin',
+        ApiEndpoints.googleLogin,
         data: {'id_token': idToken},
       );
       return UserModel.fromJson(response.data ?? {});

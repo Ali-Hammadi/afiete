@@ -278,6 +278,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         email: email,
         otp: _otpController.text.trim(),
         newPassword: newPassword,
+        confirmPassword: _confirmPasswordController.text,
       );
 
       if (!mounted) return;
