@@ -1,7 +1,6 @@
-import 'dart:developer' as developer;
-
 import 'package:afiete/core/usecases/usecase.dart';
 import 'package:afiete/core/utils/age_utils.dart';
+import 'package:afiete/core/utils/logger.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 
 import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
@@ -21,7 +20,7 @@ import '../../domain/entities/auth_user_entity.dart';
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  static const String _logName = 'AuthCubit';
+  final _log = loggerFor('AuthCubit');
   UserAuthEntity? _pendingSignupUser;
 
   final LoginUseCase loginUseCase;
@@ -53,17 +52,18 @@ class AuthCubit extends Cubit<AuthState> {
   ) : super(AuthInitial());
 
   Future<void> login(String email, String password) async {
-    _log('login:start', data: {'email': email});
+    _log.info('login:start', data: {'email': email});
     emit(AuthLoading());
     final result = await loginUseCase(
       LoginParams(email: email, password: password),
     );
     result.fold(
       (failure) {
-        _log('login:error', data: {'message': failure.errorMessage});
+        _log.error('login:error', data: {'message': failure.errorMessage});
 
         // Check if account is inactive/restricted
         if (_isInactiveAccountError(failure.errorMessage)) {
+          _log.warn('login:account_inactive', data: {'email': email});
           emit(
             const AuthError(
               'This account is inactive or restricted on the server, so sign-in is currently unavailable. Please contact support if you believe this is an error.',
@@ -76,10 +76,8 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(failure.errorMessage));
       },
       (user) {
-        _log(
-          'login:success',
-          data: {'email': user.email, 'isVerified': user.isVerified},
-        );
+        _log.info('login:success',
+            data: {'email': user.email, 'isVerified': user.isVerified});
 
         // Login now goes straight to the authenticated session.
         return _cacheAndEmitUser(user);
@@ -88,7 +86,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> signup(String nickname, String email, String password) async {
-    _log('signup:start', data: {'email': email, 'nickname': nickname});
+    _log.info('signup:start', data: {'email': email, 'nickname': nickname});
     _pendingSignupUser = null;
     emit(AuthLoading());
     final result = await signupUseCase(
@@ -96,11 +94,11 @@ class AuthCubit extends Cubit<AuthState> {
     );
     result.fold(
       (failure) {
-        _log('signup:error', data: {'message': failure.errorMessage});
-        // If email already exists (unverified), send OTP for verification
+        _log.error('signup:error', data: {'message': failure.errorMessage});
+        // If email already exists (unverified), ask for OTP verification
         if (_isNotVerifiedError(failure.errorMessage) ||
             _isEmailAlreadyExistsError(failure.errorMessage)) {
-          _log('signup:email_unverified_send_otp', data: {'email': email});
+          _log.warn('signup:email_already_exists', data: {'email': email});
           _pendingSignupUser = UserAuthEntity(
             username: nickname,
             nickname: nickname,
@@ -109,13 +107,14 @@ class AuthCubit extends Cubit<AuthState> {
 
             isVerified: false,
           );
-          return sendVerificationOtp(email);
+          // OTP already sent by backend; wait for user input
+          emit(WaitingForOtpVerification(email));
         } else {
           emit(AuthError(failure.errorMessage));
         }
       },
       (otpEntity) {
-        _log('signup:otp_sent', data: {'email': email});
+        _log.info('signup:otp_sent', data: {'email': email});
         // OTP was sent; store signup data and wait for verification
         _pendingSignupUser = UserAuthEntity(
           username: nickname,
@@ -125,23 +124,24 @@ class AuthCubit extends Cubit<AuthState> {
 
           isVerified: false,
         );
-        return sendVerificationOtp(email, userAuthEntity: _pendingSignupUser);
+        // OTP sent by backend; wait for user input
+        emit(WaitingForOtpVerification(email));
       },
     );
   }
 
   Future<bool> logout(String email, String password) async {
-    _log('logout:start', data: {'email': email});
+    _log.info('logout:start', data: {'email': email});
     emit(AuthLoading());
     final result = await logoutUseCase(NoParams());
     return result.fold(
       (failure) {
-        _log('logout:error', data: {'message': failure.errorMessage});
+        _log.error('logout:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (_) async {
-        _log('logout:success');
+        _log.info('logout:success');
         await authRepository.clearCachedSession();
         _pendingSignupUser = null;
         emit(const AuthInitial());
@@ -151,19 +151,19 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> deleteAccount(String password) async {
-    _log('delete_account:start', data: {'passwordLength': password});
+    _log.warn('delete_account:start', data: {'passwordLength': password.length});
     emit(AuthLoading());
     final result = await deleteAccountUseCase(
       DeleteAccountParams(password: password),
     );
     return result.fold(
       (failure) {
-        _log('delete_account:error', data: {'message': failure.errorMessage});
+        _log.error('delete_account:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (_) async {
-        _log('delete_account:success');
+        _log.info('delete_account:success');
         await authRepository.clearCachedSession();
         _pendingSignupUser = null;
         emit(const AuthInitial());
@@ -173,14 +173,14 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> googleSignIn() async {
-    _log('google_sign_in:start');
+    _log.info('google_sign_in:start');
     emit(AuthLoading());
     final result = await googleSignInUseCase(
       const GoogleSignInParams(idToken: ''),
     );
     result.fold(
       (failure) {
-        _log('google_sign_in:error', data: {'message': failure.errorMessage});
+        _log.error('google_sign_in:error', data: {'message': failure.errorMessage});
 
         final msg = failure.errorMessage.toLowerCase();
 
@@ -234,7 +234,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(failure.errorMessage));
       },
       (user) {
-        _log(
+        _log.info(
           'google_sign_in:success',
           data: {'username': user.username, 'email': user.email},
         );
@@ -251,7 +251,6 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     final currentState = state;
     if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
-      _log('update_profile:skipped', data: {'reason': 'invalid_state'});
       return false;
     }
 
@@ -268,15 +267,10 @@ class AuthCubit extends Cubit<AuthState> {
 
     return result.fold(
       (failure) {
-        _log('update_profile:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (updatedUser) {
-        _log(
-          'update_profile:success',
-          data: {'username': updatedUser.username, 'email': updatedUser.email},
-        );
         final mergedUser = _mergeWithCurrentUser(currentState, updatedUser);
         _cacheAndEmitUser(mergedUser, asProfileUpdated: true);
 
@@ -293,38 +287,31 @@ class AuthCubit extends Cubit<AuthState> {
     VerifyOtpParams? params,
     UserAuthEntity? userAuthEntity,
   }) async {
-    _log('send_verification_otp:start', data: {'email': email});
+    _log.info('sendVerificationOtp:start', data: {'email': email});
     emit(AuthLoading());
-    final result = await verifyOtpUseCase(
-      VerifyOtpParams(email: email, otp: params!.otp),
+    // Request to resend OTP for signup verification
+    final result = await requestForgotPasswordOtpUseCase(
+      ForgotPasswordParams(email: email),
     );
 
     await result.fold(
       (failure) async {
-        // _log(
-        //   'send_verification_otp:error',
-        //   data: {'message': failure.errorMessage},
-        // );
-        if (userAuthEntity != null &&
-            _isAlreadyVerifiedError(failure.errorMessage)) {
-          // _log(
-          //   'send_verification_otp:already_verified_recover_login',
-          //   data: {'email': fallbackUser.email},
-          // );
-          await _cacheAndEmitUser(userAuthEntity.copyWith(isVerified: true));
-          return;
-        }
+        _log.error(
+          'sendVerificationOtp:error',
+          data: {'message': failure.errorMessage},
+        );
         emit(AuthError(failure.errorMessage));
       },
-      (message) async {
-        // _log('send_verification_otp:success', data: {'message': message});
+      (otpEntity) async {
+        _log.info('sendVerificationOtp:success', data: {'email': email});
+        // OTP resent successfully; wait for user input
         emit(WaitingForOtpVerification(email));
       },
     );
   }
 
   Future<void> verifyOtp(String email, String otp) async {
-    _log('verify_otp:start', data: {'email': email, 'otpLength': otp.length});
+    _log.info('verify_otp:start', data: {'email': email, 'otpLength': otp.length});
     emit(AuthLoading());
     final result = await verifyOtpUseCase(
       VerifyOtpParams(email: email, otp: otp),
@@ -332,11 +319,11 @@ class AuthCubit extends Cubit<AuthState> {
 
     await result.fold(
       (failure) {
-        _log('verify_otp:error', data: {'message': failure.errorMessage});
+        _log.error('verify_otp:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
       },
       (user) async {
-        _log(
+        _log.info(
           'verify_otp:success',
           data: {'email': email, 'emailVerified': user.isVerified},
         );
@@ -347,7 +334,7 @@ class AuthCubit extends Cubit<AuthState> {
         // Determine next step based on flow
         if (_pendingSignupUser != null) {
           // SIGNUP FLOW: Account is verified via email, proceed to profile completion
-          _log('verify_otp:signup_flow', data: {'email': email});
+          _log.info('verify_otp:signup_flow', data: {'email': email});
           final pendingSignupUser = _pendingSignupUser;
           emit(AuthLoading());
 
@@ -360,7 +347,7 @@ class AuthCubit extends Cubit<AuthState> {
 
           return loginResult.fold(
             (failure) {
-              _log(
+              _log.error(
                 'verify_otp:signup_login_error',
                 data: {'message': failure.errorMessage},
               );
@@ -373,7 +360,7 @@ class AuthCubit extends Cubit<AuthState> {
               return;
             },
             (signedInUser) {
-              _log(
+              _log.info(
                 'verify_otp:signup_login_success',
                 data: {'email': signedInUser.email},
               );
@@ -405,7 +392,6 @@ class AuthCubit extends Cubit<AuthState> {
           );
         } else {
           // FALLBACK: No flow context, just proceed with verified user
-          _log('verify_otp:no_flow_context', data: {'email': email});
           return _cacheAndEmitUser(verifiedUser);
         }
       },
@@ -440,18 +426,11 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> restoreSession() async {
-    _log('restore_session:start');
     final cachedUser = await authRepository.getCachedSession();
     if (cachedUser == null) {
-      _log('restore_session:missing_cache');
       emit(const AuthInitial());
       return false;
     }
-
-    _log(
-      'restore_session:success',
-      data: {'username': cachedUser.username, 'email': cachedUser.email},
-    );
     emit(AuthLoaded(cachedUser));
     await refreshProfileFromBackend();
     return true;
@@ -466,21 +445,15 @@ class AuthCubit extends Cubit<AuthState> {
         : await authRepository.getCachedSession();
 
     if (currentUser == null) {
-      _log('refresh_profile:skipped', data: {'reason': 'no_current_user'});
       return false;
     }
 
     final result = await fetchProfileUseCase(NoParams());
     return result.fold(
       (failure) {
-        _log('refresh_profile:error', data: {'message': failure.errorMessage});
         return false;
       },
       (remoteUser) {
-        _log(
-          'refresh_profile:success',
-          data: {'username': remoteUser.username, 'email': remoteUser.email},
-        );
         final mergedUser = _mergeWithCurrentUser(currentState, remoteUser);
         return _cacheAndEmitUser(
           mergedUser,
@@ -494,7 +467,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String currentPassword,
     required String newPassword,
   }) async {
-    _log('change_password:start');
+    _log.warn('change_password:start');
 
     final result = await authRepository.updatePassword(
       currentPassword: currentPassword,
@@ -504,12 +477,12 @@ class AuthCubit extends Cubit<AuthState> {
 
     final success = result.fold(
       (failure) {
-        _log('change_password:error', data: {'message': failure.errorMessage});
+        _log.error('change_password:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (updatedUser) {
-        _log('change_password:success');
+        _log.info('change_password:success');
 
         // Update cached user with new password
         final currentState = state;
@@ -534,14 +507,14 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<String?> requestForgotPasswordOtp({required String email}) async {
-    _log('forgot_password_otp:start', data: {'email': email});
+    _log.info('forgot_password_otp:start', data: {'email': email});
     final result = await requestForgotPasswordOtpUseCase(
       ForgotPasswordParams(email: email),
     );
 
     return result.fold(
       (failure) {
-        _log(
+        _log.error(
           'forgot_password_otp:error',
           data: {'message': failure.errorMessage},
         );
@@ -549,7 +522,7 @@ class AuthCubit extends Cubit<AuthState> {
         return failure.errorMessage;
       },
       (message) {
-        _log('forgot_password_otp:success', data: {'message': message});
+        _log.info('forgot_password_otp:success', data: {'message': message});
         return null;
       },
     );
@@ -561,7 +534,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String newPassword,
     required String confirmPassword,
   }) async {
-    _log('reset_password:start', data: {'email': email});
+    _log.info('reset_password:start', data: {'email': email});
 
     final result = await authRepository.resetPassword(
       email: email,
@@ -572,12 +545,12 @@ class AuthCubit extends Cubit<AuthState> {
 
     return result.fold(
       (failure) {
-        _log('reset_password:error', data: {'message': failure.errorMessage});
+        _log.error('reset_password:error', data: {'message': failure.errorMessage});
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (otpEntity) {
-        _log('reset_password:otp_sent');
+        _log.info('reset_password:otp_sent');
         return true;
       },
     );
@@ -607,10 +580,6 @@ class AuthCubit extends Cubit<AuthState> {
         normalized.contains('blocked') ||
         normalized.contains('suspended') ||
         normalized.contains('deactivated');
-  }
-
-  void _log(String message, {Map<String, dynamic>? data}) {
-    developer.log(data == null ? message : '$message | $data', name: _logName);
   }
 
   Future<bool> _cacheAndEmitUser(

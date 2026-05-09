@@ -7,13 +7,15 @@ import 'package:afiete/feature/auth/domain/entities/otp_entity.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:afiete/core/utils/logger.dart';
 
 /// Implementation of [AuthRepository] that wraps [AuthRemoteDataSource] with error handling.
 /// All DioException are caught and converted to ServerFailure.
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
+  final _log = loggerFor('AuthRepository');
 
-  const AuthRepositoryImpl({required AuthRemoteDataSource remoteDataSource})
+  AuthRepositoryImpl({required AuthRemoteDataSource remoteDataSource})
     : _remoteDataSource = remoteDataSource;
 
   // ==================== SIGNUP FLOW ====================
@@ -24,12 +26,30 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
+    _log.info('signup:start', data: {'email': email, 'nickname': nickname});
     try {
       final model = await _remoteDataSource.signup(nickname, email, password);
+      _log.info('signup:success');
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'signup:error',
+        data: {
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'signup:exception',
+        data: {'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -39,12 +59,30 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String otpCode,
   }) async {
+    _log.info('verifySignupOtp:start', data: {'email': email});
     try {
       final model = await _remoteDataSource.verifySignupOtp(email, otpCode);
+      _log.info('verifySignupOtp:success');
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'verifySignupOtp:error',
+        data: {
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'verifySignupOtp:exception',
+        data: {'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -56,12 +94,30 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
+    _log.info('login:start', data: {'email': email});
     try {
       final model = await _remoteDataSource.login(email, password);
+      _log.info('login:success');
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'login:error',
+        data: {
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'login:exception',
+        data: {'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -70,12 +126,30 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, UserAuthEntity>> fetchProfile() async {
+    _log.info('fetchProfile:start');
     try {
       final model = await _remoteDataSource.fetchProfile();
+      _log.info('fetchProfile:success');
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'fetchProfile:error',
+        data: {
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'fetchProfile:exception',
+        data: {'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -86,16 +160,20 @@ class AuthRepositoryImpl implements AuthRepository {
     String? gender,
     String? phoneNumber,
   }) async {
+    _log.info('updateProfileInfo:start', data: {'dateOfBirth': dateOfBirth, 'gender': gender});
     try {
       final model = await _remoteDataSource.updateProfileInfo(
         dateOfBirth: dateOfBirth,
         gender: gender,
         phoneNumber: phoneNumber,
       );
+      _log.info('updateProfileInfo:success');
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error('updateProfileInfo:error', data: {'message': e.message, 'statusCode': e.response?.statusCode, 'response': e.response?.data}, error: e, stackTrace: st);
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error('updateProfileInfo:exception', data: {'error': e.toString()}, error: e, stackTrace: st);
       return Left(ServerFailure(e.toString()));
     }
   }

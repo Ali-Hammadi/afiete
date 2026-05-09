@@ -102,6 +102,20 @@ class ServerFailure extends Failure {
             ? extractedMessage
             : 'Authentication failed. Please sign in again.',
       );
+    } else if (statusCode == 422) {
+      // Validation errors often return 422 - present field-level guidance
+      return ServerFailure(
+        extractedMessage.isNotEmpty
+            ? extractedMessage
+            : 'There are validation issues with the provided data. Please check the highlighted fields and try again.',
+      );
+    } else if (statusCode == 429) {
+      // Rate limiting
+      return ServerFailure(
+        extractedMessage.isNotEmpty
+            ? extractedMessage
+            : 'Too many requests. Please wait a moment and try again.',
+      );
     } else if (statusCode == 403) {
       return ServerFailure(
         extractedMessage.isNotEmpty
@@ -252,6 +266,9 @@ class ServerFailure extends Failure {
         normalized.contains('deactivated')) {
       return 'This account is inactive or restricted on the server, so sign-in is currently unavailable. Please contact support if you believe this is an error.';
     }
+    if (normalized.contains('token') && normalized.contains('expired')) {
+      return 'Your session has expired. Please sign in again.';
+    }
     if (normalized.contains('already verified')) {
       return 'Your account is already verified. Please sign in directly.';
     }
@@ -268,6 +285,9 @@ class ServerFailure extends Failure {
     if (normalized.contains('does not exist') ||
         normalized.contains('not found')) {
       return 'No account was found for this data. Please check your input or create a new account.';
+    }
+    if (normalized.contains('rate limit') || normalized.contains('too many')) {
+      return 'You have made too many requests. Please wait a moment and try again.';
     }
     if (normalized.contains('invalid otp') ||
         normalized.contains('invalid code')) {
