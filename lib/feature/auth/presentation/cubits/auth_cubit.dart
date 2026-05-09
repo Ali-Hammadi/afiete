@@ -76,8 +76,10 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(failure.errorMessage));
       },
       (user) {
-        _log.info('login:success',
-            data: {'email': user.email, 'isVerified': user.isVerified});
+        _log.info(
+          'login:success',
+          data: {'email': user.email, 'isVerified': user.isVerified},
+        );
 
         // Login now goes straight to the authenticated session.
         return _cacheAndEmitUser(user);
@@ -151,14 +153,20 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> deleteAccount(String password) async {
-    _log.warn('delete_account:start', data: {'passwordLength': password.length});
+    _log.warn(
+      'delete_account:start',
+      data: {'passwordLength': password.length},
+    );
     emit(AuthLoading());
     final result = await deleteAccountUseCase(
       DeleteAccountParams(password: password),
     );
     return result.fold(
       (failure) {
-        _log.error('delete_account:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'delete_account:error',
+          data: {'message': failure.errorMessage},
+        );
         emit(AuthError(failure.errorMessage));
         return false;
       },
@@ -180,7 +188,10 @@ class AuthCubit extends Cubit<AuthState> {
     );
     result.fold(
       (failure) {
-        _log.error('google_sign_in:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'google_sign_in:error',
+          data: {'message': failure.errorMessage},
+        );
 
         final msg = failure.errorMessage.toLowerCase();
 
@@ -311,7 +322,10 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> verifyOtp(String email, String otp) async {
-    _log.info('verify_otp:start', data: {'email': email, 'otpLength': otp.length});
+    _log.info(
+      'verify_otp:start',
+      data: {'email': email, 'otpLength': otp.length},
+    );
     emit(AuthLoading());
     final result = await verifyOtpUseCase(
       VerifyOtpParams(email: email, otp: otp),
@@ -335,61 +349,11 @@ class AuthCubit extends Cubit<AuthState> {
         if (_pendingSignupUser != null) {
           // SIGNUP FLOW: Account is verified via email, proceed to profile completion
           _log.info('verify_otp:signup_flow', data: {'email': email});
-          final pendingSignupUser = _pendingSignupUser;
-          emit(AuthLoading());
+          _pendingSignupUser = null;
 
-          final loginResult = await loginUseCase(
-            LoginParams(
-              email: pendingSignupUser!.email,
-              password: pendingSignupUser.password ?? '',
-            ),
-          );
-
-          return loginResult.fold(
-            (failure) {
-              _log.error(
-                'verify_otp:signup_login_error',
-                data: {'message': failure.errorMessage},
-              );
-              _pendingSignupUser = null;
-              emit(
-                const AuthError(
-                  'Your account was verified, but sign-in could not be completed automatically. Please log in again.',
-                ),
-              );
-              return;
-            },
-            (signedInUser) {
-              _log.info(
-                'verify_otp:signup_login_success',
-                data: {'email': signedInUser.email},
-              );
-              _pendingSignupUser = null;
-
-              final authenticatedUser = verifiedUser.copyWith(
-                username: (signedInUser.username.isNotEmpty)
-                    ? signedInUser.username
-                    : verifiedUser.username,
-                nickname: (signedInUser.nickname?.isNotEmpty ?? false)
-                    ? signedInUser.nickname
-                    : verifiedUser.nickname,
-                email: signedInUser.email.isNotEmpty
-                    ? signedInUser.email
-                    : verifiedUser.email,
-                password: pendingSignupUser.password,
-
-                isVerified: true,
-                birthDate: signedInUser.birthDate ?? verifiedUser.birthDate,
-                age: signedInUser.age ?? verifiedUser.age,
-                gender: signedInUser.gender ?? verifiedUser.gender,
-                phoneNumber:
-                    signedInUser.phoneNumber ?? verifiedUser.phoneNumber,
-              );
-
-              // Cache the authenticated session so profile completion can use the token.
-              return _cacheAndEmitUser(authenticatedUser);
-            },
-          );
+          // Backend verifyOtp already returns the authenticated user/session.
+          // Cache it directly so the UI can navigate without a second login call.
+          return _cacheAndEmitUser(verifiedUser);
         } else {
           // FALLBACK: No flow context, just proceed with verified user
           return _cacheAndEmitUser(verifiedUser);
@@ -477,7 +441,10 @@ class AuthCubit extends Cubit<AuthState> {
 
     final success = result.fold(
       (failure) {
-        _log.error('change_password:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'change_password:error',
+          data: {'message': failure.errorMessage},
+        );
         emit(AuthError(failure.errorMessage));
         return false;
       },
@@ -545,7 +512,10 @@ class AuthCubit extends Cubit<AuthState> {
 
     return result.fold(
       (failure) {
-        _log.error('reset_password:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'reset_password:error',
+          data: {'message': failure.errorMessage},
+        );
         emit(AuthError(failure.errorMessage));
         return false;
       },
