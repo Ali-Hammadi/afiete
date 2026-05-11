@@ -53,6 +53,8 @@ abstract class AuthRemoteDataSource {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? psychologicalHistory,
+    String? nickname,
     String? correlationId,
   });
 
@@ -285,6 +287,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? psychologicalHistory,
+    String? nickname,
     String? correlationId,
   }) async {
     _log.info(
@@ -294,22 +298,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'dateOfBirth': dateOfBirth,
         'gender': gender,
         'phoneLength': phoneNumber?.length ?? 0,
+        'hasPsychologicalHistory': psychologicalHistory != null,
+        'nickname': nickname,
       },
     );
     try {
-      final data = <String, dynamic>{};
-      if (dateOfBirth != null) data['birth_date'] = dateOfBirth;
-      if (gender != null) data['gender'] = gender;
-      if (phoneNumber != null) data['phone'] = phoneNumber;
+      final userData = <String, dynamic>{};
+      if (dateOfBirth != null) userData['birth_date'] = dateOfBirth;
+      if (gender != null) userData['gender'] = gender;
+      if (phoneNumber != null) userData['phone'] = phoneNumber;
+
+      final data = <String, dynamic>{'user': userData};
+      if (psychologicalHistory != null) {
+        data['psychological_history'] = psychologicalHistory;
+      }
+      if (nickname != null) {
+        data['nickname'] = nickname;
+      }
 
       _log.info(
         'updateProfileInfo:request_payload',
         data: {
           'cid': correlationId,
           'payloadKeys': data.keys.toList(),
-          'birthDate': data['birth_date'],
-          'gender': data['gender'],
+          'userPayloadKeys': userData.keys.toList(),
+          'birthDate': userData['birth_date'],
+          'gender': userData['gender'],
           'phoneLength': phoneNumber?.length ?? 0,
+          'hasPsychologicalHistory': data['psychological_history'] != null,
+          'nickname': data['nickname'],
         },
       );
 
@@ -337,6 +354,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'dateOfBirth': dateOfBirth,
           'gender': gender,
           'phoneLength': phoneNumber?.length ?? 0,
+          'hasPsychologicalHistory': psychologicalHistory != null,
+          'nickname': nickname,
         },
         error: e,
         stackTrace: st,

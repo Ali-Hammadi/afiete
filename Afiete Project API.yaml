@@ -1,0 +1,1979 @@
+openapi: 3.0.3
+info:
+  title: Afiete Project API
+  version: 1.0.0
+paths:
+  # /api/appointmetns/dcotors/prices/:
+  #   get:
+  #     operationId: appointmetns_dcotors_prices_list
+  #     tags:
+  #     - appointmetns
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Prices'
+  #         description: ''
+  #   post:
+  #     operationId: appointmetns_dcotors_prices_create
+  #     tags:
+  #     - appointmetns
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/Prices'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/Prices'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/Prices'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '201':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Prices'
+  #         description: ''
+  # /api/appointmetns/dcotors/prices/{type}/:
+  #   get:
+  #     operationId: appointmetns_dcotors_prices_retrieve
+  #     parameters:
+  #     - in: path
+  #       name: type
+  #       schema:
+  #         type: string
+  #       required: true
+  #     tags:
+  #     - appointmetns
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Prices'
+  #         description: ''
+  #   put:
+  #     operationId: appointmetns_dcotors_prices_update
+  #     parameters:
+  #     - in: path
+  #       name: type
+  #       schema:
+  #         type: string
+  #       required: true
+  #     tags:
+  #     - appointmetns
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/Prices'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/Prices'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/Prices'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Prices'
+  #         description: ''
+  #   patch:
+  #     operationId: appointmetns_dcotors_prices_partial_update
+  #     parameters:
+  #     - in: path
+  #       name: type
+  #       schema:
+  #         type: string
+  #       required: true
+  #     tags:
+  #     - appointmetns
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/PatchedPrices'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/PatchedPrices'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/PatchedPrices'
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Prices'
+  #         description: ''
+  #   delete:
+  #     operationId: appointmetns_dcotors_prices_destroy
+  #     parameters:
+  #     - in: path
+  #       name: type
+  #       schema:
+  #         type: string
+  #       required: true
+  #     tags:
+  #     - appointmetns
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '204':
+  #         description: No response body
+  # /api/articles/:
+  #   get:
+  #     operationId: articles_list
+  #     parameters:
+  #     - name: page
+  #       required: false
+  #       in: query
+  #       description: A page number within the paginated result set.
+  #       schema:
+  #         type: integer
+  #     tags:
+  #     - articles
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/PaginatedArticleRetrieveList'
+  #         description: ''
+  # /api/articles/{article_id}/react:
+  #   post:
+  #     operationId: articles_react_create
+  #     parameters:
+  #     - in: path
+  #       name: article_id
+  #       schema:
+  #         type: integer
+  #       required: true
+  #     tags:
+  #     - articles
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/Reaction'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/Reaction'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/Reaction'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Reaction'
+  #         description: ''
+  # /api/articles/{id}/:
+  #   get:
+  #     operationId: articles_retrieve
+  #     parameters:
+  #     - in: path
+  #       name: id
+  #       schema:
+  #         type: integer
+  #       required: true
+  #     tags:
+  #     - articles
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ArticleRetrieve'
+  #         description: ''
+  # /api/articles/create/:
+  #   post:
+  #     operationId: articles_create_create
+  #     tags:
+  #     - articles
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/ArticaleCraete'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/ArticaleCraete'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/ArticaleCraete'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '201':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ArticaleCraete'
+  #         description: ''
+  # /api/articles/recommended/:
+  #   get:
+  #     operationId: articles_recommended_list
+  #     parameters:
+  #     - name: page
+  #       required: false
+  #       in: query
+  #       description: A page number within the paginated result set.
+  #       schema:
+  #         type: integer
+  #     tags:
+  #     - articles
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/PaginatedArticleList'
+  #         description: ''
+  # /api/articles/remove/{article_id}:
+  #   delete:
+  #     operationId: articles_remove_destroy
+  #     parameters:
+  #     - in: path
+  #       name: article_id
+  #       schema:
+  #         type: integer
+  #       required: true
+  #     tags:
+  #     - articles
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '204':
+  #         description: No response body
+  # /api/articles/trending/:
+  #   get:
+  #     operationId: articles_trending_list
+  #     parameters:
+  #     - name: page
+  #       required: false
+  #       in: query
+  #       description: A page number within the paginated result set.
+  #       schema:
+  #         type: integer
+  #     tags:
+  #     - articles
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/PaginatedArticlesMostReactionScoreList'
+  #         description: ''
+  # /api/assessments/doctors/recommend/:
+  #   get:
+  #     operationId: assessments_doctors_recommend_retrieve
+  #     tags:
+  #     - assessments
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     - {}
+  #     responses:
+  #       '200':
+  #         description: No response body
+  # /api/assessments/form/:
+  #   get:
+  #     operationId: assessments_form_list
+  #     tags:
+  #     - assessments
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     - {}
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/ServeyForm'
+  #         description: ''
+  # /api/assessments/form/submit/:
+  #   post:
+  #     operationId: assessments_form_submit_create
+  #     tags:
+  #     - assessments
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/SubmitAnswer'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/SubmitAnswer'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/SubmitAnswer'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     - {}
+  #     responses:
+  #       '201':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/SubmitAnswer'
+  #         description: ''
+  # /api/assessments/scores/:
+  #   get:
+  #     operationId: assessments_scores_retrieve
+  #     tags:
+  #     - assessments
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     - {}
+  #     responses:
+  #       '200':
+  #         description: No response body
+  # /api/doctors/education/add:
+  #   post:
+  #     operationId: doctors_education_add_create
+  #     tags:
+  #     - doctors
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorEducation'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorEducation'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorEducation'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '201':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/DoctorEducation'
+  #         description: ''
+  # /api/doctors/profile/:
+  #   get:
+  #     operationId: doctors_profile_retrieve
+  #     tags:
+  #     - doctors
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/DoctorProfileSerialzer'
+  #         description: ''
+  #   put:
+  #     operationId: doctors_profile_update
+  #     tags:
+  #     - doctors
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorProfileSerialzer'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorProfileSerialzer'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorProfileSerialzer'
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/DoctorProfileSerialzer'
+  #         description: ''
+  #   patch:
+  #     operationId: doctors_profile_partial_update
+  #     tags:
+  #     - doctors
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/PatchedDoctorProfileSerialzer'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/PatchedDoctorProfileSerialzer'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/PatchedDoctorProfileSerialzer'
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/DoctorProfileSerialzer'
+  #         description: ''
+  # /api/doctors/register/:
+  #   post:
+  #     operationId: doctors_register_create
+  #     tags:
+  #     - doctors
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorRegister'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorRegister'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/DoctorRegister'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     - {}
+  #     responses:
+  #       '201':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/DoctorRegister'
+  #         description: ''
+  # /api/doctors/schedule/:
+  #   get:
+  #     operationId: doctors_schedule_list
+  #     tags:
+  #     - doctors
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '200':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Schedule'
+  #         description: ''
+  #   post:
+  #     operationId: doctors_schedule_create
+  #     tags:
+  #     - doctors
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/Schedule'
+  #         application/x-www-form-urlencoded:
+  #           schema:
+  #             $ref: '#/components/schemas/Schedule'
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/Schedule'
+  #       required: true
+  #     security:
+  #     - cookieAuth: []
+  #     - jwtAuth: []
+  #     responses:
+  #       '201':
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Schedule'
+  #         description: ''
+  # /api/doctors/schedule/{id}/:
+    get:
+      operationId: doctors_schedule_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: ''
+    put:
+      operationId: doctors_schedule_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: ''
+    patch:
+      operationId: doctors_schedule_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSchedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSchedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSchedule'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: ''
+    delete:
+      operationId: doctors_schedule_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - doctors
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/patients/google/auth/:
+    post:
+      operationId: patients_google_auth_create
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleAuth'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GoogleAuth'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GoogleAuth'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoogleAuth'
+          description: ''
+  /api/patients/profile/:
+    get:
+      operationId: patients_profile_retrieve
+      tags:
+      - patients
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfile'
+          description: ''
+    put:
+      operationId: patients_profile_update
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientProfile'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfile'
+          description: ''
+    patch:
+      operationId: patients_profile_partial_update
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientProfile'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfile'
+          description: ''
+  /api/patients/register/:
+    post:
+      operationId: patients_register_create
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientRegister'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRegister'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/token/verify/:
+    post:
+      operationId: token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+  /api/users/account/delete/:
+    post:
+      operationId: users_account_delete_create
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/users/auth/forgot-password/:
+    post:
+      operationId: users_auth_forgot_password_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForgetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForgetPassword'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgetPassword'
+          description: ''
+  /api/users/auth/reset-password/:
+    post:
+      operationId: users_auth_reset_password_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+          description: ''
+  /api/users/auth/verify-otp/:
+    post:
+      operationId: users_auth_verify_otp_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgetPasswordVerifyOtp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForgetPasswordVerifyOtp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForgetPasswordVerifyOtp'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgetPasswordVerifyOtp'
+          description: ''
+  /api/users/email/reset:
+    put:
+      operationId: users_email_reset_update
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailReset'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailReset'
+          description: ''
+    patch:
+      operationId: users_email_reset_partial_update
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEmailReset'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailReset'
+          description: ''
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin'
+          description: ''
+  /api/users/logout/:
+    post:
+      operationId: users_logout_create
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/users/otp/resend:
+    post:
+      operationId: users_otp_resend_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendOtp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResendOtp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResendOtp'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResendOtp'
+          description: ''
+  /api/users/otp/verify:
+    post:
+      operationId: users_otp_verify_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyOtp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyOtp'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyOtp'
+          description: ''
+  /api/users/password/change:
+    put:
+      operationId: users_password_change_update
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+        required: true
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordReset'
+          description: ''
+    patch:
+      operationId: users_password_change_partial_update
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPasswordReset'
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordReset'
+          description: ''
+# components:
+#   schemas:
+#     AnswerOption:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         text:
+#           type: string
+#           maxLength: 255
+#         score:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: -9223372036854775808
+#           format: int64
+#         question:
+#           type: integer
+#       required:
+#       - id
+#       - question
+#       - score
+#       - text
+#     ArticaleCraete:
+#       type: object
+#       properties:
+#         title:
+#           type: string
+#           maxLength: 50
+#         content:
+#           type: string
+#           maxLength: 5000
+#         specialization:
+#           type: integer
+#           nullable: true
+#       required:
+#       - content
+#       - title
+#     Article:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         likes:
+#           type: integer
+#           readOnly: true
+#         dislikes:
+#           type: integer
+#           readOnly: true
+#         score:
+#           type: integer
+#           readOnly: true
+#         author:
+#           $ref: '#/components/schemas/Author'
+#         status:
+#           $ref: '#/components/schemas/StatusEnum'
+#         title:
+#           type: string
+#           maxLength: 50
+#         content:
+#           type: string
+#           maxLength: 5000
+#         created_at:
+#           type: string
+#           format: date-time
+#           readOnly: true
+#         specialization:
+#           type: integer
+#           nullable: true
+#       required:
+#       - author
+#       - content
+#       - created_at
+#       - dislikes
+#       - id
+#       - likes
+#       - score
+#       - title
+#     ArticleRetrieve:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         specialization:
+#           allOf:
+#           - $ref: '#/components/schemas/Specialization'
+#           readOnly: true
+#         author:
+#           $ref: '#/components/schemas/Author'
+#         likes:
+#           type: integer
+#           readOnly: true
+#         dislikes:
+#           type: integer
+#           readOnly: true
+#         score:
+#           type: integer
+#           readOnly: true
+#         status:
+#           $ref: '#/components/schemas/StatusEnum'
+#         title:
+#           type: string
+#           maxLength: 50
+#         content:
+#           type: string
+#           maxLength: 5000
+#         created_at:
+#           type: string
+#           format: date-time
+#           readOnly: true
+#       required:
+#       - author
+#       - content
+#       - created_at
+#       - dislikes
+#       - id
+#       - likes
+#       - score
+#       - specialization
+#       - title
+#     ArticlesMostReactionScore:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         likes:
+#           type: integer
+#           readOnly: true
+#         dislikes:
+#           type: integer
+#           readOnly: true
+#         score:
+#           type: integer
+#           readOnly: true
+#         author:
+#           $ref: '#/components/schemas/Author'
+#         specialization:
+#           allOf:
+#           - $ref: '#/components/schemas/Specialization'
+#           readOnly: true
+#         status:
+#           $ref: '#/components/schemas/StatusEnum'
+#         title:
+#           type: string
+#           maxLength: 50
+#         content:
+#           type: string
+#           maxLength: 5000
+#         created_at:
+#           type: string
+#           format: date-time
+#           readOnly: true
+#       required:
+#       - author
+#       - content
+#       - created_at
+#       - dislikes
+#       - id
+#       - likes
+#       - score
+#       - specialization
+#       - title
+#     Author:
+#       type: object
+#       properties:
+#         user:
+#           $ref: '#/components/schemas/AuthorDoctor'
+#         job_title:
+#           $ref: '#/components/schemas/job_titleSerialzer'
+#       required:
+#       - job_title
+#       - user
+#     AuthorDoctor:
+#       type: object
+#       properties:
+#         username:
+#           type: string
+#           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+#             only.
+#           pattern: ^[\w.@+-]+$
+#           maxLength: 150
+#         first_name:
+#           type: string
+#           maxLength: 150
+#         last_name:
+#           type: string
+#           maxLength: 150
+#       required:
+#       - username
+#     BlankEnum:
+#       enum:
+#       - ''
+#     DayOfWeekEnum:
+#       enum:
+#       - Monday
+#       - Tuesday
+#       - Wednesday
+#       - Thursday
+#       - Friday
+#       - Saturday
+#       - Sunday
+#       type: string
+#       description: |-
+#         * `Monday` - Monday
+#         * `Tuesday` - Tuesday
+#         * `Wednesday` - Wednesday
+#         * `Thursday` - Thursday
+#         * `Friday` - Friday
+#         * `Saturday` - Saturday
+#         * `Sunday` - Sunday
+#     DoctorEducation:
+#       type: object
+#       properties:
+#         degree:
+#           type: string
+#           maxLength: 100
+#         institution:
+#           type: string
+#           maxLength: 100
+#         graduation_year:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: 0
+#           format: int64
+#           nullable: true
+#         license_number:
+#           type: string
+#           nullable: true
+#           maxLength: 100
+#         certificate:
+#           type: string
+#           format: uri
+#           nullable: true
+#       required:
+#       - degree
+#       - institution
+#     DoctorProfileSerialzer:
+#       type: object
+#       properties:
+#         user:
+#           $ref: '#/components/schemas/UserUpdateSerialzer'
+#         job_title:
+#           $ref: '#/components/schemas/job_titleSerialzer'
+#         specialties:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/SubSpecialization'
+#         experience:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: -9223372036854775808
+#           format: int64
+#           nullable: true
+#         bio:
+#           type: string
+#           nullable: true
+#         session_prices:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/Prices'
+#     DoctorRegister:
+#       type: object
+#       properties:
+#         user:
+#           $ref: '#/components/schemas/UserDoctor'
+#       required:
+#       - user
+#     EmailReset:
+#       type: object
+#       properties:
+#         new_email:
+#           type: string
+#           format: email
+#           writeOnly: true
+#         password:
+#           type: string
+#           writeOnly: true
+#           maxLength: 128
+#         refresh:
+#           type: string
+#           writeOnly: true
+#       required:
+#       - new_email
+#       - password
+#       - refresh
+#     ForgetPassword:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#       required:
+#       - email
+#     ForgetPasswordVerifyOtp:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#         code:
+#           type: string
+#       required:
+#       - code
+#       - email
+#     GenderEnum:
+#       enum:
+#       - male
+#       - female
+#       type: string
+#       description: |-
+#         * `male` - Male
+#         * `female` - Female
+#     GoogleAuth:
+#       type: object
+#       properties:
+#         id_token:
+#           type: string
+#       required:
+#       - id_token
+#     NullEnum:
+#       enum:
+#       - null
+#     PaginatedArticleList:
+#       type: object
+#       required:
+#       - count
+#       - results
+#       properties:
+#         count:
+#           type: integer
+#           example: 123
+#         next:
+#           type: string
+#           nullable: true
+#           format: uri
+#           example: http://api.example.org/accounts/?page=4
+#         previous:
+#           type: string
+#           nullable: true
+#           format: uri
+#           example: http://api.example.org/accounts/?page=2
+#         results:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/Article'
+#     PaginatedArticleRetrieveList:
+#       type: object
+#       required:
+#       - count
+#       - results
+#       properties:
+#         count:
+#           type: integer
+#           example: 123
+#         next:
+#           type: string
+#           nullable: true
+#           format: uri
+#           example: http://api.example.org/accounts/?page=4
+#         previous:
+#           type: string
+#           nullable: true
+#           format: uri
+#           example: http://api.example.org/accounts/?page=2
+#         results:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/ArticleRetrieve'
+#     PaginatedArticlesMostReactionScoreList:
+#       type: object
+#       required:
+#       - count
+#       - results
+#       properties:
+#         count:
+#           type: integer
+#           example: 123
+#         next:
+#           type: string
+#           nullable: true
+#           format: uri
+#           example: http://api.example.org/accounts/?page=4
+#         previous:
+#           type: string
+#           nullable: true
+#           format: uri
+#           example: http://api.example.org/accounts/?page=2
+#         results:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/ArticlesMostReactionScore'
+#     PasswordReset:
+#       type: object
+#       properties:
+#         password:
+#           type: string
+#           maxLength: 128
+#         new_password:
+#           type: string
+#           writeOnly: true
+#         confirm_password:
+#           type: string
+#           writeOnly: true
+#       required:
+#       - confirm_password
+#       - new_password
+#       - password
+#     PatchedDoctorProfileSerialzer:
+#       type: object
+#       properties:
+#         user:
+#           $ref: '#/components/schemas/UserUpdateSerialzer'
+#         job_title:
+#           $ref: '#/components/schemas/job_titleSerialzer'
+#         specialties:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/SubSpecialization'
+#         experience:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: -9223372036854775808
+#           format: int64
+#           nullable: true
+#         bio:
+#           type: string
+#           nullable: true
+#         session_prices:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/Prices'
+#     PatchedEmailReset:
+#       type: object
+#       properties:
+#         new_email:
+#           type: string
+#           format: email
+#           writeOnly: true
+#         password:
+#           type: string
+#           writeOnly: true
+#           maxLength: 128
+#         refresh:
+#           type: string
+#           writeOnly: true
+#     PatchedPasswordReset:
+#       type: object
+#       properties:
+#         password:
+#           type: string
+#           maxLength: 128
+#         new_password:
+#           type: string
+#           writeOnly: true
+#         confirm_password:
+#           type: string
+#           writeOnly: true
+#     PatchedPatientProfile:
+#       type: object
+#       properties:
+#         user:
+#           $ref: '#/components/schemas/UserUpdate'
+#         psychological_history:
+#           type: string
+#           nullable: true
+#         nickname:
+#           type: string
+#           nullable: true
+#           maxLength: 100
+#     PatchedPrices:
+#       type: object
+#       properties:
+#         duration:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: -9223372036854775808
+#           format: int64
+#         type:
+#           $ref: '#/components/schemas/TypeEnum'
+#         price:
+#           type: string
+#           format: decimal
+#           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+#     PatchedSchedule:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         day_of_week:
+#           $ref: '#/components/schemas/DayOfWeekEnum'
+#         start_time:
+#           type: string
+#           format: time
+#         end_time:
+#           type: string
+#           format: time
+#     PatientProfile:
+#       type: object
+#       properties:
+#         user:
+#           $ref: '#/components/schemas/UserUpdate'
+#         psychological_history:
+#           type: string
+#           nullable: true
+#         nickname:
+#           type: string
+#           nullable: true
+#           maxLength: 100
+#       required:
+#       - user
+#     PatientRegister:
+#       type: object
+#       properties:
+#         user:
+#           $ref: '#/components/schemas/User'
+#       required:
+#       - user
+#     Prices:
+#       type: object
+#       properties:
+#         duration:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: -9223372036854775808
+#           format: int64
+#         type:
+#           $ref: '#/components/schemas/TypeEnum'
+#         price:
+#           type: string
+#           format: decimal
+#           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+#       required:
+#       - duration
+#       - price
+#       - type
+#     Question:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         text:
+#           type: string
+#         order:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: 0
+#           format: int64
+#           nullable: true
+#         options:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/AnswerOption'
+#           readOnly: true
+#       required:
+#       - id
+#       - options
+#       - text
+#     Reaction:
+#       type: object
+#       properties:
+#         reaction:
+#           $ref: '#/components/schemas/ReactionEnum'
+#       required:
+#       - reaction
+#     ReactionEnum:
+#       enum:
+#       - like
+#       - dislike
+#       type: string
+#       description: |-
+#         * `like` - Like
+#         * `dislike` - Dislike
+#     ResendOtp:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#       required:
+#       - email
+#     ResetPassword:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#         new_password:
+#           type: string
+#           writeOnly: true
+#           minLength: 8
+#         confirm_password:
+#           type: string
+#           writeOnly: true
+#           minLength: 8
+#       required:
+#       - confirm_password
+#       - email
+#       - new_password
+#     Schedule:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         day_of_week:
+#           $ref: '#/components/schemas/DayOfWeekEnum'
+#         start_time:
+#           type: string
+#           format: time
+#         end_time:
+#           type: string
+#           format: time
+#       required:
+#       - day_of_week
+#       - end_time
+#       - id
+#       - start_time
+#     ServeyForm:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           readOnly: true
+#         name:
+#           type: string
+#           maxLength: 255
+#         description:
+#           type: string
+#           nullable: true
+#         order:
+#           type: integer
+#           maximum: 9223372036854775807
+#           minimum: 0
+#           format: int64
+#           nullable: true
+#         questions:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/Question'
+#           readOnly: true
+#       required:
+#       - id
+#       - name
+#       - questions
+#     Specialization:
+#       type: object
+#       properties:
+#         name:
+#           type: string
+#           maxLength: 255
+#     StatusEnum:
+#       enum:
+#       - Pending
+#       - Approved
+#       - Rejected
+#       type: string
+#       description: |-
+#         * `Pending` - pending
+#         * `Approved` - approved
+#         * `Rejected` - rejected
+#     SubSpecialization:
+#       type: object
+#       properties:
+#         name:
+#           type: string
+#           maxLength: 255
+#     SubmitAnswer:
+#       type: object
+#       properties:
+#         answers:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/UserAnswer'
+#       required:
+#       - answers
+#     TokenRefresh:
+#       type: object
+#       properties:
+#         access:
+#           type: string
+#           readOnly: true
+#         refresh:
+#           type: string
+#           writeOnly: true
+#       required:
+#       - access
+#       - refresh
+#     TokenVerify:
+#       type: object
+#       properties:
+#         token:
+#           type: string
+#           writeOnly: true
+#       required:
+#       - token
+#     TypeEnum:
+#       enum:
+#       - video
+#       - audio
+#       - text_message
+#       type: string
+#       description: |-
+#         * `video` - Video
+#         * `audio` - Audio
+#         * `text_message` - Text Message
+#     User:
+#       type: object
+#       properties:
+#         nickname:
+#           type: string
+#           maxLength: 100
+#         email:
+#           type: string
+#           format: email
+#           maxLength: 254
+#         password:
+#           type: string
+#           writeOnly: true
+#           maxLength: 128
+#       required:
+#       - email
+#       - password
+#     UserAnswer:
+#       type: object
+#       properties:
+#         question_id:
+#           type: integer
+#         answer_id:
+#           type: integer
+#       required:
+#       - answer_id
+#       - question_id
+#     UserDoctor:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#           maxLength: 254
+#         password:
+#           type: string
+#           writeOnly: true
+#           maxLength: 128
+#         first_name:
+#           type: string
+#           maxLength: 150
+#         last_name:
+#           type: string
+#           maxLength: 150
+#       required:
+#       - email
+#       - password
+#     UserLogin:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#         password:
+#           type: string
+#       required:
+#       - email
+#       - password
+#     UserUpdate:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#           readOnly: true
+#         username:
+#           type: string
+#           readOnly: true
+#           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+#             only.
+#         birth_date:
+#           type: string
+#           format: date
+#           nullable: true
+#         gender:
+#           nullable: true
+#           oneOf:
+#           - $ref: '#/components/schemas/GenderEnum'
+#           - $ref: '#/components/schemas/BlankEnum'
+#           - $ref: '#/components/schemas/NullEnum'
+#         phone:
+#           type: string
+#           nullable: true
+#           maxLength: 15
+#         age:
+#           type: string
+#           readOnly: true
+#       required:
+#       - age
+#       - email
+#       - username
+#     UserUpdateSerialzer:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#           maxLength: 254
+#         username:
+#           type: string
+#           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+#             only.
+#           pattern: ^[\w.@+-]+$
+#           maxLength: 150
+#         gender:
+#           nullable: true
+#           oneOf:
+#           - $ref: '#/components/schemas/GenderEnum'
+#           - $ref: '#/components/schemas/BlankEnum'
+#           - $ref: '#/components/schemas/NullEnum'
+#         birth_date:
+#           type: string
+#           format: date
+#           nullable: true
+#         phone:
+#           type: string
+#           nullable: true
+#           maxLength: 15
+#         first_name:
+#           type: string
+#           maxLength: 150
+#         last_name:
+#           type: string
+#           maxLength: 150
+#         age:
+#           type: string
+#           readOnly: true
+#       required:
+#       - age
+#       - email
+#       - username
+#     VerifyOtp:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#           format: email
+#         code:
+#           type: string
+#       required:
+#       - code
+#       - email
+#     job_titleSerialzer:
+#       type: object
+#       properties:
+#         title:
+#           type: string
+#   securitySchemes:
+#     cookieAuth:
+#       type: apiKey
+#       in: cookie
+#       name: sessionid
+#     jwtAuth:
+#       type: http
+#       scheme: bearer
+#       bearerFormat: JWT

@@ -192,6 +192,8 @@ class AuthRepositoryImpl implements AuthRepository {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? psychologicalHistory,
+    String? nickname,
     String? correlationId,
   }) async {
     _log.info(
@@ -201,6 +203,8 @@ class AuthRepositoryImpl implements AuthRepository {
         'dateOfBirth': dateOfBirth,
         'gender': gender,
         'phoneLength': phoneNumber?.length ?? 0,
+        'hasPsychologicalHistory': psychologicalHistory != null,
+        'nickname': nickname,
       },
     );
     try {
@@ -208,6 +212,8 @@ class AuthRepositoryImpl implements AuthRepository {
         dateOfBirth: dateOfBirth,
         gender: gender,
         phoneNumber: phoneNumber,
+        psychologicalHistory: psychologicalHistory,
+        nickname: nickname,
         correlationId: correlationId,
       );
       _log.info(
@@ -231,6 +237,8 @@ class AuthRepositoryImpl implements AuthRepository {
           'dateOfBirth': dateOfBirth,
           'gender': gender,
           'phoneLength': phoneNumber?.length ?? 0,
+          'hasPsychologicalHistory': psychologicalHistory != null,
+          'nickname': nickname,
         },
         error: e,
         stackTrace: st,
@@ -245,6 +253,8 @@ class AuthRepositoryImpl implements AuthRepository {
           'dateOfBirth': dateOfBirth,
           'gender': gender,
           'phoneLength': phoneNumber?.length ?? 0,
+          'hasPsychologicalHistory': psychologicalHistory != null,
+          'nickname': nickname,
         },
         error: e,
         stackTrace: st,

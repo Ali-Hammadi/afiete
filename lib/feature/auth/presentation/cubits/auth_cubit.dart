@@ -322,6 +322,7 @@ class AuthCubit extends Cubit<AuthState> {
     required DateTime birthDate,
     required String gender,
     String? phoneNumber,
+    String? psychologicalHistory,
   }) async {
     final correlationId = _ensureAuthFlowCorrelationId(
       context: 'profile_update',
@@ -337,6 +338,8 @@ class AuthCubit extends Cubit<AuthState> {
         'birthDate': birthDateIso,
         'gender': sanitizedGender,
         'phoneLength': sanitizedPhone?.length ?? 0,
+        'nickname': nickname,
+        'hasPsychologicalHistory': psychologicalHistory != null,
       },
     );
 
@@ -413,6 +416,11 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     final payloadPhone = sanitizedPhone ?? existingUser.phoneNumber ?? '';
+    final payloadNickname =
+        (nickname?.trim().isNotEmpty == true)
+            ? nickname!.trim()
+            : (existingUser.nickname ?? '').trim();
+    final payloadPsychologicalHistory = psychologicalHistory ?? '';
 
     _log.info(
       'update_profile_info:payload_ready',
@@ -421,6 +429,9 @@ class AuthCubit extends Cubit<AuthState> {
         'date_of_birth': birthDateIso,
         'gender': sanitizedGender,
         'phoneLength': payloadPhone.length,
+        'nickname': payloadNickname,
+        'hasPsychologicalHistory':
+            payloadPsychologicalHistory.trim().isNotEmpty,
       },
     );
 
@@ -429,6 +440,8 @@ class AuthCubit extends Cubit<AuthState> {
         dateOfBirth: birthDateIso,
         gender: sanitizedGender,
         phoneNumber: payloadPhone,
+        nickname: payloadNickname,
+        psychologicalHistory: payloadPsychologicalHistory,
         correlationId: correlationId,
       ),
     );
@@ -447,6 +460,9 @@ class AuthCubit extends Cubit<AuthState> {
             'birthDate': birthDateIso,
             'gender': sanitizedGender,
             'phoneLength': payloadPhone.length,
+            'nickname': payloadNickname,
+            'hasPsychologicalHistory':
+                payloadPsychologicalHistory.trim().isNotEmpty,
           },
         );
         emit(AuthError(normalizedMessage));

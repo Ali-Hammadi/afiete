@@ -51,6 +51,8 @@ abstract class AuthRepository {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? psychologicalHistory,
+    String? nickname,
     String? correlationId,
   });
 

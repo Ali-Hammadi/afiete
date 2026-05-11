@@ -8,12 +8,16 @@ class UpdateProfileParams {
   final String? dateOfBirth;
   final String? gender;
   final String? phoneNumber;
+  final String? psychologicalHistory;
+  final String? nickname;
   final String? correlationId;
 
   const UpdateProfileParams({
     this.dateOfBirth,
     this.gender,
     this.phoneNumber,
+    this.psychologicalHistory,
+    this.nickname,
     this.correlationId,
   });
 }
@@ -33,6 +37,8 @@ class UpdateProfileInfoUseCase
       dateOfBirth: params.dateOfBirth,
       gender: params.gender,
       phoneNumber: params.phoneNumber,
+      psychologicalHistory: params.psychologicalHistory,
+      nickname: params.nickname,
       correlationId: params.correlationId,
     );
   }

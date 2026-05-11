@@ -66,6 +66,8 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
         ? authState.user.nickname
         : authState is AuthProfileUpdated
         ? authState.user.nickname
+      : authState is SignupOtpVerified
+      ? authState.user.nickname
         : '';
 
     return Scaffold(
