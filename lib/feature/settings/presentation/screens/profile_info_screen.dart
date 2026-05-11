@@ -16,8 +16,8 @@ class ProfileInfoScreen extends StatefulWidget {
 }
 
 class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
-  static const String _genderMale = 'Male';
-  static const String _genderFemale = 'Female';
+  static const String _genderMale = 'male';
+  static const String _genderFemale = 'female';
 
   @override
   void initState() {
@@ -30,8 +30,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
 
   String _normalizeGenderValue(String? raw) {
     final value = (raw ?? '').trim().toLowerCase();
-    if (value == 'male' || value == 'ذكر') return _genderMale;
-    if (value == 'female' || value == 'أنثى' || value == 'انثى') {
+    if (value == 'male' || value == 'm' || value == 'ذكر') {
+      return _genderMale;
+    }
+    if (value == 'female' || value == 'f' || value == 'أنثى' || value == 'انثى') {
       return _genderFemale;
     }
     return _genderMale;
