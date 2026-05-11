@@ -35,9 +35,47 @@ class UserModel extends Equatable {
   /// Handles both snake_case (backend) and camelCase (legacy) field names.
   /// Also supports responses wrapped in a top-level `data` object.
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    final payload = json['data'] is Map<String, dynamic>
-        ? json['data'] as Map<String, dynamic>
-        : json;
+    final rootPayload = json['data'] is Map<String, dynamic>
+      ? json['data'] as Map<String, dynamic>
+      : json;
+
+    final payload = rootPayload['user'] is Map<String, dynamic>
+      ? rootPayload['user'] as Map<String, dynamic>
+      : rootPayload;
+
+    final tokens = rootPayload['tokens'] is Map<String, dynamic>
+      ? rootPayload['tokens'] as Map<String, dynamic>
+      : (json['tokens'] is Map<String, dynamic>
+          ? json['tokens'] as Map<String, dynamic>
+          : const <String, dynamic>{});
+
+    final accessToken =
+      payload['access_token'] ??
+      payload['accessToken'] ??
+      payload['access'] ??
+      rootPayload['access_token'] ??
+      rootPayload['accessToken'] ??
+      rootPayload['access'] ??
+      json['access_token'] ??
+      json['accessToken'] ??
+      json['access'] ??
+      tokens['access_token'] ??
+      tokens['accessToken'] ??
+      tokens['access'];
+
+    final refreshToken =
+      payload['refresh_token'] ??
+      payload['refreshToken'] ??
+      payload['refresh'] ??
+      rootPayload['refresh_token'] ??
+      rootPayload['refreshToken'] ??
+      rootPayload['refresh'] ??
+      json['refresh_token'] ??
+      json['refreshToken'] ??
+      json['refresh'] ??
+      tokens['refresh_token'] ??
+      tokens['refreshToken'] ??
+      tokens['refresh'];
 
     return UserModel(
       id: payload['id'] ?? payload['user_id'] ?? '',
@@ -50,9 +88,8 @@ class UserModel extends Equatable {
       isVerified: payload['is_verified'] ?? payload['isVerified'] ?? false,
       profileImageUrl:
           payload['profile_image_url'] ?? payload['profileImageUrl'],
-      accessToken:
-          payload['access_token'] ?? payload['accessToken'] ?? payload['access'],
-      refreshToken: payload['refresh_token'] ?? payload['refreshToken'] ?? payload['refresh'],
+      accessToken: accessToken?.toString(),
+      refreshToken: refreshToken?.toString(),
     );
   }
 

@@ -7,8 +7,13 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 class LoginParams {
   final String email;
   final String password;
+  final String? correlationId;
 
-  const LoginParams({required this.email, required this.password});
+  const LoginParams({
+    required this.email,
+    required this.password,
+    this.correlationId,
+  });
 }
 
 class LoginUseCase implements UseCase<UserAuthEntity, LoginParams> {
@@ -21,6 +26,7 @@ class LoginUseCase implements UseCase<UserAuthEntity, LoginParams> {
     return await repository.login(
       email: params.email,
       password: params.password,
+      correlationId: params.correlationId,
     );
   }
 }

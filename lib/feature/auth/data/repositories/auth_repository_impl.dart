@@ -26,16 +26,26 @@ class AuthRepositoryImpl implements AuthRepository {
     required String nickname,
     required String email,
     required String password,
+    String? correlationId,
   }) async {
-    _log.info('signup:start', data: {'email': email, 'nickname': nickname});
+    _log.info(
+      'signup:start',
+      data: {'cid': correlationId, 'email': email, 'nickname': nickname},
+    );
     try {
-      final model = await _remoteDataSource.signup(nickname, email, password);
-      _log.info('signup:success');
+      final model = await _remoteDataSource.signup(
+        nickname,
+        email,
+        password,
+        correlationId: correlationId,
+      );
+      _log.info('signup:success', data: {'cid': correlationId});
       return Right(model.toEntity());
     } on DioException catch (e, st) {
       _log.error(
         'signup:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -47,7 +57,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e, st) {
       _log.error(
         'signup:exception',
-        data: {'error': e.toString()},
+        data: {'cid': correlationId, 'error': e.toString()},
         error: e,
         stackTrace: st,
       );
@@ -59,16 +69,25 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserAuthEntity>> verifySignupOtp({
     required String email,
     required String otpCode,
+    String? correlationId,
   }) async {
-    _log.info('verifySignupOtp:start', data: {'email': email});
+    _log.info(
+      'verifySignupOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
-      final model = await _remoteDataSource.verifySignupOtp(email, otpCode);
-      _log.info('verifySignupOtp:success');
+      final model = await _remoteDataSource.verifySignupOtp(
+        email,
+        otpCode,
+        correlationId: correlationId,
+      );
+      _log.info('verifySignupOtp:success', data: {'cid': correlationId});
       return Right(model.toEntity());
     } on DioException catch (e, st) {
       _log.error(
         'verifySignupOtp:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -80,7 +99,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e, st) {
       _log.error(
         'verifySignupOtp:exception',
-        data: {'error': e.toString()},
+        data: {'cid': correlationId, 'error': e.toString()},
         error: e,
         stackTrace: st,
       );
@@ -94,16 +113,22 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserAuthEntity>> login({
     required String email,
     required String password,
+    String? correlationId,
   }) async {
-    _log.info('login:start', data: {'email': email});
+    _log.info('login:start', data: {'cid': correlationId, 'email': email});
     try {
-      final model = await _remoteDataSource.login(email, password);
-      _log.info('login:success');
+      final model = await _remoteDataSource.login(
+        email,
+        password,
+        correlationId: correlationId,
+      );
+      _log.info('login:success', data: {'cid': correlationId});
       return Right(model.toEntity());
     } on DioException catch (e, st) {
       _log.error(
         'login:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -115,7 +140,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e, st) {
       _log.error(
         'login:exception',
-        data: {'error': e.toString()},
+        data: {'cid': correlationId, 'error': e.toString()},
         error: e,
         stackTrace: st,
       );
@@ -126,16 +151,21 @@ class AuthRepositoryImpl implements AuthRepository {
   // ==================== PROFILE ====================
 
   @override
-  Future<Either<Failure, UserAuthEntity>> fetchProfile() async {
-    _log.info('fetchProfile:start');
+  Future<Either<Failure, UserAuthEntity>> fetchProfile({
+    String? correlationId,
+  }) async {
+    _log.info('fetchProfile:start', data: {'cid': correlationId});
     try {
-      final model = await _remoteDataSource.fetchProfile();
-      _log.info('fetchProfile:success');
+      final model = await _remoteDataSource.fetchProfile(
+        correlationId: correlationId,
+      );
+      _log.info('fetchProfile:success', data: {'cid': correlationId});
       return Right(model.toEntity());
     } on DioException catch (e, st) {
       _log.error(
         'fetchProfile:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -147,7 +177,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e, st) {
       _log.error(
         'fetchProfile:exception',
-        data: {'error': e.toString()},
+        data: {'cid': correlationId, 'error': e.toString()},
         error: e,
         stackTrace: st,
       );
@@ -160,10 +190,12 @@ class AuthRepositoryImpl implements AuthRepository {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? correlationId,
   }) async {
     _log.info(
       'updateProfileInfo:start',
       data: {
+        'cid': correlationId,
         'dateOfBirth': dateOfBirth,
         'gender': gender,
         'phoneLength': phoneNumber?.length ?? 0,
@@ -174,10 +206,12 @@ class AuthRepositoryImpl implements AuthRepository {
         dateOfBirth: dateOfBirth,
         gender: gender,
         phoneNumber: phoneNumber,
+        correlationId: correlationId,
       );
       _log.info(
         'updateProfileInfo:success',
         data: {
+          'cid': correlationId,
           'hasBirthDate': model.dateOfBirth != null,
           'hasGender': model.gender != null,
           'hasPhoneNumber': model.phoneNumber != null,
@@ -188,6 +222,7 @@ class AuthRepositoryImpl implements AuthRepository {
       _log.error(
         'updateProfileInfo:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -203,6 +238,7 @@ class AuthRepositoryImpl implements AuthRepository {
       _log.error(
         'updateProfileInfo:exception',
         data: {
+          'cid': correlationId,
           'error': e.toString(),
           'dateOfBirth': dateOfBirth,
           'gender': gender,
@@ -220,13 +256,42 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, OtpEntity>> requestForgotPasswordOtp({
     required String email,
+    String? correlationId,
   }) async {
+    _log.info(
+      'requestForgotPasswordOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
-      final model = await _remoteDataSource.requestForgotPasswordOtp(email);
+      final model = await _remoteDataSource.requestForgotPasswordOtp(
+        email,
+        correlationId: correlationId,
+      );
+      _log.info(
+        'requestForgotPasswordOtp:success',
+        data: {'cid': correlationId},
+      );
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'requestForgotPasswordOtp:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'requestForgotPasswordOtp:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -237,18 +302,45 @@ class AuthRepositoryImpl implements AuthRepository {
     required String otpCode,
     required String newPassword,
     required String confirmPassword,
+    String? correlationId,
   }) async {
+    _log.info(
+      'verifyForgotPasswordOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
       final model = await _remoteDataSource.verifyForgotPasswordOtp(
         email,
         otpCode,
         newPassword,
         confirmPassword,
+        correlationId: correlationId,
+      );
+      _log.info(
+        'verifyForgotPasswordOtp:success',
+        data: {'cid': correlationId},
       );
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'verifyForgotPasswordOtp:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'verifyForgotPasswordOtp:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -256,13 +348,32 @@ class AuthRepositoryImpl implements AuthRepository {
   // ==================== SESSION MANAGEMENT ====================
 
   @override
-  Future<Either<Failure, void>> logout() async {
+  Future<Either<Failure, void>> logout({String? correlationId}) async {
+    _log.info('logout:start', data: {'cid': correlationId});
     try {
-      await _remoteDataSource.logout();
+      await _remoteDataSource.logout(correlationId: correlationId);
+      _log.info('logout:success', data: {'cid': correlationId});
       return const Right(null);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'logout:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'logout:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -270,13 +381,36 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> deleteAccount({
     required String password,
+    String? correlationId,
   }) async {
+    _log.info('deleteAccount:start', data: {'cid': correlationId});
     try {
-      await _remoteDataSource.deleteAccount(password);
+      await _remoteDataSource.deleteAccount(
+        password,
+        correlationId: correlationId,
+      );
+      _log.info('deleteAccount:success', data: {'cid': correlationId});
       return const Right(null);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'deleteAccount:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'deleteAccount:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -285,13 +419,37 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserAuthEntity>> verifyOtp({
     required String email,
     required String otpCode,
+    String? correlationId,
   }) async {
+    _log.info('verifyOtp:start', data: {'cid': correlationId, 'email': email});
     try {
-      final model = await _remoteDataSource.verifyOtp(email, otpCode);
+      final model = await _remoteDataSource.verifyOtp(
+        email,
+        otpCode,
+        correlationId: correlationId,
+      );
+      _log.info('verifyOtp:success', data: {'cid': correlationId});
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'verifyOtp:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'verifyOtp:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -302,18 +460,42 @@ class AuthRepositoryImpl implements AuthRepository {
     required String otpCode,
     required String newPassword,
     required String confirmPassword,
+    String? correlationId,
   }) async {
+    _log.info(
+      'resetPassword:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
       final model = await _remoteDataSource.verifyForgotPasswordOtp(
         email,
         otpCode,
         newPassword,
         confirmPassword,
+        correlationId: correlationId,
       );
+      _log.info('resetPassword:success', data: {'cid': correlationId});
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'resetPassword:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'resetPassword:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -323,15 +505,32 @@ class AuthRepositoryImpl implements AuthRepository {
   static const String _cachedUserKey = 'auth_cached_user';
 
   @override
-  Future<void> cacheSession(UserAuthEntity user) async {
+  Future<void> cacheSession(
+    UserAuthEntity user, {
+    String? correlationId,
+  }) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_cachedUserKey, jsonEncode(_encodeUser(user)));
 
     final accessToken = user.accessToken;
     final refreshToken = user.refreshToken;
 
+    _log.info(
+      'cacheSession:start',
+      data: {
+        'cid': correlationId,
+        'email': user.email,
+        'hasAccessToken': accessToken?.isNotEmpty == true,
+        'hasRefreshToken': refreshToken?.isNotEmpty == true,
+      },
+    );
+
     if (accessToken == null || accessToken.isEmpty) {
       await TokenStorage.clearTokens();
+      _log.warn(
+        'cacheSession:cleared_tokens_missing_access',
+        data: {'cid': correlationId},
+      );
       return;
     }
 
@@ -340,8 +539,16 @@ class AuthRepositoryImpl implements AuthRepository {
         accessToken: accessToken,
         refreshToken: refreshToken,
       );
+      _log.info(
+        'cacheSession:saved_access_and_refresh',
+        data: {'cid': correlationId},
+      );
     } else {
       await TokenStorage.saveToken(accessToken);
+      _log.warn(
+        'cacheSession:saved_access_only_no_refresh',
+        data: {'cid': correlationId},
+      );
     }
   }
 
@@ -404,17 +611,38 @@ class AuthRepositoryImpl implements AuthRepository {
     required String currentPassword,
     required String newPassword,
     required String confirmPassword,
+    String? correlationId,
   }) async {
+    _log.info('updatePassword:start', data: {'cid': correlationId});
     try {
       final model = await _remoteDataSource.updatePassword(
         currentPassword,
         newPassword,
         confirmPassword,
+        correlationId: correlationId,
       );
+      _log.info('updatePassword:success', data: {'cid': correlationId});
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'updatePassword:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'updatePassword:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -424,13 +652,36 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserAuthEntity>> googleSignIn({
     required String idToken,
+    String? correlationId,
   }) async {
+    _log.info('googleSignIn:start', data: {'cid': correlationId});
     try {
-      final model = await _remoteDataSource.googleSignIn(idToken);
+      final model = await _remoteDataSource.googleSignIn(
+        idToken,
+        correlationId: correlationId,
+      );
+      _log.info('googleSignIn:success', data: {'cid': correlationId});
       return Right(model.toEntity());
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
+      _log.error(
+        'googleSignIn:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
-    } catch (e) {
+    } catch (e, st) {
+      _log.error(
+        'googleSignIn:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }

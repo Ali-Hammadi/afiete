@@ -1,4 +1,3 @@
-import 'package:afiete/core/usecases/usecase.dart';
 import 'package:afiete/core/utils/age_utils.dart';
 import 'package:afiete/core/utils/logger.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
@@ -22,6 +21,9 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final _log = loggerFor('AuthCubit');
   UserAuthEntity? _pendingSignupUser;
+  String? _activeAuthFlowCorrelationId;
+
+  String? get activeAuthFlowCorrelationId => _activeAuthFlowCorrelationId;
 
   final LoginUseCase loginUseCase;
   final SignupUseCase signupUseCase;
@@ -52,18 +54,29 @@ class AuthCubit extends Cubit<AuthState> {
   ) : super(AuthInitial());
 
   Future<void> login(String email, String password) async {
-    _log.info('login:start', data: {'email': email});
+    final correlationId = _newCorrelationId(context: 'login');
+    _log.info('login:start', data: {'cid': correlationId, 'email': email});
     emit(AuthLoading());
     final result = await loginUseCase(
-      LoginParams(email: email, password: password),
+      LoginParams(
+        email: email,
+        password: password,
+        correlationId: correlationId,
+      ),
     );
     result.fold(
       (failure) {
-        _log.error('login:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'login:error',
+          data: {'cid': correlationId, 'message': failure.errorMessage},
+        );
 
         // Check if account is inactive/restricted
         if (_isInactiveAccountError(failure.errorMessage)) {
-          _log.warn('login:account_inactive', data: {'email': email});
+          _log.warn(
+            'login:account_inactive',
+            data: {'cid': correlationId, 'email': email},
+          );
           emit(
             const AuthError(
               'This account is inactive or restricted on the server, so sign-in is currently unavailable. Please contact support if you believe this is an error.',
@@ -78,29 +91,48 @@ class AuthCubit extends Cubit<AuthState> {
       (user) {
         _log.info(
           'login:success',
-          data: {'email': user.email, 'isVerified': user.isVerified},
+          data: {
+            'cid': correlationId,
+            'email': user.email,
+            'isVerified': user.isVerified,
+          },
         );
 
         // Login now goes straight to the authenticated session.
-        return _cacheAndEmitUser(user);
+        return _cacheAndEmitUser(user, correlationId: correlationId);
       },
     );
   }
 
   Future<void> signup(String nickname, String email, String password) async {
-    _log.info('signup:start', data: {'email': email, 'nickname': nickname});
+    final correlationId = _startAuthFlowCorrelationId(context: 'signup');
+    _log.info(
+      'signup:start',
+      data: {'cid': correlationId, 'email': email, 'nickname': nickname},
+    );
     _pendingSignupUser = null;
     emit(AuthLoading());
     final result = await signupUseCase(
-      SignupParams(nickname: nickname, email: email, password: password),
+      SignupParams(
+        nickname: nickname,
+        email: email,
+        password: password,
+        correlationId: correlationId,
+      ),
     );
     result.fold(
       (failure) {
-        _log.error('signup:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'signup:error',
+          data: {'cid': correlationId, 'message': failure.errorMessage},
+        );
         // If email already exists (unverified), ask for OTP verification
         if (_isNotVerifiedError(failure.errorMessage) ||
             _isEmailAlreadyExistsError(failure.errorMessage)) {
-          _log.warn('signup:email_already_exists', data: {'email': email});
+          _log.warn(
+            'signup:email_already_exists',
+            data: {'cid': correlationId, 'email': email},
+          );
           _pendingSignupUser = UserAuthEntity(
             username: nickname,
             nickname: nickname,
@@ -116,7 +148,10 @@ class AuthCubit extends Cubit<AuthState> {
         }
       },
       (otpEntity) {
-        _log.info('signup:otp_sent', data: {'email': email});
+        _log.info(
+          'signup:otp_sent',
+          data: {'cid': correlationId, 'email': email},
+        );
         // OTP was sent; store signup data and wait for verification
         _pendingSignupUser = UserAuthEntity(
           username: nickname,
@@ -133,19 +168,26 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> logout(String email, String password) async {
-    _log.info('logout:start', data: {'email': email});
+    final correlationId = _newCorrelationId(context: 'logout');
+    _log.info('logout:start', data: {'cid': correlationId, 'email': email});
     emit(AuthLoading());
-    final result = await logoutUseCase(NoParams());
+    final result = await logoutUseCase(
+      LogoutParams(correlationId: correlationId),
+    );
     return result.fold(
       (failure) {
-        _log.error('logout:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'logout:error',
+          data: {'cid': correlationId, 'message': failure.errorMessage},
+        );
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (_) async {
-        _log.info('logout:success');
+        _log.info('logout:success', data: {'cid': correlationId});
         await authRepository.clearCachedSession();
         _pendingSignupUser = null;
+        _activeAuthFlowCorrelationId = null;
         emit(const AuthInitial());
         return true;
       },
@@ -153,27 +195,29 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> deleteAccount(String password) async {
+    final correlationId = _newCorrelationId(context: 'delete_account');
     _log.warn(
       'delete_account:start',
-      data: {'passwordLength': password.length},
+      data: {'cid': correlationId, 'passwordLength': password.length},
     );
     emit(AuthLoading());
     final result = await deleteAccountUseCase(
-      DeleteAccountParams(password: password),
+      DeleteAccountParams(password: password, correlationId: correlationId),
     );
     return result.fold(
       (failure) {
         _log.error(
           'delete_account:error',
-          data: {'message': failure.errorMessage},
+          data: {'cid': correlationId, 'message': failure.errorMessage},
         );
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (_) async {
-        _log.info('delete_account:success');
+        _log.info('delete_account:success', data: {'cid': correlationId});
         await authRepository.clearCachedSession();
         _pendingSignupUser = null;
+        _activeAuthFlowCorrelationId = null;
         emit(const AuthInitial());
         return true;
       },
@@ -181,16 +225,17 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> googleSignIn() async {
-    _log.info('google_sign_in:start');
+    final correlationId = _newCorrelationId(context: 'google_sign_in');
+    _log.info('google_sign_in:start', data: {'cid': correlationId});
     emit(AuthLoading());
     final result = await googleSignInUseCase(
-      const GoogleSignInParams(idToken: ''),
+      GoogleSignInParams(idToken: '', correlationId: correlationId),
     );
     result.fold(
       (failure) {
         _log.error(
           'google_sign_in:error',
-          data: {'message': failure.errorMessage},
+          data: {'cid': correlationId, 'message': failure.errorMessage},
         );
 
         final msg = failure.errorMessage.toLowerCase();
@@ -247,9 +292,13 @@ class AuthCubit extends Cubit<AuthState> {
       (user) {
         _log.info(
           'google_sign_in:success',
-          data: {'username': user.username, 'email': user.email},
+          data: {
+            'cid': correlationId,
+            'username': user.username,
+            'email': user.email,
+          },
         );
-        return _cacheAndEmitUser(user);
+        return _cacheAndEmitUser(user, correlationId: correlationId);
       },
     );
   }
@@ -260,6 +309,9 @@ class AuthCubit extends Cubit<AuthState> {
     required String gender,
     String? phoneNumber,
   }) async {
+    final correlationId = _ensureAuthFlowCorrelationId(
+      context: 'profile_update',
+    );
     final sanitizedGender = gender.trim();
     final sanitizedPhone = phoneNumber?.trim();
     final birthDateIso = birthDate.toIso8601String().split('T')[0];
@@ -267,6 +319,7 @@ class AuthCubit extends Cubit<AuthState> {
     _log.info(
       'update_profile_info:start',
       data: {
+        'cid': correlationId,
         'birthDate': birthDateIso,
         'gender': sanitizedGender,
         'phoneLength': sanitizedPhone?.length ?? 0,
@@ -274,10 +327,44 @@ class AuthCubit extends Cubit<AuthState> {
     );
 
     final currentState = state;
-    if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
+    AuthState mergeBaseState = currentState;
+    UserAuthEntity? existingUser;
+
+    if (currentState is AuthLoaded) {
+      existingUser = currentState.user;
+    } else if (currentState is AuthProfileUpdated) {
+      existingUser = currentState.user;
+    } else {
+      _log.warn(
+        'update_profile_info:state_not_ready_try_cache',
+        data: {
+          'cid': correlationId,
+          'stateType': currentState.runtimeType.toString(),
+        },
+      );
+      final cachedUser = await authRepository.getCachedSession();
+      if (cachedUser != null) {
+        existingUser = cachedUser;
+        mergeBaseState = AuthLoaded(cachedUser);
+        emit(AuthLoaded(cachedUser));
+        _log.info(
+          'update_profile_info:state_recovered_from_cache',
+          data: {
+            'cid': correlationId,
+            'email': cachedUser.email,
+            'hasAccessToken': cachedUser.accessToken?.isNotEmpty == true,
+          },
+        );
+      }
+    }
+
+    if (existingUser == null) {
       _log.error(
         'update_profile_info:invalid_state',
-        data: {'stateType': currentState.runtimeType.toString()},
+        data: {
+          'cid': correlationId,
+          'stateType': currentState.runtimeType.toString(),
+        },
       );
       emit(
         const AuthError(
@@ -290,7 +377,7 @@ class AuthCubit extends Cubit<AuthState> {
     if (sanitizedGender.isEmpty) {
       _log.warn(
         'update_profile_info:validation_failed',
-        data: {'field': 'gender'},
+        data: {'cid': correlationId, 'field': 'gender'},
       );
       emit(const AuthError('Please select your gender before continuing.'));
       return false;
@@ -301,6 +388,7 @@ class AuthCubit extends Cubit<AuthState> {
       _log.warn(
         'update_profile_info:validation_failed',
         data: {
+          'cid': correlationId,
           'field': 'phoneNumber',
           'reason': phoneValidationError,
           'phoneLength': sanitizedPhone?.length ?? 0,
@@ -310,14 +398,12 @@ class AuthCubit extends Cubit<AuthState> {
       return false;
     }
 
-    final existingUser = currentState is AuthLoaded
-        ? currentState.user
-        : (currentState as AuthProfileUpdated).user;
     final payloadPhone = sanitizedPhone ?? existingUser.phoneNumber ?? '';
 
     _log.info(
       'update_profile_info:payload_ready',
       data: {
+        'cid': correlationId,
         'date_of_birth': birthDateIso,
         'gender': sanitizedGender,
         'phoneLength': payloadPhone.length,
@@ -329,6 +415,7 @@ class AuthCubit extends Cubit<AuthState> {
         dateOfBirth: birthDateIso,
         gender: sanitizedGender,
         phoneNumber: payloadPhone,
+        correlationId: correlationId,
       ),
     );
 
@@ -340,6 +427,7 @@ class AuthCubit extends Cubit<AuthState> {
         _log.error(
           'update_profile_info:error',
           data: {
+            'cid': correlationId,
             'message': failure.errorMessage,
             'normalizedMessage': normalizedMessage,
             'birthDate': birthDateIso,
@@ -354,6 +442,7 @@ class AuthCubit extends Cubit<AuthState> {
         _log.info(
           'update_profile_info:success',
           data: {
+            'cid': correlationId,
             'hasBirthDate': updatedUser.birthDate != null,
             'hasGender': (updatedUser.gender?.trim().isNotEmpty ?? false),
             'hasPhoneNumber':
@@ -361,11 +450,21 @@ class AuthCubit extends Cubit<AuthState> {
           },
         );
 
-        final mergedUser = _mergeWithCurrentUser(currentState, updatedUser);
-        _cacheAndEmitUser(mergedUser, asProfileUpdated: true);
+        final mergedUser = _mergeWithCurrentUser(mergeBaseState, updatedUser);
+        _cacheAndEmitUser(
+          mergedUser,
+          asProfileUpdated: true,
+          correlationId: correlationId,
+        );
 
         // Refresh profile from backend to ensure complete sync
         refreshProfileFromBackend();
+
+        _log.info(
+          'auth_flow:cid_completed',
+          data: {'cid': correlationId, 'stage': 'profile_update_success'},
+        );
+        _activeAuthFlowCorrelationId = null;
 
         return true;
       },
@@ -377,23 +476,32 @@ class AuthCubit extends Cubit<AuthState> {
     VerifyOtpParams? params,
     UserAuthEntity? userAuthEntity,
   }) async {
-    _log.info('sendVerificationOtp:start', data: {'email': email});
+    final correlationId = _ensureAuthFlowCorrelationId(
+      context: 'send_verification_otp',
+    );
+    _log.info(
+      'sendVerificationOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     emit(AuthLoading());
     // Request to resend OTP for signup verification
     final result = await requestForgotPasswordOtpUseCase(
-      ForgotPasswordParams(email: email),
+      ForgotPasswordParams(email: email, correlationId: correlationId),
     );
 
     await result.fold(
       (failure) async {
         _log.error(
           'sendVerificationOtp:error',
-          data: {'message': failure.errorMessage},
+          data: {'cid': correlationId, 'message': failure.errorMessage},
         );
         emit(AuthError(failure.errorMessage));
       },
       (otpEntity) async {
-        _log.info('sendVerificationOtp:success', data: {'email': email});
+        _log.info(
+          'sendVerificationOtp:success',
+          data: {'cid': correlationId, 'email': email},
+        );
         // OTP resent successfully; wait for user input
         emit(WaitingForOtpVerification(email));
       },
@@ -401,42 +509,153 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> verifyOtp(String email, String otp) async {
+    final correlationId = _ensureAuthFlowCorrelationId(context: 'verify_otp');
     _log.info(
       'verify_otp:start',
-      data: {'email': email, 'otpLength': otp.length},
+      data: {'cid': correlationId, 'email': email, 'otpLength': otp.length},
     );
     emit(AuthLoading());
     final result = await verifyOtpUseCase(
-      VerifyOtpParams(email: email, otp: otp),
+      VerifyOtpParams(email: email, otp: otp, correlationId: correlationId),
     );
 
     await result.fold(
       (failure) {
-        _log.error('verify_otp:error', data: {'message': failure.errorMessage});
+        _log.error(
+          'verify_otp:error',
+          data: {'cid': correlationId, 'message': failure.errorMessage},
+        );
         emit(AuthError(failure.errorMessage));
       },
       (user) async {
-        _log.info(
-          'verify_otp:success',
-          data: {'email': email, 'emailVerified': user.isVerified},
-        );
-
         // Build verified user from signup or login flow
         final verifiedUser = _buildVerifiedUser(user);
+        final isSignupFlow = _pendingSignupUser != null;
+
+        _log.info(
+          'verify_otp:success',
+          data: {
+            'cid': correlationId,
+            'email': email,
+            'emailVerified': verifiedUser.isVerified,
+            'hasAccessToken': verifiedUser.accessToken?.isNotEmpty == true,
+            'hasRefreshToken': verifiedUser.refreshToken?.isNotEmpty == true,
+            'isSignupFlow': isSignupFlow,
+          },
+        );
+
+        UserAuthEntity? sessionUser = verifiedUser;
+
+        if (!(verifiedUser.accessToken?.isNotEmpty == true)) {
+          sessionUser = await _recoverAuthenticatedSessionAfterOtp(
+            email: email,
+            verifiedUser: verifiedUser,
+            correlationId: correlationId,
+          );
+
+          if (sessionUser == null) {
+            emit(
+              const AuthError(
+                'OTP verified, but authentication session could not be established. Please sign in again.',
+              ),
+            );
+            return false;
+          }
+        }
 
         // Determine next step based on flow
-        if (_pendingSignupUser != null) {
+        if (isSignupFlow) {
           // SIGNUP FLOW: Account is verified via email, proceed to profile completion
-          _log.info('verify_otp:signup_flow', data: {'email': email});
+          _log.info(
+            'verify_otp:signup_flow',
+            data: {'cid': correlationId, 'email': email},
+          );
           _pendingSignupUser = null;
 
           // Backend verifyOtp already returns the authenticated user/session.
           // Cache it directly so the UI can navigate without a second login call.
-          return _cacheAndEmitUser(verifiedUser);
+          return _cacheAndEmitUser(sessionUser, correlationId: correlationId);
         } else {
           // FALLBACK: No flow context, just proceed with verified user
-          return _cacheAndEmitUser(verifiedUser);
+          return _cacheAndEmitUser(sessionUser, correlationId: correlationId);
         }
+      },
+    );
+  }
+
+  Future<UserAuthEntity?> _recoverAuthenticatedSessionAfterOtp({
+    required String email,
+    required UserAuthEntity verifiedUser,
+    required String correlationId,
+  }) async {
+    final fallbackPassword =
+        _pendingSignupUser?.password ?? verifiedUser.password;
+
+    _log.warn(
+      'verify_otp:missing_tokens_attempt_login_fallback',
+      data: {
+        'cid': correlationId,
+        'email': email,
+        'hasPassword': fallbackPassword?.isNotEmpty == true,
+      },
+    );
+
+    if (fallbackPassword == null || fallbackPassword.isEmpty) {
+      _log.error(
+        'verify_otp:login_fallback_unavailable',
+        data: {
+          'cid': correlationId,
+          'reason': 'missing_password_for_fallback_login',
+        },
+      );
+      return null;
+    }
+
+    final loginResult = await loginUseCase(
+      LoginParams(
+        email: email,
+        password: fallbackPassword,
+        correlationId: correlationId,
+      ),
+    );
+
+    return loginResult.fold(
+      (failure) {
+        _log.error(
+          'verify_otp:login_fallback_failed',
+          data: {
+            'cid': correlationId,
+            'email': email,
+            'message': failure.errorMessage,
+          },
+        );
+        return null;
+      },
+      (loggedInUser) {
+        final merged = loggedInUser.copyWith(
+          username: verifiedUser.username.isNotEmpty
+              ? verifiedUser.username
+              : loggedInUser.username,
+          nickname: verifiedUser.nickname ?? loggedInUser.nickname,
+          birthDate: verifiedUser.birthDate ?? loggedInUser.birthDate,
+          age: verifiedUser.age ?? loggedInUser.age,
+          gender: verifiedUser.gender ?? loggedInUser.gender,
+          phoneNumber: verifiedUser.phoneNumber ?? loggedInUser.phoneNumber,
+          isVerified: true,
+          password: fallbackPassword,
+        );
+
+        _log.info(
+          'verify_otp:login_fallback_success',
+          data: {
+            'cid': correlationId,
+            'email': email,
+            'hasAccessToken': merged.accessToken?.isNotEmpty == true,
+            'hasRefreshToken': merged.refreshToken?.isNotEmpty == true,
+          },
+        );
+
+        return merged;
       },
     );
   }
@@ -469,17 +688,19 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> restoreSession() async {
+    final correlationId = _newCorrelationId(context: 'restore_session');
     final cachedUser = await authRepository.getCachedSession();
     if (cachedUser == null) {
       emit(const AuthInitial());
       return false;
     }
     emit(AuthLoaded(cachedUser));
-    await refreshProfileFromBackend();
+    await refreshProfileFromBackend(correlationId: correlationId);
     return true;
   }
 
-  Future<bool> refreshProfileFromBackend() async {
+  Future<bool> refreshProfileFromBackend({String? correlationId}) async {
+    final cid = correlationId ?? _newCorrelationId(context: 'refresh_profile');
     final currentState = state;
     final currentUser = currentState is AuthLoaded
         ? currentState.user
@@ -491,16 +712,24 @@ class AuthCubit extends Cubit<AuthState> {
       return false;
     }
 
-    final result = await fetchProfileUseCase(NoParams());
+    final result = await fetchProfileUseCase(
+      FetchProfileParams(correlationId: cid),
+    );
     return result.fold(
       (failure) {
+        _log.error(
+          'refresh_profile:error',
+          data: {'cid': cid, 'message': failure.errorMessage},
+        );
         return false;
       },
       (remoteUser) {
+        _log.info('refresh_profile:success', data: {'cid': cid});
         final mergedUser = _mergeWithCurrentUser(currentState, remoteUser);
         return _cacheAndEmitUser(
           mergedUser,
           asProfileUpdated: currentState is AuthProfileUpdated,
+          correlationId: cid,
         );
       },
     );
@@ -510,25 +739,27 @@ class AuthCubit extends Cubit<AuthState> {
     required String currentPassword,
     required String newPassword,
   }) async {
-    _log.warn('change_password:start');
+    final correlationId = _newCorrelationId(context: 'change_password');
+    _log.warn('change_password:start', data: {'cid': correlationId});
 
     final result = await authRepository.updatePassword(
       currentPassword: currentPassword,
       newPassword: newPassword,
       confirmPassword: newPassword,
+      correlationId: correlationId,
     );
 
     final success = result.fold(
       (failure) {
         _log.error(
           'change_password:error',
-          data: {'message': failure.errorMessage},
+          data: {'cid': correlationId, 'message': failure.errorMessage},
         );
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (updatedUser) {
-        _log.info('change_password:success');
+        _log.info('change_password:success', data: {'cid': correlationId});
 
         // Update cached user with new password
         final currentState = state;
@@ -537,6 +768,7 @@ class AuthCubit extends Cubit<AuthState> {
           _cacheAndEmitUser(
             mergedUser,
             asProfileUpdated: currentState is AuthProfileUpdated,
+            correlationId: correlationId,
           );
         }
 
@@ -546,29 +778,36 @@ class AuthCubit extends Cubit<AuthState> {
 
     if (success) {
       // Refresh profile from backend to ensure sync
-      await refreshProfileFromBackend();
+      await refreshProfileFromBackend(correlationId: correlationId);
     }
 
     return success;
   }
 
   Future<String?> requestForgotPasswordOtp({required String email}) async {
-    _log.info('forgot_password_otp:start', data: {'email': email});
+    final correlationId = _newCorrelationId(context: 'forgot_password_otp');
+    _log.info(
+      'forgot_password_otp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     final result = await requestForgotPasswordOtpUseCase(
-      ForgotPasswordParams(email: email),
+      ForgotPasswordParams(email: email, correlationId: correlationId),
     );
 
     return result.fold(
       (failure) {
         _log.error(
           'forgot_password_otp:error',
-          data: {'message': failure.errorMessage},
+          data: {'cid': correlationId, 'message': failure.errorMessage},
         );
         emit(AuthError(failure.errorMessage));
         return failure.errorMessage;
       },
       (message) {
-        _log.info('forgot_password_otp:success', data: {'message': message});
+        _log.info(
+          'forgot_password_otp:success',
+          data: {'cid': correlationId, 'message': message},
+        );
         return null;
       },
     );
@@ -580,26 +819,31 @@ class AuthCubit extends Cubit<AuthState> {
     required String newPassword,
     required String confirmPassword,
   }) async {
-    _log.info('reset_password:start', data: {'email': email});
+    final correlationId = _newCorrelationId(context: 'reset_password');
+    _log.info(
+      'reset_password:start',
+      data: {'cid': correlationId, 'email': email},
+    );
 
     final result = await authRepository.resetPassword(
       email: email,
       otpCode: otp,
       newPassword: newPassword,
       confirmPassword: confirmPassword,
+      correlationId: correlationId,
     );
 
     return result.fold(
       (failure) {
         _log.error(
           'reset_password:error',
-          data: {'message': failure.errorMessage},
+          data: {'cid': correlationId, 'message': failure.errorMessage},
         );
         emit(AuthError(failure.errorMessage));
         return false;
       },
       (otpEntity) {
-        _log.info('reset_password:otp_sent');
+        _log.info('reset_password:otp_sent', data: {'cid': correlationId});
         return true;
       },
     );
@@ -665,6 +909,9 @@ class AuthCubit extends Cubit<AuthState> {
     if (normalized.contains('token') && normalized.contains('expired')) {
       return 'Your session expired while saving profile info. Please sign in again.';
     }
+    if (normalized.contains('authentication credentials were not provided')) {
+      return 'Your session is missing authentication credentials. Please sign in again.';
+    }
     if (normalized.contains('unauthorized') ||
         normalized.contains('forbidden')) {
       return 'You are not allowed to update profile info right now. Please sign in again.';
@@ -676,14 +923,47 @@ class AuthCubit extends Cubit<AuthState> {
   Future<bool> _cacheAndEmitUser(
     UserAuthEntity user, {
     bool asProfileUpdated = false,
+    String? correlationId,
   }) async {
-    await authRepository.cacheSession(user);
+    await authRepository.cacheSession(user, correlationId: correlationId);
     if (asProfileUpdated) {
       emit(AuthProfileUpdated(user));
     } else {
       emit(AuthLoaded(user));
     }
     return true;
+  }
+
+  String _ensureAuthFlowCorrelationId({required String context}) {
+    if (_activeAuthFlowCorrelationId != null &&
+        _activeAuthFlowCorrelationId!.isNotEmpty) {
+      return _activeAuthFlowCorrelationId!;
+    }
+
+    final generated =
+        'auth-${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
+    _activeAuthFlowCorrelationId = generated;
+    _log.info(
+      'auth_flow:cid_created',
+      data: {'cid': generated, 'context': context},
+    );
+    return generated;
+  }
+
+  String _startAuthFlowCorrelationId({required String context}) {
+    final generated = _newCorrelationId(context: context);
+    _activeAuthFlowCorrelationId = generated;
+    return generated;
+  }
+
+  String _newCorrelationId({required String context}) {
+    final generated =
+        'auth-${DateTime.now().microsecondsSinceEpoch.toRadixString(16)}';
+    _log.info(
+      'auth_flow:cid_created',
+      data: {'cid': generated, 'context': context},
+    );
+    return generated;
   }
 
   UserAuthEntity _mergeWithCurrentUser(

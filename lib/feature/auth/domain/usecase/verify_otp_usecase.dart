@@ -7,8 +7,13 @@ import 'package:dartz/dartz.dart';
 class VerifyOtpParams {
   final String email;
   final String otp;
+  final String? correlationId;
 
-  const VerifyOtpParams({required this.email, required this.otp});
+  const VerifyOtpParams({
+    required this.email,
+    required this.otp,
+    this.correlationId,
+  });
 }
 
 class VerifyOtpUseCase implements UseCase<UserAuthEntity, VerifyOtpParams> {
@@ -18,6 +23,10 @@ class VerifyOtpUseCase implements UseCase<UserAuthEntity, VerifyOtpParams> {
 
   @override
   Future<Either<Failure, UserAuthEntity>> call(VerifyOtpParams params) {
-    return repository.verifyOtp(email: params.email, otpCode: params.otp);
+    return repository.verifyOtp(
+      email: params.email,
+      otpCode: params.otp,
+      correlationId: params.correlationId,
+    );
   }
 }

@@ -8,11 +8,13 @@ class SignupParams {
   final String nickname;
   final String email;
   final String password;
+  final String? correlationId;
 
   const SignupParams({
     required this.nickname,
     required this.email,
     required this.password,
+    this.correlationId,
   });
 }
 
@@ -30,6 +32,7 @@ class SignupUseCase implements UseCase<OtpEntity, SignupParams> {
       nickname: params.nickname,
       email: params.email,
       password: params.password,
+      correlationId: params.correlationId,
     );
   }
 }

@@ -7,8 +7,13 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 class VerifySignupOtpParams {
   final String email;
   final String otpCode;
+  final String? correlationId;
 
-  const VerifySignupOtpParams({required this.email, required this.otpCode});
+  const VerifySignupOtpParams({
+    required this.email,
+    required this.otpCode,
+    this.correlationId,
+  });
 }
 
 /// Usecase for verifying OTP during signup flow.
@@ -29,6 +34,7 @@ class VerifySignupOtpUseCase
     return await repository.verifySignupOtp(
       email: params.email,
       otpCode: params.otpCode,
+      correlationId: params.correlationId,
     );
   }
 }

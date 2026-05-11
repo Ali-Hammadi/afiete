@@ -12,24 +12,37 @@ abstract class AuthRemoteDataSource {
   /// Step 1: Initiate signup - send nickname, email, password.
   /// Returns OtpModel with expiration info.
   /// Requires: None (unauthenticated)
-  Future<OtpModel> signup(String nickname, String email, String password);
+  Future<OtpModel> signup(
+    String nickname,
+    String email,
+    String password, {
+    String? correlationId,
+  });
 
   /// Step 2: Verify signup OTP and get authentication tokens.
   /// Returns UserModel with access+refresh tokens and profile data.
   /// Requires: None (unauthenticated)
-  Future<UserModel> verifySignupOtp(String email, String otpCode);
+  Future<UserModel> verifySignupOtp(
+    String email,
+    String otpCode, {
+    String? correlationId,
+  });
 
   // Login (1 endpoint)
   /// Login with email and password.
   /// Returns UserModel with access+refresh tokens.
   /// Requires: None (unauthenticated)
-  Future<UserModel> login(String email, String password);
+  Future<UserModel> login(
+    String email,
+    String password, {
+    String? correlationId,
+  });
 
   // Profile (2 endpoints)
   /// Fetch full profile of authenticated user.
   /// Returns UserModel with all profile data.
   /// Requires: access_token (via interceptor)
-  Future<UserModel> fetchProfile();
+  Future<UserModel> fetchProfile({String? correlationId});
 
   /// Update profile info (dateOfBirth, gender, phoneNumber).
   /// All parameters are optional - only update provided fields.
@@ -39,13 +52,17 @@ abstract class AuthRemoteDataSource {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? correlationId,
   });
 
   // Password recovery (2 endpoints)
   /// Step 1: Request OTP for password reset.
   /// Returns OtpModel with expiration info.
   /// Requires: None (unauthenticated)
-  Future<OtpModel> requestForgotPasswordOtp(String email);
+  Future<OtpModel> requestForgotPasswordOtp(
+    String email, {
+    String? correlationId,
+  });
 
   /// Step 2: Verify password reset OTP and change password.
   /// Returns OtpModel confirming completion.
@@ -54,20 +71,25 @@ abstract class AuthRemoteDataSource {
     String email,
     String otpCode,
     String newPassword,
-    String confirmPassword,
-  );
+    String confirmPassword, {
+    String? correlationId,
+  });
 
   // Session management (3 endpoints)
   /// Logout and invalidate current session.
   /// Requires: access_token (via interceptor)
-  Future<void> logout();
+  Future<void> logout({String? correlationId});
 
   /// Delete account permanently (hard delete with verification).
   /// Requires: access_token (via interceptor) + password in body
-  Future<void> deleteAccount(String password);
+  Future<void> deleteAccount(String password, {String? correlationId});
 
   /// Verify OTP for authentication/login purposes (OTP login flow).
-  Future<UserModel> verifyOtp(String email, String otp);
+  Future<UserModel> verifyOtp(
+    String email,
+    String otp, {
+    String? correlationId,
+  });
 
   /// Change password with current password verification.
   /// Returns updated UserModel.
@@ -75,14 +97,15 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> updatePassword(
     String currentPassword,
     String newPassword,
-    String confirmPassword,
-  );
+    String confirmPassword, {
+    String? correlationId,
+  });
 
   // OAuth (1 endpoint)
   /// Sign in with Google OAuth token.
   /// Returns UserModel with access+refresh tokens.
   /// Requires: None (unauthenticated)
-  Future<UserModel> googleSignIn(String idToken);
+  Future<UserModel> googleSignIn(String idToken, {String? correlationId});
 }
 
 /// Implementation of [AuthRemoteDataSource] using Dio HTTP client.
@@ -100,9 +123,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<OtpModel> signup(
     String nickname,
     String email,
-    String password,
-  ) async {
-    _log.info('signup:start', data: {'email': email, 'nickname': nickname});
+    String password, {
+    String? correlationId,
+  }) async {
+    _log.info(
+      'signup:start',
+      data: {'cid': correlationId, 'email': email, 'nickname': nickname},
+    );
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.signup,
@@ -110,12 +137,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'user': {'nickname': nickname, 'email': email, 'password': password},
         },
       );
-      _log.info('signup:success', data: {'statusCode': response.statusCode});
+      _log.info(
+        'signup:success',
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
+      );
       return OtpModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'signup:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -128,8 +159,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> verifySignupOtp(String email, String otpCode) async {
-    _log.info('verifySignupOtp:start', data: {'email': email});
+  Future<UserModel> verifySignupOtp(
+    String email,
+    String otpCode, {
+    String? correlationId,
+  }) async {
+    _log.info(
+      'verifySignupOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.otpVerify,
@@ -137,13 +175,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'verifySignupOtp:success',
-        data: {'statusCode': response.statusCode},
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
       );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'verifySignupOtp:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -158,19 +197,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // ==================== LOGIN ====================
 
   @override
-  Future<UserModel> login(String email, String password) async {
-    _log.info('login:start', data: {'email': email});
+  Future<UserModel> login(
+    String email,
+    String password, {
+    String? correlationId,
+  }) async {
+    _log.info('login:start', data: {'cid': correlationId, 'email': email});
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
-      _log.info('login:success', data: {'statusCode': response.statusCode});
+      _log.info(
+        'login:success',
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
+      );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'login:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -185,21 +232,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // ==================== PROFILE ====================
 
   @override
-  Future<UserModel> fetchProfile() async {
-    _log.info('fetchProfile:start');
+  Future<UserModel> fetchProfile({String? correlationId}) async {
+    _log.info('fetchProfile:start', data: {'cid': correlationId});
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         ApiEndpoints.profile,
       );
       _log.info(
         'fetchProfile:success',
-        data: {'statusCode': response.statusCode},
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
       );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'fetchProfile:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -216,10 +264,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? correlationId,
   }) async {
     _log.info(
       'updateProfileInfo:start',
       data: {
+        'cid': correlationId,
         'dateOfBirth': dateOfBirth,
         'gender': gender,
         'phoneLength': phoneNumber?.length ?? 0,
@@ -234,6 +284,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _log.info(
         'updateProfileInfo:request_payload',
         data: {
+          'cid': correlationId,
           'payloadKeys': data.keys.toList(),
           'dateOfBirth': data['date_of_birth'],
           'gender': data['gender'],
@@ -248,6 +299,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _log.info(
         'updateProfileInfo:success',
         data: {
+          'cid': correlationId,
           'statusCode': response.statusCode,
           'responseKeys': (response.data ?? {}).keys.toList(),
         },
@@ -257,6 +309,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _log.error(
         'updateProfileInfo:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -274,8 +327,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // ==================== PASSWORD RECOVERY ====================
 
   @override
-  Future<OtpModel> requestForgotPasswordOtp(String email) async {
-    _log.info('requestForgotPasswordOtp:start', data: {'email': email});
+  Future<OtpModel> requestForgotPasswordOtp(
+    String email, {
+    String? correlationId,
+  }) async {
+    _log.info(
+      'requestForgotPasswordOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.forgotPasswordOtp,
@@ -283,13 +342,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'requestForgotPasswordOtp:success',
-        data: {'statusCode': response.statusCode},
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
       );
       return OtpModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'requestForgotPasswordOtp:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -306,9 +366,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String email,
     String otpCode,
     String newPassword,
-    String confirmPassword,
-  ) async {
-    _log.info('verifyForgotPasswordOtp:start', data: {'email': email});
+    String confirmPassword, {
+    String? correlationId,
+  }) async {
+    _log.info(
+      'verifyForgotPasswordOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.otpVerify,
@@ -321,13 +385,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'verifyForgotPasswordOtp:success',
-        data: {'statusCode': response.statusCode},
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
       );
       return OtpModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'verifyForgotPasswordOtp:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -342,17 +407,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // ==================== SESSION MANAGEMENT ====================
 
   @override
-  Future<void> logout() async {
-    _log.info('logout:start');
+  Future<void> logout({String? correlationId}) async {
+    _log.info('logout:start', data: {'cid': correlationId});
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.logout,
       );
-      _log.info('logout:success', data: {'statusCode': response.statusCode});
+      _log.info(
+        'logout:success',
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
+      );
     } on DioException catch (e, st) {
       _log.error(
         'logout:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -365,8 +434,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> deleteAccount(String password) async {
-    _log.info('deleteAccount:start');
+  Future<void> deleteAccount(String password, {String? correlationId}) async {
+    _log.info('deleteAccount:start', data: {'cid': correlationId});
     try {
       final response = await _dio.delete<Map<String, dynamic>>(
         ApiEndpoints.deleteAccount,
@@ -374,12 +443,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'deleteAccount:success',
-        data: {'statusCode': response.statusCode},
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
       );
     } on DioException catch (e, st) {
       _log.error(
         'deleteAccount:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -393,19 +463,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   /// Verify OTP for authentication/login purposes (OTP login flow).
   @override
-  Future<UserModel> verifyOtp(String email, String otp) async {
-    _log.info('verifyOtp:start', data: {'email': email});
+  Future<UserModel> verifyOtp(
+    String email,
+    String otp, {
+    String? correlationId,
+  }) async {
+    _log.info('verifyOtp:start', data: {'cid': correlationId, 'email': email});
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.otpVerify,
         data: {'email': email, 'code': otp},
       );
-      _log.info('verifyOtp:success', data: {'statusCode': response.statusCode});
+      _log.info(
+        'verifyOtp:success',
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
+      );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'verifyOtp:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -423,9 +501,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> updatePassword(
     String currentPassword,
     String newPassword,
-    String confirmPassword,
-  ) async {
-    _log.info('updatePassword:start');
+    String confirmPassword, {
+    String? correlationId,
+  }) async {
+    _log.info('updatePassword:start', data: {'cid': correlationId});
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.passwordChange,
@@ -436,13 +515,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'updatePassword:success',
-        data: {'statusCode': response.statusCode},
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
       );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'updatePassword:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
@@ -457,8 +537,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // ==================== OAUTH ====================
 
   @override
-  Future<UserModel> googleSignIn(String idToken) async {
-    _log.info('googleSignIn:start');
+  Future<UserModel> googleSignIn(
+    String idToken, {
+    String? correlationId,
+  }) async {
+    _log.info('googleSignIn:start', data: {'cid': correlationId});
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.googleLogin,
@@ -466,13 +549,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'googleSignIn:success',
-        data: {'statusCode': response.statusCode},
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
       );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
       _log.error(
         'googleSignIn:error',
         data: {
+          'cid': correlationId,
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,

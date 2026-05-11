@@ -14,6 +14,7 @@ abstract class AuthRepository {
     required String nickname,
     required String email,
     required String password,
+    String? correlationId,
   });
 
   /// Step 2: Verify signup OTP code (returned from email).
@@ -22,6 +23,7 @@ abstract class AuthRepository {
   Future<Either<Failure, UserAuthEntity>> verifySignupOtp({
     required String email,
     required String otpCode,
+    String? correlationId,
   });
 
   // ===== LOGIN FLOW =====
@@ -32,13 +34,14 @@ abstract class AuthRepository {
   Future<Either<Failure, UserAuthEntity>> login({
     required String email,
     required String password,
+    String? correlationId,
   });
 
   // ===== PROFILE MANAGEMENT =====
 
   /// Fetch current authenticated user's profile.
   /// Requires valid access token in Authorization header (managed by Dio interceptor).
-  Future<Either<Failure, UserAuthEntity>> fetchProfile();
+  Future<Either<Failure, UserAuthEntity>> fetchProfile({String? correlationId});
 
   /// Update user profile (partially or fully).
   /// All fields are optional; only provided fields are updated.
@@ -47,6 +50,7 @@ abstract class AuthRepository {
     String? dateOfBirth,
     String? gender,
     String? phoneNumber,
+    String? correlationId,
   });
 
   // ===== PASSWORD RECOVERY FLOW =====
@@ -55,6 +59,7 @@ abstract class AuthRepository {
   /// Public endpoint (no auth required).
   Future<Either<Failure, OtpEntity>> requestForgotPasswordOtp({
     required String email,
+    String? correlationId,
   });
 
   /// Verify forgot password OTP and set new password.
@@ -65,6 +70,7 @@ abstract class AuthRepository {
     required String otpCode,
     required String newPassword,
     required String confirmPassword,
+    String? correlationId,
   });
 
   // ===== SESSION MANAGEMENT =====
@@ -72,13 +78,16 @@ abstract class AuthRepository {
   /// Logout current user.
   /// Requires access token; server invalidates token.
   /// Note: Logout failures should still clear local tokens (done in cubit).
-  Future<Either<Failure, void>> logout();
+  Future<Either<Failure, void>> logout({String? correlationId});
 
   /// Delete user account permanently.
   /// Requires email + password verification for security.
   /// Hard delete from database; cannot be recovered.
   /// Backend should clear all associated data.
-  Future<Either<Failure, void>> deleteAccount({required String password});
+  Future<Either<Failure, void>> deleteAccount({
+    required String password,
+    String? correlationId,
+  });
 
   // ===== GOOGLE SIGN-IN =====
 
@@ -88,6 +97,7 @@ abstract class AuthRepository {
   /// Returns user with token; check [UserAuthEntity.isProfileComplete] for profile completion.
   Future<Either<Failure, UserAuthEntity>> googleSignIn({
     required String idToken,
+    String? correlationId,
   });
 
   // ===== SENSITIVE PROFILE UPDATES (PASSWORD-PROTECTED) =====
@@ -99,12 +109,13 @@ abstract class AuthRepository {
     required String currentPassword,
     required String newPassword,
     required String confirmPassword,
+    String? correlationId,
   });
 
   // ===== LOCAL SESSION CACHE HELPERS =====
 
   /// Cache the authenticated user session locally.
-  Future<void> cacheSession(UserAuthEntity user);
+  Future<void> cacheSession(UserAuthEntity user, {String? correlationId});
 
   /// Retrieve cached user session if available.
   Future<UserAuthEntity?> getCachedSession();
@@ -118,6 +129,7 @@ abstract class AuthRepository {
   Future<Either<Failure, UserAuthEntity>> verifyOtp({
     required String email,
     required String otpCode,
+    String? correlationId,
   });
 
   /// Request an email-change OTP by providing current password (unauthenticated path).
@@ -128,5 +140,6 @@ abstract class AuthRepository {
     required String otpCode,
     required String newPassword,
     required String confirmPassword,
+    String? correlationId,
   });
 }

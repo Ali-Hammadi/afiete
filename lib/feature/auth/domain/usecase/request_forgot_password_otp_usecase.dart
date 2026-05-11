@@ -6,8 +6,9 @@ import 'package:dartz/dartz.dart';
 
 class ForgotPasswordParams {
   final String email;
+  final String? correlationId;
 
-  const ForgotPasswordParams({required this.email});
+  const ForgotPasswordParams({required this.email, this.correlationId});
 }
 
 /// Usecase for requesting OTP during password recovery.
@@ -21,6 +22,9 @@ class RequestForgotPasswordOtpUseCase
 
   @override
   Future<Either<Failure, OtpEntity>> call(ForgotPasswordParams params) {
-    return repository.requestForgotPasswordOtp(email: params.email);
+    return repository.requestForgotPasswordOtp(
+      email: params.email,
+      correlationId: params.correlationId,
+    );
   }
 }

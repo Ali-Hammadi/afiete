@@ -6,8 +6,9 @@ import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 
 class GoogleSignInParams {
   final String idToken;
+  final String? correlationId;
 
-  const GoogleSignInParams({required this.idToken});
+  const GoogleSignInParams({required this.idToken, this.correlationId});
 }
 
 class GoogleSignInUseCase
@@ -20,6 +21,9 @@ class GoogleSignInUseCase
   Future<Either<Failure, UserAuthEntity>> call(
     GoogleSignInParams params,
   ) async {
-    return await repository.googleSignIn(idToken: params.idToken);
+    return await repository.googleSignIn(
+      idToken: params.idToken,
+      correlationId: params.correlationId,
+    );
   }
 }

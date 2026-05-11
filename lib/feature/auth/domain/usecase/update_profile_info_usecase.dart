@@ -8,8 +8,14 @@ class UpdateProfileParams {
   final String? dateOfBirth;
   final String? gender;
   final String? phoneNumber;
+  final String? correlationId;
 
-  const UpdateProfileParams({this.dateOfBirth, this.gender, this.phoneNumber});
+  const UpdateProfileParams({
+    this.dateOfBirth,
+    this.gender,
+    this.phoneNumber,
+    this.correlationId,
+  });
 }
 
 /// Usecase for updating user profile information (partially or fully).
@@ -27,6 +33,7 @@ class UpdateProfileInfoUseCase
       dateOfBirth: params.dateOfBirth,
       gender: params.gender,
       phoneNumber: params.phoneNumber,
+      correlationId: params.correlationId,
     );
   }
 }

@@ -249,6 +249,10 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                         });
 
                         try {
+                            final cid = context
+                                .read<AuthCubit>()
+                                .activeAuthFlowCorrelationId;
+
                           final saved = await context
                               .read<AuthCubit>()
                               .updateProfileInfo(
@@ -271,6 +275,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                             _log.error(
                               'submit_profile_info:failed',
                               data: {
+                                'cid': cid,
                                 'stateType': currentState.runtimeType
                                     .toString(),
                                 'message': message,
@@ -283,7 +288,10 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                             return;
                           }
 
-                          _log.info('submit_profile_info:success');
+                          _log.info(
+                            'submit_profile_info:success',
+                            data: {'cid': cid},
+                          );
                           Navigator.pushReplacementNamed(
                             context,
                             MyRoutes.homeScreen,

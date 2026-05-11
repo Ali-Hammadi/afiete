@@ -8,11 +8,13 @@ class UpdatePasswordParams {
   final String currentPassword;
   final String newPassword;
   final String confirmPassword;
+  final String? correlationId;
 
   const UpdatePasswordParams({
     required this.currentPassword,
     required this.newPassword,
     required this.confirmPassword,
+    this.correlationId,
   });
 }
 
@@ -33,6 +35,7 @@ class UpdatePasswordUseCase
       currentPassword: params.currentPassword,
       newPassword: params.newPassword,
       confirmPassword: params.confirmPassword,
+      correlationId: params.correlationId,
     );
   }
 }
