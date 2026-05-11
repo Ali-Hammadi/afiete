@@ -219,7 +219,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     _log.info(
       'updateProfileInfo:start',
-      data: {'dateOfBirth': dateOfBirth, 'gender': gender},
+      data: {
+        'dateOfBirth': dateOfBirth,
+        'gender': gender,
+        'phoneLength': phoneNumber?.length ?? 0,
+      },
     );
     try {
       final data = <String, dynamic>{};
@@ -227,13 +231,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (gender != null) data['gender'] = gender;
       if (phoneNumber != null) data['phone_number'] = phoneNumber;
 
+      _log.info(
+        'updateProfileInfo:request_payload',
+        data: {
+          'payloadKeys': data.keys.toList(),
+          'dateOfBirth': data['date_of_birth'],
+          'gender': data['gender'],
+          'phoneLength': phoneNumber?.length ?? 0,
+        },
+      );
+
       final response = await _dio.patch<Map<String, dynamic>>(
         ApiEndpoints.profile,
         data: data,
       );
       _log.info(
         'updateProfileInfo:success',
-        data: {'statusCode': response.statusCode},
+        data: {
+          'statusCode': response.statusCode,
+          'responseKeys': (response.data ?? {}).keys.toList(),
+        },
       );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {
@@ -243,6 +260,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'message': e.message,
           'statusCode': e.response?.statusCode,
           'response': e.response?.data,
+          'dateOfBirth': dateOfBirth,
+          'gender': gender,
+          'phoneLength': phoneNumber?.length ?? 0,
         },
         error: e,
         stackTrace: st,

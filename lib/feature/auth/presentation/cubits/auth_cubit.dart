@@ -260,28 +260,107 @@ class AuthCubit extends Cubit<AuthState> {
     required String gender,
     String? phoneNumber,
   }) async {
+    final sanitizedGender = gender.trim();
+    final sanitizedPhone = phoneNumber?.trim();
+    final birthDateIso = birthDate.toIso8601String().split('T')[0];
+
+    _log.info(
+      'update_profile_info:start',
+      data: {
+        'birthDate': birthDateIso,
+        'gender': sanitizedGender,
+        'phoneLength': sanitizedPhone?.length ?? 0,
+      },
+    );
+
     final currentState = state;
     if (currentState is! AuthLoaded && currentState is! AuthProfileUpdated) {
+      _log.error(
+        'update_profile_info:invalid_state',
+        data: {'stateType': currentState.runtimeType.toString()},
+      );
+      emit(
+        const AuthError(
+          'Unable to update profile info because your session is not ready. Please sign in again.',
+        ),
+      );
+      return false;
+    }
+
+    if (sanitizedGender.isEmpty) {
+      _log.warn(
+        'update_profile_info:validation_failed',
+        data: {'field': 'gender'},
+      );
+      emit(const AuthError('Please select your gender before continuing.'));
+      return false;
+    }
+
+    final phoneValidationError = _validatePhoneNumberForProfile(sanitizedPhone);
+    if (phoneValidationError != null) {
+      _log.warn(
+        'update_profile_info:validation_failed',
+        data: {
+          'field': 'phoneNumber',
+          'reason': phoneValidationError,
+          'phoneLength': sanitizedPhone?.length ?? 0,
+        },
+      );
+      emit(AuthError(phoneValidationError));
       return false;
     }
 
     final existingUser = currentState is AuthLoaded
         ? currentState.user
         : (currentState as AuthProfileUpdated).user;
+    final payloadPhone = sanitizedPhone ?? existingUser.phoneNumber ?? '';
+
+    _log.info(
+      'update_profile_info:payload_ready',
+      data: {
+        'date_of_birth': birthDateIso,
+        'gender': sanitizedGender,
+        'phoneLength': payloadPhone.length,
+      },
+    );
+
     final result = await updateProfileInfoUseCase(
       UpdateProfileParams(
-        dateOfBirth: birthDate.toIso8601String().split('T')[0],
-        gender: gender,
-        phoneNumber: phoneNumber ?? existingUser.phoneNumber ?? '',
+        dateOfBirth: birthDateIso,
+        gender: sanitizedGender,
+        phoneNumber: payloadPhone,
       ),
     );
 
     return result.fold(
       (failure) {
-        emit(AuthError(failure.errorMessage));
+        final normalizedMessage = _normalizeProfileInfoUpdateError(
+          failure.errorMessage,
+        );
+        _log.error(
+          'update_profile_info:error',
+          data: {
+            'message': failure.errorMessage,
+            'normalizedMessage': normalizedMessage,
+            'birthDate': birthDateIso,
+            'gender': sanitizedGender,
+            'phoneLength': payloadPhone.length,
+          },
+        );
+        emit(AuthError(normalizedMessage));
         return false;
       },
       (updatedUser) {
+        _log.info(
+          'update_profile_info:success',
+          data: {
+            'hasBirthDate': updatedUser.birthDate != null,
+            'hasGender': (updatedUser.gender?.trim().isNotEmpty ?? false),
+            'hasPhoneNumber':
+                (updatedUser.phoneNumber?.trim().isNotEmpty ?? false),
+          },
+        );
+
         final mergedUser = _mergeWithCurrentUser(currentState, updatedUser);
         _cacheAndEmitUser(mergedUser, asProfileUpdated: true);
 
@@ -550,6 +629,48 @@ class AuthCubit extends Cubit<AuthState> {
         normalized.contains('blocked') ||
         normalized.contains('suspended') ||
         normalized.contains('deactivated');
+  }
+
+  String? _validatePhoneNumberForProfile(String? phoneNumber) {
+    final value = phoneNumber?.trim() ?? '';
+    if (value.isEmpty) {
+      return 'Please enter your phone number before continuing.';
+    }
+
+    final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digitsOnly.length < 9 || digitsOnly.length > 15) {
+      return 'Please enter a valid phone number (9 to 15 digits).';
+    }
+
+    return null;
+  }
+
+  String _normalizeProfileInfoUpdateError(String message) {
+    final normalized = message.trim().toLowerCase();
+
+    if (normalized.isEmpty) {
+      return 'Could not save profile information. Please try again.';
+    }
+    if (normalized.contains('date_of_birth') ||
+        normalized.contains('birth date') ||
+        normalized.contains('dob')) {
+      return 'Birthdate is invalid. Please select a valid date and try again.';
+    }
+    if (normalized.contains('gender')) {
+      return 'Gender value is invalid. Please reselect your gender and try again.';
+    }
+    if (normalized.contains('phone')) {
+      return 'Phone number is invalid. Please check the number and try again.';
+    }
+    if (normalized.contains('token') && normalized.contains('expired')) {
+      return 'Your session expired while saving profile info. Please sign in again.';
+    }
+    if (normalized.contains('unauthorized') ||
+        normalized.contains('forbidden')) {
+      return 'You are not allowed to update profile info right now. Please sign in again.';
+    }
+
+    return message;
   }
 
   Future<bool> _cacheAndEmitUser(

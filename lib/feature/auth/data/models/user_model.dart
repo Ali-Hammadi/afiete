@@ -33,19 +33,26 @@ class UserModel extends Equatable {
 
   /// Parse JSON response from backend.
   /// Handles both snake_case (backend) and camelCase (legacy) field names.
+  /// Also supports responses wrapped in a top-level `data` object.
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final payload = json['data'] is Map<String, dynamic>
+        ? json['data'] as Map<String, dynamic>
+        : json;
+
     return UserModel(
-      id: json['id'] ?? json['user_id'] ?? '',
-      username: json['username'] ?? '',
-      nickname: json['nickname'],
-      email: json['email'] ?? '',
-      dateOfBirth: json['date_of_birth'] ?? json['dateOfBirth'],
-      gender: json['gender'],
-      phoneNumber: json['phone_number'] ?? json['phoneNumber'],
-      isVerified: json['is_verified'] ?? json['isVerified'] ?? false,
-      profileImageUrl: json['profile_image_url'] ?? json['profileImageUrl'],
-      accessToken: json['access_token'] ?? json['accessToken'],
-      refreshToken: json['refresh_token'] ?? json['refreshToken'],
+      id: payload['id'] ?? payload['user_id'] ?? '',
+      username: payload['username'] ?? '',
+      nickname: payload['nickname'],
+      email: payload['email'] ?? '',
+      dateOfBirth: payload['date_of_birth'] ?? payload['dateOfBirth'],
+      gender: payload['gender'],
+      phoneNumber: payload['phone_number'] ?? payload['phoneNumber'],
+      isVerified: payload['is_verified'] ?? payload['isVerified'] ?? false,
+      profileImageUrl:
+          payload['profile_image_url'] ?? payload['profileImageUrl'],
+      accessToken:
+          payload['access_token'] ?? payload['accessToken'] ?? payload['access'],
+      refreshToken: payload['refresh_token'] ?? payload['refreshToken'] ?? payload['refresh'],
     );
   }
 

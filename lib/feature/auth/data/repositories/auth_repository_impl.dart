@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:afiete/core/error/failure.dart';
+import 'package:afiete/core/network/token_storage.dart';
 import 'package:afiete/feature/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/domain/entities/otp_entity.dart';
@@ -160,20 +161,56 @@ class AuthRepositoryImpl implements AuthRepository {
     String? gender,
     String? phoneNumber,
   }) async {
-    _log.info('updateProfileInfo:start', data: {'dateOfBirth': dateOfBirth, 'gender': gender});
+    _log.info(
+      'updateProfileInfo:start',
+      data: {
+        'dateOfBirth': dateOfBirth,
+        'gender': gender,
+        'phoneLength': phoneNumber?.length ?? 0,
+      },
+    );
     try {
       final model = await _remoteDataSource.updateProfileInfo(
         dateOfBirth: dateOfBirth,
         gender: gender,
         phoneNumber: phoneNumber,
       );
-      _log.info('updateProfileInfo:success');
+      _log.info(
+        'updateProfileInfo:success',
+        data: {
+          'hasBirthDate': model.dateOfBirth != null,
+          'hasGender': model.gender != null,
+          'hasPhoneNumber': model.phoneNumber != null,
+        },
+      );
       return Right(model.toEntity());
     } on DioException catch (e, st) {
-      _log.error('updateProfileInfo:error', data: {'message': e.message, 'statusCode': e.response?.statusCode, 'response': e.response?.data}, error: e, stackTrace: st);
+      _log.error(
+        'updateProfileInfo:error',
+        data: {
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+          'dateOfBirth': dateOfBirth,
+          'gender': gender,
+          'phoneLength': phoneNumber?.length ?? 0,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure.fromDioError(e));
     } catch (e, st) {
-      _log.error('updateProfileInfo:exception', data: {'error': e.toString()}, error: e, stackTrace: st);
+      _log.error(
+        'updateProfileInfo:exception',
+        data: {
+          'error': e.toString(),
+          'dateOfBirth': dateOfBirth,
+          'gender': gender,
+          'phoneLength': phoneNumber?.length ?? 0,
+        },
+        error: e,
+        stackTrace: st,
+      );
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -289,6 +326,23 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> cacheSession(UserAuthEntity user) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_cachedUserKey, jsonEncode(_encodeUser(user)));
+
+    final accessToken = user.accessToken;
+    final refreshToken = user.refreshToken;
+
+    if (accessToken == null || accessToken.isEmpty) {
+      await TokenStorage.clearTokens();
+      return;
+    }
+
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      await TokenStorage.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+    } else {
+      await TokenStorage.saveToken(accessToken);
+    }
   }
 
   @override
@@ -308,6 +362,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> clearCachedSession() async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_cachedUserKey);
+    await TokenStorage.clearTokens();
   }
 
   Map<String, dynamic> _encodeUser(UserAuthEntity user) {

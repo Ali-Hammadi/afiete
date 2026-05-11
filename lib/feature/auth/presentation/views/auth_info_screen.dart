@@ -1,6 +1,7 @@
 import 'package:afiete/core/constants/settings_strings.dart';
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/routes/app_route.dart';
+import 'package:afiete/core/utils/logger.dart';
 import 'package:afiete/feature/auth/presentation/widgets/custom_text_form_field.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +17,10 @@ class AuthInfoScreen extends StatefulWidget {
 }
 
 class _AuthInfoScreenState extends State<AuthInfoScreen> {
+  final _log = loggerFor('AuthInfoScreen');
   DateTime? selectedDate;
   String? selectedGender;
+  bool _isSubmitting = false;
   final TextEditingController birthdateController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
@@ -29,17 +32,28 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
   }
 
   Future<void> _selectDate() async {
+    _log.info('birthdate_picker:open');
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null && picked != selectedDate) {
+
+    if (picked == null) {
+      _log.warn('birthdate_picker:cancelled');
+      return;
+    }
+
+    if (picked != selectedDate) {
       setState(() {
         selectedDate = picked;
         birthdateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
+      _log.info(
+        'birthdate_picker:selected',
+        data: {'birthDate': birthdateController.text},
+      );
     }
   }
 
@@ -137,6 +151,10 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                           setState(() {
                             selectedGender = newValue;
                           });
+                          _log.info(
+                            'gender:selected',
+                            data: {'gender': selectedGender},
+                          );
                         },
                       ),
                       const SizedBox(height: 20),
@@ -162,38 +180,138 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
               SizedBox(height: 20),
               CustomButton(
                 widget: Text(
-                  SettingsStrings.next,
+                  _isSubmitting ? 'Saving...' : SettingsStrings.next,
                   style: TextStyle(
                     color: colorScheme.onPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                onPressed: () async {
-                  if (selectedDate == null ||
-                      selectedGender == null ||
-                      phoneController.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(SettingsStrings.fillAllFieldsError),
-                      ),
-                    );
-                    return;
-                  }
+                onPressed: _isSubmitting
+                    ? null
+                    : () async {
+                        final phone = phoneController.text.trim();
+                        final missingFields = <String>[];
+                        if (selectedDate == null) {
+                          missingFields.add('birthDate');
+                        }
+                        if (selectedGender == null ||
+                            selectedGender!.trim().isEmpty) {
+                          missingFields.add('gender');
+                        }
+                        if (phone.isEmpty) missingFields.add('phoneNumber');
 
-                  final saved = await context
-                      .read<AuthCubit>()
-                      .updateProfileInfo(
-                        nickname: currentNickname,
-                        birthDate: selectedDate!,
-                        gender: selectedGender!,
-                        phoneNumber: phoneController.text.trim().isNotEmpty
-                            ? phoneController.text.trim()
-                            : null,
-                      );
-                  if (!context.mounted || !saved) return;
-                  Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
-                },
+                        _log.info(
+                          'submit_profile_info:tap',
+                          data: {
+                            'hasBirthDate': selectedDate != null,
+                            'gender': selectedGender,
+                            'phoneLength': phone.length,
+                            'missingFields': missingFields,
+                          },
+                        );
+
+                        if (missingFields.isNotEmpty) {
+                          _log.warn(
+                            'submit_profile_info:validation_missing_fields',
+                            data: {'missingFields': missingFields},
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(SettingsStrings.fillAllFieldsError),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final digitsOnly = phone.replaceAll(
+                          RegExp(r'[^0-9]'),
+                          '',
+                        );
+                        if (digitsOnly.length < 9 || digitsOnly.length > 15) {
+                          _log.warn(
+                            'submit_profile_info:validation_phone_invalid',
+                            data: {
+                              'phoneLength': phone.length,
+                              'digitLength': digitsOnly.length,
+                            },
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(SettingsStrings.invalidPhoneNumber),
+                            ),
+                          );
+                          return;
+                        }
+
+                        setState(() {
+                          _isSubmitting = true;
+                        });
+
+                        try {
+                          final saved = await context
+                              .read<AuthCubit>()
+                              .updateProfileInfo(
+                                nickname: currentNickname,
+                                birthDate: selectedDate!,
+                                gender: selectedGender!,
+                                phoneNumber: phone,
+                              );
+
+                          if (!context.mounted) return;
+
+                          if (!saved) {
+                            final currentState = context
+                                .read<AuthCubit>()
+                                .state;
+                            final message = currentState is AuthError
+                                ? currentState.message
+                                : 'Could not complete your profile information. Please try again.';
+
+                            _log.error(
+                              'submit_profile_info:failed',
+                              data: {
+                                'stateType': currentState.runtimeType
+                                    .toString(),
+                                'message': message,
+                              },
+                            );
+
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text(message)));
+                            return;
+                          }
+
+                          _log.info('submit_profile_info:success');
+                          Navigator.pushReplacementNamed(
+                            context,
+                            MyRoutes.homeScreen,
+                          );
+                        } catch (e, st) {
+                          _log.error(
+                            'submit_profile_info:exception',
+                            data: {'error': e.toString()},
+                            error: e,
+                            stackTrace: st,
+                          );
+
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Unexpected error while saving your profile info. Please try again.',
+                              ),
+                            ),
+                          );
+                        } finally {
+                          if (context.mounted) {
+                            setState(() {
+                              _isSubmitting = false;
+                            });
+                          }
+                        }
+                      },
               ),
             ],
           ),
