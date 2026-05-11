@@ -175,7 +175,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'verifySignupOtp:success',
-        data: {'cid': correlationId, 'statusCode': response.statusCode},
+        data: {
+          'cid': correlationId,
+          'statusCode': response.statusCode,
+          'responseKeys': (response.data ?? {}).keys.toList(),
+          'hasDataObject': (response.data ?? {})['data'] is Map<String, dynamic>,
+          'hasAccessToken':
+              ((response.data ?? {})['access']?.toString().isNotEmpty ?? false) ||
+              ((response.data ?? {})['access_token']?.toString().isNotEmpty ?? false),
+        },
       );
       return UserModel.fromJson(response.data ?? {});
     } on DioException catch (e, st) {

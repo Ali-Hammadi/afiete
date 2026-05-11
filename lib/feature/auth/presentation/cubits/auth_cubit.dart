@@ -110,6 +110,11 @@ class AuthCubit extends Cubit<AuthState> {
       'signup:start',
       data: {'cid': correlationId, 'email': email, 'nickname': nickname},
     );
+
+    // Pre-OTP flow must be unauthenticated. Clear any previous session first.
+    await authRepository.clearCachedSession();
+    _log.info('signup:pre_otp_session_cleared', data: {'cid': correlationId});
+
     _pendingSignupUser = null;
     emit(AuthLoading());
     final result = await signupUseCase(
@@ -515,9 +520,20 @@ class AuthCubit extends Cubit<AuthState> {
       data: {'cid': correlationId, 'email': email, 'otpLength': otp.length},
     );
     emit(AuthLoading());
-    final result = await verifyOtpUseCase(
-      VerifyOtpParams(email: email, otp: otp, correlationId: correlationId),
-    );
+    final isSignupFlow = _pendingSignupUser != null;
+    final result = isSignupFlow
+        ? await authRepository.verifySignupOtp(
+            email: email,
+            otpCode: otp,
+            correlationId: correlationId,
+          )
+        : await verifyOtpUseCase(
+            VerifyOtpParams(
+              email: email,
+              otp: otp,
+              correlationId: correlationId,
+            ),
+          );
 
     await result.fold(
       (failure) {
@@ -530,7 +546,6 @@ class AuthCubit extends Cubit<AuthState> {
       (user) async {
         // Build verified user from signup or login flow
         final verifiedUser = _buildVerifiedUser(user);
-        final isSignupFlow = _pendingSignupUser != null;
 
         _log.info(
           'verify_otp:success',
@@ -547,6 +562,23 @@ class AuthCubit extends Cubit<AuthState> {
         UserAuthEntity? sessionUser = verifiedUser;
 
         if (!(verifiedUser.accessToken?.isNotEmpty == true)) {
+          if (isSignupFlow) {
+            _log.error(
+              'verify_otp:missing_tokens_after_signup_verification',
+              data: {
+                'cid': correlationId,
+                'email': email,
+                'emailVerified': verifiedUser.isVerified,
+              },
+            );
+            emit(
+              const AuthError(
+                'Verification completed, but session tokens were not issued by the server. Please try again in a moment or contact support.',
+              ),
+            );
+            return false;
+          }
+
           sessionUser = await _recoverAuthenticatedSessionAfterOtp(
             email: email,
             verifiedUser: verifiedUser,
@@ -675,7 +707,6 @@ class AuthCubit extends Cubit<AuthState> {
             ? _pendingSignupUser!.email
             : backendUser.email,
         password: _pendingSignupUser!.password,
-        isVerified: true,
         birthDate: backendUser.birthDate ?? _pendingSignupUser!.birthDate,
         age: backendUser.age ?? _pendingSignupUser!.age,
         gender: backendUser.gender ?? _pendingSignupUser!.gender,
@@ -683,8 +714,8 @@ class AuthCubit extends Cubit<AuthState> {
       );
     }
 
-    // From login flow, just mark as verified
-    return backendUser.copyWith(isVerified: true);
+    // For non-signup flows, keep backend verification flag as-is.
+    return backendUser;
   }
 
   Future<bool> restoreSession() async {
@@ -694,6 +725,17 @@ class AuthCubit extends Cubit<AuthState> {
       emit(const AuthInitial());
       return false;
     }
+
+    if (!(cachedUser.accessToken?.isNotEmpty == true)) {
+      _log.warn(
+        'restore_session:invalid_cached_user_missing_token',
+        data: {'cid': correlationId, 'email': cachedUser.email},
+      );
+      await authRepository.clearCachedSession();
+      emit(const AuthInitial());
+      return false;
+    }
+
     emit(AuthLoaded(cachedUser));
     await refreshProfileFromBackend(correlationId: correlationId);
     return true;
@@ -709,6 +751,14 @@ class AuthCubit extends Cubit<AuthState> {
         : await authRepository.getCachedSession();
 
     if (currentUser == null) {
+      return false;
+    }
+
+    if (!(currentUser.accessToken?.isNotEmpty == true)) {
+      _log.warn(
+        'refresh_profile:missing_access_token_skip',
+        data: {'cid': cid, 'email': currentUser.email},
+      );
       return false;
     }
 
@@ -925,6 +975,24 @@ class AuthCubit extends Cubit<AuthState> {
     bool asProfileUpdated = false,
     String? correlationId,
   }) async {
+    if (!(user.accessToken?.isNotEmpty == true)) {
+      _log.error(
+        'cache_emit_user:missing_access_token',
+        data: {
+          'cid': correlationId,
+          'email': user.email,
+          'asProfileUpdated': asProfileUpdated,
+        },
+      );
+      await authRepository.clearCachedSession();
+      emit(
+        const AuthError(
+          'Authentication session is not available. Please sign in again.',
+        ),
+      );
+      return false;
+    }
+
     await authRepository.cacheSession(user, correlationId: correlationId);
     if (asProfileUpdated) {
       emit(AuthProfileUpdated(user));

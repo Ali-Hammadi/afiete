@@ -46,6 +46,18 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthLoaded) {
+            if (!(state.user.accessToken?.isNotEmpty == true)) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Authentication session is not available. Please sign in again.',
+                  ),
+                ),
+              );
+              Navigator.pushReplacementNamed(context, MyRoutes.login);
+              return;
+            }
+
             // OTP verification successful
             // Check if user profile is incomplete (signup flow)
             // If birthDate, age, gender, or phoneNumber are missing, it's a signup flow
