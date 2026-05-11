@@ -44,8 +44,22 @@ class _SignupScreenState extends State<SignupScreen> {
                 arguments: state.user.email,
               );
             }
+          } else if (state is OtpSent) {
+            // PHASE 1 → PHASE 2: Navigate to OTP verification screen
+            Navigator.pushNamed(
+              context,
+              MyRoutes.verifyAccountScreen,
+              arguments: state.email,
+            );
+          } else if (state is SignupOtpVerified) {
+            // PHASE 2 → PHASE 3: Navigate to profile completion screen
+            Navigator.pushNamed(
+              context,
+              MyRoutes.authInfoScreens, // Route to CompleteProfileScreen
+              arguments: state.user,
+            );
           } else if (state is WaitingForOtpVerification) {
-            // Auto-navigate to OTP verification screen when account not verified
+            // Fallback for legacy compatibility
             Navigator.pushNamed(
               context,
               MyRoutes.verifyAccountScreen,

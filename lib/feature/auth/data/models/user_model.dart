@@ -9,9 +9,11 @@ class UserModel extends Equatable {
   final String username;
   final String? nickname;
   final String email;
-  final String? dateOfBirth; // ISO 8601 format
+  final String? dateOfBirth; // ISO 8601 format (birth_date from backend)
+  final String? age;
   final String? gender;
-  final String? phoneNumber;
+  final String? phoneNumber; // Maps to 'phone' from backend
+  final String? psychologicalHistory;
   final bool isVerified;
   final String? profileImageUrl;
   final String? accessToken;
@@ -23,8 +25,10 @@ class UserModel extends Equatable {
     this.nickname,
     required this.email,
     this.dateOfBirth,
+    this.age,
     this.gender,
     this.phoneNumber,
+    this.psychologicalHistory,
     required this.isVerified,
     this.profileImageUrl,
     this.accessToken,
@@ -34,57 +38,70 @@ class UserModel extends Equatable {
   /// Parse JSON response from backend.
   /// Handles both snake_case (backend) and camelCase (legacy) field names.
   /// Also supports responses wrapped in a top-level `data` object.
+  /// Backend response can have user data nested in 'user' object or at root.
   factory UserModel.fromJson(Map<String, dynamic> json) {
     final rootPayload = json['data'] is Map<String, dynamic>
-      ? json['data'] as Map<String, dynamic>
-      : json;
+        ? json['data'] as Map<String, dynamic>
+        : json;
 
     final payload = rootPayload['user'] is Map<String, dynamic>
-      ? rootPayload['user'] as Map<String, dynamic>
-      : rootPayload;
+        ? rootPayload['user'] as Map<String, dynamic>
+        : rootPayload;
 
     final tokens = rootPayload['tokens'] is Map<String, dynamic>
-      ? rootPayload['tokens'] as Map<String, dynamic>
-      : (json['tokens'] is Map<String, dynamic>
-          ? json['tokens'] as Map<String, dynamic>
-          : const <String, dynamic>{});
+        ? rootPayload['tokens'] as Map<String, dynamic>
+        : (json['tokens'] is Map<String, dynamic>
+              ? json['tokens'] as Map<String, dynamic>
+              : const <String, dynamic>{});
 
     final accessToken =
-      payload['access_token'] ??
-      payload['accessToken'] ??
-      payload['access'] ??
-      rootPayload['access_token'] ??
-      rootPayload['accessToken'] ??
-      rootPayload['access'] ??
-      json['access_token'] ??
-      json['accessToken'] ??
-      json['access'] ??
-      tokens['access_token'] ??
-      tokens['accessToken'] ??
-      tokens['access'];
+        payload['access_token'] ??
+        payload['accessToken'] ??
+        payload['access'] ??
+        rootPayload['access_token'] ??
+        rootPayload['accessToken'] ??
+        rootPayload['access'] ??
+        json['access_token'] ??
+        json['accessToken'] ??
+        json['access'] ??
+        tokens['access_token'] ??
+        tokens['accessToken'] ??
+        tokens['access'];
 
     final refreshToken =
-      payload['refresh_token'] ??
-      payload['refreshToken'] ??
-      payload['refresh'] ??
-      rootPayload['refresh_token'] ??
-      rootPayload['refreshToken'] ??
-      rootPayload['refresh'] ??
-      json['refresh_token'] ??
-      json['refreshToken'] ??
-      json['refresh'] ??
-      tokens['refresh_token'] ??
-      tokens['refreshToken'] ??
-      tokens['refresh'];
+        payload['refresh_token'] ??
+        payload['refreshToken'] ??
+        payload['refresh'] ??
+        rootPayload['refresh_token'] ??
+        rootPayload['refreshToken'] ??
+        rootPayload['refresh'] ??
+        json['refresh_token'] ??
+        json['refreshToken'] ??
+        json['refresh'] ??
+        tokens['refresh_token'] ??
+        tokens['refreshToken'] ??
+        tokens['refresh'];
+
+    // Extract nickname from root or payload
+    final nickname = rootPayload['nickname'] ?? payload['nickname'];
+
+    // Extract psychological_history from root (not nested in user)
+    final psychologicalHistory = rootPayload['psychological_history'];
 
     return UserModel(
       id: payload['id'] ?? payload['user_id'] ?? '',
       username: payload['username'] ?? '',
-      nickname: payload['nickname'],
+      nickname: nickname,
       email: payload['email'] ?? '',
-      dateOfBirth: payload['date_of_birth'] ?? payload['dateOfBirth'],
+      dateOfBirth:
+          payload['birth_date'] ??
+          payload['date_of_birth'] ??
+          payload['dateOfBirth'],
+      age: payload['age']?.toString(),
       gender: payload['gender'],
-      phoneNumber: payload['phone_number'] ?? payload['phoneNumber'],
+      phoneNumber:
+          payload['phone'] ?? payload['phone_number'] ?? payload['phoneNumber'],
+      psychologicalHistory: psychologicalHistory,
       isVerified: payload['is_verified'] ?? payload['isVerified'] ?? false,
       profileImageUrl:
           payload['profile_image_url'] ?? payload['profileImageUrl'],
@@ -99,9 +116,11 @@ class UserModel extends Equatable {
     'username': username,
     'nickname': nickname,
     'email': email,
-    'date_of_birth': dateOfBirth,
+    'birth_date': dateOfBirth,
+    'age': age,
     'gender': gender,
-    'phone_number': phoneNumber,
+    'phone': phoneNumber,
+    'psychological_history': psychologicalHistory,
     'is_verified': isVerified,
     'profile_image_url': profileImageUrl,
     'access_token': accessToken,
@@ -127,8 +146,10 @@ class UserModel extends Equatable {
     String? nickname,
     String? email,
     String? dateOfBirth,
+    String? age,
     String? gender,
     String? phoneNumber,
+    String? psychologicalHistory,
     bool? isVerified,
     String? profileImageUrl,
     String? accessToken,
@@ -140,8 +161,10 @@ class UserModel extends Equatable {
       nickname: nickname ?? this.nickname,
       email: email ?? this.email,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      age: age ?? this.age,
       gender: gender ?? this.gender,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      psychologicalHistory: psychologicalHistory ?? this.psychologicalHistory,
       isVerified: isVerified ?? this.isVerified,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       accessToken: accessToken ?? this.accessToken,
@@ -156,8 +179,10 @@ class UserModel extends Equatable {
     nickname,
     email,
     dateOfBirth,
+    age,
     gender,
     phoneNumber,
+    psychologicalHistory,
     isVerified,
     profileImageUrl,
     accessToken,

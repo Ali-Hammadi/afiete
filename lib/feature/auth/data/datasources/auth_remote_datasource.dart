@@ -25,6 +25,7 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> verifySignupOtp(
     String email,
     String otpCode, {
+    String? password,
     String? correlationId,
   });
 
@@ -162,16 +163,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> verifySignupOtp(
     String email,
     String otpCode, {
+    String? password,
     String? correlationId,
   }) async {
     _log.info(
       'verifySignupOtp:start',
-      data: {'cid': correlationId, 'email': email},
+      data: {
+        'cid': correlationId,
+        'email': email,
+        'hasPassword': password?.isNotEmpty == true,
+      },
     );
     try {
+      final requestData = <String, dynamic>{'email': email, 'code': otpCode};
+      if (password?.isNotEmpty == true) {
+        requestData['password'] = password;
+      }
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.otpVerify,
-        data: {'email': email, 'code': otpCode},
+        data: requestData,
       );
       _log.info(
         'verifySignupOtp:success',
@@ -179,10 +189,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'cid': correlationId,
           'statusCode': response.statusCode,
           'responseKeys': (response.data ?? {}).keys.toList(),
-          'hasDataObject': (response.data ?? {})['data'] is Map<String, dynamic>,
+          'hasDataObject':
+              (response.data ?? {})['data'] is Map<String, dynamic>,
           'hasAccessToken':
-              ((response.data ?? {})['access']?.toString().isNotEmpty ?? false) ||
-              ((response.data ?? {})['access_token']?.toString().isNotEmpty ?? false),
+              ((response.data ?? {})['access']?.toString().isNotEmpty ??
+                  false) ||
+              ((response.data ?? {})['access_token']?.toString().isNotEmpty ??
+                  false),
         },
       );
       return UserModel.fromJson(response.data ?? {});
@@ -285,16 +298,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
     try {
       final data = <String, dynamic>{};
-      if (dateOfBirth != null) data['date_of_birth'] = dateOfBirth;
+      if (dateOfBirth != null) data['birth_date'] = dateOfBirth;
       if (gender != null) data['gender'] = gender;
-      if (phoneNumber != null) data['phone_number'] = phoneNumber;
+      if (phoneNumber != null) data['phone'] = phoneNumber;
 
       _log.info(
         'updateProfileInfo:request_payload',
         data: {
           'cid': correlationId,
           'payloadKeys': data.keys.toList(),
-          'dateOfBirth': data['date_of_birth'],
+          'birthDate': data['birth_date'],
           'gender': data['gender'],
           'phoneLength': phoneNumber?.length ?? 0,
         },

@@ -143,11 +143,15 @@ class AuthCubit extends Cubit<AuthState> {
             nickname: nickname,
             email: email,
             password: password,
-
             isVerified: false,
           );
           // OTP already sent by backend; wait for user input
-          emit(WaitingForOtpVerification(email));
+          emit(
+            OtpSent(
+              email: email,
+              expiresInSeconds: 600, // 10 minutes default
+            ),
+          );
         } else {
           emit(AuthError(failure.errorMessage));
         }
@@ -155,7 +159,11 @@ class AuthCubit extends Cubit<AuthState> {
       (otpEntity) {
         _log.info(
           'signup:otp_sent',
-          data: {'cid': correlationId, 'email': email},
+          data: {
+            'cid': correlationId,
+            'email': email,
+            'expiresIn': otpEntity.expiresInSeconds,
+          },
         );
         // OTP was sent; store signup data and wait for verification
         _pendingSignupUser = UserAuthEntity(
@@ -163,11 +171,12 @@ class AuthCubit extends Cubit<AuthState> {
           nickname: nickname,
           email: email,
           password: password,
-
           isVerified: false,
         );
-        // OTP sent by backend; wait for user input
-        emit(WaitingForOtpVerification(email));
+        // PHASE 1: OTP sent by backend; navigate to verification screen
+        emit(
+          OtpSent(email: email, expiresInSeconds: otpEntity.expiresInSeconds),
+        );
       },
     );
   }
@@ -505,10 +514,16 @@ class AuthCubit extends Cubit<AuthState> {
       (otpEntity) async {
         _log.info(
           'sendVerificationOtp:success',
-          data: {'cid': correlationId, 'email': email},
+          data: {
+            'cid': correlationId,
+            'email': email,
+            'expiresIn': otpEntity.expiresInSeconds,
+          },
         );
         // OTP resent successfully; wait for user input
-        emit(WaitingForOtpVerification(email));
+        emit(
+          OtpSent(email: email, expiresInSeconds: otpEntity.expiresInSeconds),
+        );
       },
     );
   }
@@ -525,6 +540,7 @@ class AuthCubit extends Cubit<AuthState> {
         ? await authRepository.verifySignupOtp(
             email: email,
             otpCode: otp,
+            password: _pendingSignupUser?.password,
             correlationId: correlationId,
           )
         : await verifyOtpUseCase(
@@ -562,23 +578,6 @@ class AuthCubit extends Cubit<AuthState> {
         UserAuthEntity? sessionUser = verifiedUser;
 
         if (!(verifiedUser.accessToken?.isNotEmpty == true)) {
-          if (isSignupFlow) {
-            _log.error(
-              'verify_otp:missing_tokens_after_signup_verification',
-              data: {
-                'cid': correlationId,
-                'email': email,
-                'emailVerified': verifiedUser.isVerified,
-              },
-            );
-            emit(
-              const AuthError(
-                'Verification completed, but session tokens were not issued by the server. Please try again in a moment or contact support.',
-              ),
-            );
-            return false;
-          }
-
           sessionUser = await _recoverAuthenticatedSessionAfterOtp(
             email: email,
             verifiedUser: verifiedUser,
@@ -586,30 +585,54 @@ class AuthCubit extends Cubit<AuthState> {
           );
 
           if (sessionUser == null) {
-            emit(
-              const AuthError(
-                'OTP verified, but authentication session could not be established. Please sign in again.',
-              ),
-            );
-            return false;
+            if (isSignupFlow) {
+              _log.error(
+                'verify_otp:missing_tokens_after_signup_verification',
+                data: {
+                  'cid': correlationId,
+                  'email': email,
+                  'emailVerified': verifiedUser.isVerified,
+                },
+              );
+              emit(
+                const AuthError(
+                  'Verification completed, but authentication session could not be established. Please try again in a moment or contact support.',
+                ),
+              );
+            } else {
+              emit(
+                const AuthError(
+                  'OTP verified, but authentication session could not be established. Please sign in again.',
+                ),
+              );
+            }
+            return;
           }
         }
 
-        // Determine next step based on flow
-        if (isSignupFlow) {
-          // SIGNUP FLOW: Account is verified via email, proceed to profile completion
-          _log.info(
-            'verify_otp:signup_flow',
-            data: {'cid': correlationId, 'email': email},
-          );
-          _pendingSignupUser = null;
+        // PHASE 2: OTP verified successfully - CRITICAL token caching point
+        // Cache tokens immediately after OTP verification
+        await _cacheAndEmitUser(sessionUser, correlationId: correlationId);
 
-          // Backend verifyOtp already returns the authenticated user/session.
-          // Cache it directly so the UI can navigate without a second login call.
-          return _cacheAndEmitUser(sessionUser, correlationId: correlationId);
-        } else {
-          // FALLBACK: No flow context, just proceed with verified user
-          return _cacheAndEmitUser(sessionUser, correlationId: correlationId);
+        // Determine next step based on flow and profile completion status
+        if (isSignupFlow) {
+          // PHASE 2.5: Check if profile is complete
+          final isProfileComplete = _isUserProfileComplete(sessionUser);
+
+          if (!isProfileComplete) {
+            // Profile incomplete: emit special state to navigate to profile completion screen
+            _log.info(
+              'verify_otp:signup_requires_profile_completion',
+              data: {
+                'cid': correlationId,
+                'email': email,
+                'hasAccessToken': sessionUser.accessToken?.isNotEmpty == true,
+              },
+            );
+            // Emit SignupOtpVerified to trigger navigation to CompleteProfileScreen
+            emit(SignupOtpVerified(sessionUser));
+          }
+          // If profile IS complete, AuthLoaded was already emitted above via _cacheAndEmitUser
         }
       },
     );
@@ -1067,5 +1090,16 @@ class AuthCubit extends Cubit<AuthState> {
       phoneNumber: updatedUser.phoneNumber ?? currentUser.phoneNumber,
       isVerified: updatedUser.isVerified || currentUser.isVerified,
     );
+  }
+
+  /// Check if user profile is complete for signup flow
+  /// Profile is considered complete when: birthDate, gender, and phoneNumber are all non-empty
+  bool _isUserProfileComplete(UserAuthEntity user) {
+    final hasBirthDate = user.birthDate != null;
+    final hasGender = user.gender != null && user.gender!.trim().isNotEmpty;
+    final hasPhoneNumber =
+        user.phoneNumber != null && user.phoneNumber!.trim().isNotEmpty;
+
+    return hasBirthDate && hasGender && hasPhoneNumber;
   }
 }

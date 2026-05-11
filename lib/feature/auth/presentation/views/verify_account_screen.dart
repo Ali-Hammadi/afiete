@@ -45,7 +45,15 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
       appBar: null,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state is AuthLoaded) {
+          if (state is SignupOtpVerified) {
+            // PHASE 2 → PHASE 3: OTP verified in signup flow, navigate to profile completion
+            Navigator.pushReplacementNamed(
+              context,
+              MyRoutes.authInfoScreens,
+              arguments: state.user,
+            );
+          } else if (state is AuthLoaded) {
+            // OTP verified in login/password reset flow
             if (!(state.user.accessToken?.isNotEmpty == true)) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -58,9 +66,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               return;
             }
 
-            // OTP verification successful
-            // Check if user profile is incomplete (signup flow)
-            // If birthDate, age, gender, or phoneNumber are missing, it's a signup flow
+            // OTP verification successful - check if it was signup or login flow
             final user = state.user;
             final isProfileIncomplete =
                 user.birthDate == null ||
@@ -74,7 +80,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               // Signup flow: complete profile information
               Navigator.pushReplacementNamed(context, MyRoutes.authInfoScreens);
             } else {
-              // Login flow: proceed to home
+              // Login flow or signup with existing profile: proceed to home
               Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
             }
           } else if (state is AuthError) {

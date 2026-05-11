@@ -69,6 +69,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserAuthEntity>> verifySignupOtp({
     required String email,
     required String otpCode,
+    String? password,
     String? correlationId,
   }) async {
     _log.info(
@@ -79,6 +80,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final model = await _remoteDataSource.verifySignupOtp(
         email,
         otpCode,
+        password: password,
         correlationId: correlationId,
       );
       _log.info('verifySignupOtp:success', data: {'cid': correlationId});

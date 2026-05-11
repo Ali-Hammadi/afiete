@@ -1,0 +1,122 @@
+=================================================================================================
+                            MULTI-STEP SIGNUP & SESSION MANAGEMENT FLOW
+=================================================================================================
+
+================================= [ PHASE 1: REGISTRATION ] =====================================
+
+┌─────────────────────┐        ┌───────────────────────┐        ┌───────────────────────────────┐
+│   SignupScreen (UI) │        │      AuthCubit        │        │      BackendRepository        │
+│                     │        │                       │        │                               │
+│ 1. Enter Form Data: │ ──────>│ authCubit.signup(...) │ ──────>│ POST /api/auth/signup         │
+│ - Nickname          │        │                       │        │                               │
+│ - Email             │        │ emit(AuthLoading)     │        │ 1. Validate Uniqueness        │
+│ - Password          │        │                       │        │ 2. Send 4-Digit OTP to Email  │
+│                     │        │ emit(OtpSent)         │<───────│ 3. Return Success (No Token)  │
+└─────────────────────┘        └───────────────────────┘        └───────────────────────────────┘
+           │                               │
+           │                               V
+           │<────────────────────── [ GoRouter ]
+           V                        context.go('/verify-otp')
+[ Redirect to VerifyOtpScreen ]
+
+
+====================== [ PHASE 2: VERIFICATION & TOKEN ACQUISITION (4-DIGIT) ] ==================
+
+┌─────────────────────┐        ┌───────────────────────┐        ┌───────────────────────────────┐
+│ VerifyOtpScreen(UI) │        │      AuthCubit        │        │      BackendRepository        │
+│                     │        │                       │        │                               │
+│ 1. Enter 4-Digit OTP│        │                       │        │ POST /api/auth/verify         │
+│    [_][_][_][_]     │ ──────>│ authCubit.verify(...) │ ──────>│ 1. Validate OTP Code          │
+│                     │        │                       │        │ 2. Login User Internally      │
+│                     │        │ emit(AuthLoading)     │        │ 3. Return UserAuthEntity      │
+└─────────────────────┘        └───────────┬───────────┘        └───────────────┬───────────────┘
+                                           │                                    │
+                                           │                                    │ (Returns Entity)
+                                           │                                    V
+                                           │                      ┌─────────────────────────────┐
+                                           │                      │    Token Management         │
+                                           │                      │ 1. Extract access_token     │
+                                           │                      │ 2. Extract refresh_token    │
+                                           │                      │ 3. Save to Secure Storage   │
+                                           │                      └─────────────┬───────────────┘
+                                           │                                    │
+                                           │<────────(Success)──────────────────┘
+                                           V
+                               emit(SignupOtpVerified)
+                              (user.isProfileComplete == false)
+                                           │
+                                           V
+                                      [ GoRouter ]
+                              context.go('/complete-profile')
+
+
+====================== [ PHASE 3: SECURE PROFILE COMPLETION & INTERCEPTORS ] ====================
+
+┌─────────────────────┐        ┌───────────────────────┐        ┌───────────────────────────────┐
+│ CompleteProfileScreen│       │      AuthCubit        │        │     DIO AUTH INTERCEPTOR      │
+│                     │        │                       │        │                               │
+│ 1. Enter Data:      │ ──────>│ completeProfile(...)  │ ──────>│ 1. Intercept Request          │
+│ - DOB, Gender, Phone│        │                       │        │ 2. Read Secure Storage        │
+│                     │        │ emit(AuthLoading)     │        │ 3. Add Header:                │
+└─────────────────────┘        └───────────────────────┘        │    Authorization: Bearer xyz  │
+                                           ^                    └───────────────┬───────────────┘
+                                           │                                    │
+                                           │                                    V
+                                           │                    ┌───────────────────────────────┐
+                                           │                    │      BackendRepository        │
+                                           │                    │ PATCH /api/auth/profile       │
+                                           │                    │ -> Updates User Data          │
+                                           │<──────(Success)────│ -> Returns Updated User       │
+                                           │                    │    (isProfileComplete = true) │
+                                           │                    └───────────────────────────────┘
+                                           │
+                                  emit(AuthLoaded)
+                                           │
+                                           V
+                                      [ GoRouter ]
+                                   context.go('/home')
+
+
+================================= [ PHASE 4: SESSION HANDLING (DIO) ] ===========================
+(Happens automatically in the background for ANY authorized request if the access token expires)
+
+       [ Any Request via Dio ]
+                 │
+                 V
+     [ HTTP 401 UNAUTHORIZED ] ─────────┐
+                 ^                      │
+                 │                      V
+      [ Retry Original Request ]  [ Dio Error Interceptor ]
+                 ^                      │
+                 │                      │ 1. Lock Interceptor (dio.interceptors.requestLock)
+                 │                      │ 2. Read refresh_token from Secure Storage
+                 │                      │ 3. POST /api/auth/refresh
+                 │                      │
+                 └──────(Success)───────┤ -> Save New access_token & refresh_token
+                                        │
+                                        │
+                         (Failed)───────┤ -> Emit SessionExpired -> Clear Storage
+                                        │ -> GoRouter redirects to '/signup'
+
+
+================================= [ PHASE 5: GOROUTER GLOBAL REDIRECT ] =========================
+(The ultimate source of truth when the app starts or state changes)
+
+                  App Starts / State Changes
+                              │
+                              V
+                   [ Check Secure Storage ]
+                              │
+                    Has Valid Access Token?
+                   /                       \
+                 (NO)                     (YES)
+                 /                           \
+            Go to:                         [ Check User State ]
+           /signup                      isProfileComplete == true?
+                                           /                  \
+                                         (NO)                (YES)
+                                         /                      \
+                                      Go to:                   Go to:
+                                /complete-profile               /home
+
+=================================================================================================

@@ -57,6 +57,8 @@ abstract class ApiEndpoints {
   static const String keyCurrentPassword = 'current_password';
   static const String keyNewPassword = 'new_password';
   static const String keyOtp = 'otp';
+    static const String keyRefresh = 'refresh';
+    static const String keyToken = 'token';
   static const String keyIdToken = 'id_token';
 
   static const String allDoctors = doctors;

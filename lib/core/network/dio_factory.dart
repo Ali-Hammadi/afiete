@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:afiete/core/network/api_endpoints.dart';
 import 'package:afiete/core/network/token_storage.dart';
 
 abstract class DioFactory {
   static const String baseUrl = 'https://workserveys.pythonanywhere.com';
+  static Completer<bool>? _refreshCompleter;
 
   static Dio create() {
     final dio = Dio(
@@ -73,6 +75,13 @@ abstract class DioFactory {
       return false;
     }
 
+    // Serialize refresh requests: if one is already in progress, wait for it
+    if (_refreshCompleter != null) {
+      return _refreshCompleter!.future;
+    }
+
+    _refreshCompleter = Completer<bool>();
+
     try {
       final refreshDio = Dio(
         BaseOptions(
@@ -86,7 +95,7 @@ abstract class DioFactory {
 
       final response = await refreshDio.post<Map<String, dynamic>>(
         ApiEndpoints.tokenRefresh,
-        data: {'refresh': refreshToken},
+        data: {ApiEndpoints.keyRefresh: refreshToken},
       );
 
       final refreshedAccessToken =
@@ -94,18 +103,28 @@ abstract class DioFactory {
           _extractAccessToken(response.data?['data']) ??
           '';
       if (refreshedAccessToken.isEmpty) {
+        _refreshCompleter!.complete(false);
         return false;
       }
 
+      final refreshedRefreshToken =
+          _extractRefreshToken(response.data) ??
+          _extractRefreshToken(response.data?['data']) ??
+          refreshToken;
+
       await TokenStorage.saveTokens(
         accessToken: refreshedAccessToken,
-        refreshToken: refreshToken,
+        refreshToken: refreshedRefreshToken,
       );
 
+      _refreshCompleter!.complete(true);
       return true;
     } catch (_) {
       await TokenStorage.clearTokens();
+      _refreshCompleter!.complete(false);
       return false;
+    } finally {
+      _refreshCompleter = null;
     }
   }
 
@@ -294,17 +313,78 @@ abstract class DioFactory {
 
   static String? _extractAccessToken(dynamic data) {
     if (data is Map<String, dynamic>) {
-      final directAccess = data['access']?.toString();
-      if (directAccess != null && directAccess.isNotEmpty) {
-        return directAccess;
+      // Common token fields used by various backends
+      final candidates = ['access', 'access_token', 'accessToken'];
+
+      for (final key in candidates) {
+        final v = data[key];
+        if (v != null && v.toString().isNotEmpty) return v.toString();
       }
 
-      final nestedData = data['data'];
-      if (nestedData is Map<String, dynamic>) {
-        final nestedAccess = nestedData['access']?.toString();
-        if (nestedAccess != null && nestedAccess.isNotEmpty) {
-          return nestedAccess;
+      // Nested containers: data -> tokens or tokens -> access(_token)
+      final nested = data['data'];
+      if (nested is Map<String, dynamic>) {
+        final nestedCandidates = ['access', 'access_token', 'accessToken'];
+        for (final key in nestedCandidates) {
+          final v = nested[key];
+          if (v != null && v.toString().isNotEmpty) return v.toString();
         }
+
+        final tokens = nested['tokens'];
+        if (tokens is Map<String, dynamic>) {
+          final v =
+              tokens['access'] ??
+              tokens['access_token'] ??
+              tokens['accessToken'];
+          if (v != null && v.toString().isNotEmpty) return v.toString();
+        }
+      }
+
+      // Top-level tokens container
+      final tokens = data['tokens'];
+      if (tokens is Map<String, dynamic>) {
+        final v =
+            tokens['access'] ?? tokens['access_token'] ?? tokens['accessToken'];
+        if (v != null && v.toString().isNotEmpty) return v.toString();
+      }
+    }
+
+    return null;
+  }
+
+  static String? _extractRefreshToken(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final candidates = ['refresh', 'refresh_token', 'refreshToken'];
+
+      for (final key in candidates) {
+        final v = data[key];
+        if (v != null && v.toString().isNotEmpty) return v.toString();
+      }
+
+      final nested = data['data'];
+      if (nested is Map<String, dynamic>) {
+        for (final key in candidates) {
+          final v = nested[key];
+          if (v != null && v.toString().isNotEmpty) return v.toString();
+        }
+
+        final tokens = nested['tokens'];
+        if (tokens is Map<String, dynamic>) {
+          final v =
+              tokens['refresh'] ??
+              tokens['refresh_token'] ??
+              tokens['refreshToken'];
+          if (v != null && v.toString().isNotEmpty) return v.toString();
+        }
+      }
+
+      final tokens = data['tokens'];
+      if (tokens is Map<String, dynamic>) {
+        final v =
+            tokens['refresh'] ??
+            tokens['refresh_token'] ??
+            tokens['refreshToken'];
+        if (v != null && v.toString().isNotEmpty) return v.toString();
       }
     }
 

@@ -23,6 +23,7 @@ abstract class AuthRepository {
   Future<Either<Failure, UserAuthEntity>> verifySignupOtp({
     required String email,
     required String otpCode,
+    String? password,
     String? correlationId,
   });
 
