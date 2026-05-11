@@ -24,6 +24,22 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
   final TextEditingController birthdateController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
+  String? _normalizeDropdownGender(String? value) {
+    if (value == null) return null;
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+
+    final lowered = trimmed.toLowerCase();
+    if (lowered == 'male' || lowered == 'm' || trimmed == 'ذكر') {
+      return 'male';
+    }
+    if (lowered == 'female' || lowered == 'f' || trimmed == 'أنثى') {
+      return 'female';
+    }
+
+    return null;
+  }
+
   @override
   void dispose() {
     birthdateController.dispose();
@@ -61,13 +77,14 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final dropdownGenderValue = _normalizeDropdownGender(selectedGender);
     final authState = context.watch<AuthCubit>().state;
     final currentNickname = authState is AuthLoaded
         ? authState.user.nickname
         : authState is AuthProfileUpdated
         ? authState.user.nickname
-      : authState is SignupOtpVerified
-      ? authState.user.nickname
+        : authState is SignupOtpVerified
+        ? authState.user.nickname
         : '';
 
     return Scaffold(
@@ -110,7 +127,7 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                       ),
                       const SizedBox(height: 20),
                       DropdownButtonFormField<String>(
-                        initialValue: selectedGender,
+                        initialValue: dropdownGenderValue,
                         decoration: InputDecoration(
                           labelText: SettingsStrings.genderTitle,
                           labelStyle: AppStyles.bodyMedium,
@@ -141,11 +158,11 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                         ),
                         items: [
                           DropdownMenuItem(
-                            value: SettingsStrings.male,
+                            value: 'male',
                             child: Text(SettingsStrings.male),
                           ),
                           DropdownMenuItem(
-                            value: SettingsStrings.female,
+                            value: 'female',
                             child: Text(SettingsStrings.female),
                           ),
                         ],
@@ -251,9 +268,9 @@ class _AuthInfoScreenState extends State<AuthInfoScreen> {
                         });
 
                         try {
-                            final cid = context
-                                .read<AuthCubit>()
-                                .activeAuthFlowCorrelationId;
+                          final cid = context
+                              .read<AuthCubit>()
+                              .activeAuthFlowCorrelationId;
 
                           final saved = await context
                               .read<AuthCubit>()

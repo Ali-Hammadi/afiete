@@ -327,7 +327,7 @@ class AuthCubit extends Cubit<AuthState> {
     final correlationId = _ensureAuthFlowCorrelationId(
       context: 'profile_update',
     );
-    final sanitizedGender = gender.trim();
+    final sanitizedGender = _normalizeGenderForBackend(gender);
     final sanitizedPhone = phoneNumber?.trim();
     final birthDateIso = birthDate.toIso8601String().split('T')[0];
 
@@ -397,6 +397,23 @@ class AuthCubit extends Cubit<AuthState> {
         data: {'cid': correlationId, 'field': 'gender'},
       );
       emit(const AuthError('Please select your gender before continuing.'));
+      return false;
+    }
+
+    if (sanitizedGender != 'male' && sanitizedGender != 'female') {
+      _log.warn(
+        'update_profile_info:validation_failed',
+        data: {
+          'cid': correlationId,
+          'field': 'gender',
+          'value': sanitizedGender,
+        },
+      );
+      emit(
+        const AuthError(
+          'Gender must be male or female before continuing.',
+        ),
+      );
       return false;
     }
 
@@ -976,6 +993,20 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     return null;
+  }
+
+  String _normalizeGenderForBackend(String? gender) {
+    final value = (gender ?? '').trim();
+    if (value.isEmpty) return '';
+
+    final lowered = value.toLowerCase();
+    if (lowered == 'male' || lowered == 'm') return 'male';
+    if (lowered == 'female' || lowered == 'f') return 'female';
+
+    if (value == 'ذكر') return 'male';
+    if (value == 'أنثى') return 'female';
+
+    return lowered;
   }
 
   String _normalizeProfileInfoUpdateError(String message) {

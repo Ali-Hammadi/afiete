@@ -479,9 +479,15 @@ class AuthRepositoryImpl implements AuthRepository {
       data: {'cid': correlationId, 'email': email},
     );
     try {
-      final model = await _remoteDataSource.verifyForgotPasswordOtp(
+      await _remoteDataSource.verifyForgotPasswordOtp(
         email,
         otpCode,
+        newPassword,
+        confirmPassword,
+        correlationId: correlationId,
+      );
+      final model = await _remoteDataSource.resetPassword(
+        email,
         newPassword,
         confirmPassword,
         correlationId: correlationId,

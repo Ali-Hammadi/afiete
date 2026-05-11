@@ -78,6 +78,13 @@ abstract class AuthRemoteDataSource {
     String? correlationId,
   });
 
+  Future<OtpModel> resetPassword(
+    String email,
+    String newPassword,
+    String confirmPassword, {
+    String? correlationId,
+  });
+
   // Session management (3 endpoints)
   /// Logout and invalidate current session.
   /// Requires: access_token (via interceptor)
@@ -415,12 +422,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        ApiEndpoints.otpVerify,
+        ApiEndpoints.forgotPasswordVerifyOtp,
         data: {
           'email': email,
           'code': otpCode,
-          'new_password': newPassword,
-          'confirm_password': confirmPassword,
         },
       );
       _log.info(
@@ -431,6 +436,50 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on DioException catch (e, st) {
       _log.error(
         'verifyForgotPasswordOtp:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<OtpModel> resetPassword(
+    String email,
+    String newPassword,
+    String confirmPassword, {
+    String? correlationId,
+  }) async {
+    _log.info(
+      'resetPassword:start',
+      data: {'cid': correlationId, 'email': email},
+    );
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.passwordReset,
+        data: {
+          'email': email,
+          'new_password': newPassword,
+          'confirm_password': confirmPassword,
+        },
+      );
+      _log.info(
+        'resetPassword:success',
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
+      );
+      return OtpModel.fromJson({
+        'email': email,
+        'message': response.data?['message'] ?? response.data?['detail'],
+      });
+    } on DioException catch (e, st) {
+      _log.error(
+        'resetPassword:error',
         data: {
           'cid': correlationId,
           'message': e.message,

@@ -29,17 +29,18 @@ abstract class ApiEndpoints {
   static const String profile = '$patients/profile/';
 
   // === OTP Verification (Signup/Login Flow) ===
-  static const String otpResend = '$users/otp/resend/';
-  static const String otpVerify = '$users/otp/verify/';
+  static const String otpResend = '$users/otp/resend';
+  static const String otpVerify = '$users/otp/verify';
 
   // === Email Change (Settings) ===
-  static const String emailChangeRequest = '$users/email/reset/';
-  static const String emailChangeVerify = '$users/otp/verify/';
+  static const String emailChangeRequest = '$users/email/reset';
+  static const String emailChangeVerify = '$users/otp/verify';
 
   // === Password Management ===
   static const String passwordReset = '$users/auth/reset-password/';
-  static const String passwordChange = '$users/password/change/';
+  static const String passwordChange = '$users/password/change';
   static const String forgotPasswordOtp = '$users/auth/forgot-password/';
+  static const String forgotPasswordVerifyOtp = '$users/auth/verify-otp/';
 
   // === Token Management ===
   static const String tokenObtainPair = '$token/';
@@ -56,7 +57,7 @@ abstract class ApiEndpoints {
   static const String keyPassword = 'password';
   static const String keyCurrentPassword = 'current_password';
   static const String keyNewPassword = 'new_password';
-    static const String keyOtp = 'code';
+  static const String keyOtp = 'code';
   static const String keyRefresh = 'refresh';
   static const String keyToken = 'token';
   static const String keyIdToken = 'id_token';
