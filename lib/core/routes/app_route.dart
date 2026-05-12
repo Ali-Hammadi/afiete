@@ -8,6 +8,7 @@ import 'package:afiete/feature/auth/presentation/views/delete_account_screen.dar
 import 'package:afiete/feature/auth/presentation/views/forgot_password_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/password_change_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/verify_account_screen.dart';
+import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/appointments_screen.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/book_session_screen.dart';
 import 'package:afiete/feature/chat/presentation/screens/chat_conversation_screen.dart';
@@ -164,7 +165,12 @@ class AppRouter {
       case MyRoutes.medicalProfileScreen:
         return MaterialPageRoute(builder: (_) => const MedicalProfileScreen());
       case MyRoutes.profileInfoScreen:
-        return MaterialPageRoute(builder: (_) => const ProfileInfoScreen());
+        final args = settings.arguments;
+        return MaterialPageRoute(
+          builder: (_) => ProfileInfoScreen(
+            initialUser: args is UserAuthEntity ? args : null,
+          ),
+        );
       case MyRoutes.reportIssueScreen:
         return MaterialPageRoute(builder: (_) => const ReportIssueScreen());
       case MyRoutes.privacyScreen:

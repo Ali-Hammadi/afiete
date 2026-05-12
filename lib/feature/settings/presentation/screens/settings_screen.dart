@@ -164,11 +164,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildHeader(BuildContext context, AuthState authState) {
     final profile = _resolveProfile(authState);
+    final authUser = _resolveAuthUser(authState);
     final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, MyRoutes.profileInfoScreen);
+        Navigator.pushNamed(
+          context,
+          MyRoutes.profileInfoScreen,
+          arguments: authUser,
+        );
       },
       borderRadius: BorderRadius.circular(AppStyles.borderRadius),
       child: Row(
@@ -395,5 +400,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       gender: user.gender ?? '',
       age: user.age ?? calculateAge(user.birthDate) ?? 0,
     );
+  }
+
+  UserAuthEntity? _resolveAuthUser(AuthState authState) {
+    if (authState is AuthLoaded) return authState.user;
+    if (authState is AuthProfileUpdated) return authState.user;
+    if (authState is SignupOtpVerified) return authState.user;
+    return null;
   }
 }

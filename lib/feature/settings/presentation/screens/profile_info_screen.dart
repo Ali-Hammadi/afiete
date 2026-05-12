@@ -9,7 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileInfoScreen extends StatefulWidget {
-  const ProfileInfoScreen({super.key});
+  final UserAuthEntity? initialUser;
+
+  const ProfileInfoScreen({super.key, this.initialUser});
 
   @override
   State<ProfileInfoScreen> createState() => _ProfileInfoScreenState();
@@ -33,7 +35,10 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
     if (value == 'male' || value == 'm' || value == 'ذكر') {
       return _genderMale;
     }
-    if (value == 'female' || value == 'f' || value == 'أنثى' || value == 'انثى') {
+    if (value == 'female' ||
+        value == 'f' ||
+        value == 'أنثى' ||
+        value == 'انثى') {
       return _genderFemale;
     }
     return _genderMale;
@@ -223,6 +228,7 @@ class _ProfileInfoScreenState extends State<ProfileInfoScreen> {
   UserAuthEntity? _currentUser(AuthState authState) {
     if (authState is AuthLoaded) return authState.user;
     if (authState is AuthProfileUpdated) return authState.user;
+    if (widget.initialUser != null) return widget.initialUser;
     return null;
   }
 
