@@ -9,6 +9,7 @@ import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_u
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:afiete/core/network/token_storage.dart';
+import 'package:afiete/core/reset/nuclear_reset_helper.dart';
 import 'package:equatable/equatable.dart';
 import '../../domain/usecase/login_usecase.dart';
 import '../../domain/usecase/signup_usecase.dart';
@@ -243,11 +244,13 @@ class AuthCubit extends Cubit<AuthState> {
       },
       (_) async {
         _log.info('delete_account:success', data: {'cid': correlationId});
-        await authRepository.clearCachedSession();
-        await authRepository.clearPendingSignupSession();
+
+        // Proactive reset path after account deletion.
+        await NuclearResetHelper.performNuclearReset();
+
         _pendingSignupUser = null;
         _activeAuthFlowCorrelationId = null;
-        emit(const AuthInitial());
+        emit(const AuthReset('Account deleted successfully.'));
         return true;
       },
     );
@@ -603,20 +606,38 @@ class AuthCubit extends Cubit<AuthState> {
           data: {'cid': correlationId, 'message': failure.errorMessage},
         );
 
-        // Detect if backend indicates the user does not exist / was deleted.
-        final msg = failure.errorMessage.toLowerCase();
-        if (msg.contains('not found') ||
-            msg.contains('does not exist') ||
-            msg.contains('no user') ||
-            msg.contains('deleted') ||
-            msg.contains('user not found')) {
+        // Detect if backend indicates the account no longer exists.
+        final normalizedMessage = failure.errorMessage.toLowerCase();
+        final isMissingUser =
+            normalizedMessage.contains('no user matches the given query') ||
+            normalizedMessage.contains('no user') ||
+            normalizedMessage.contains('not found') ||
+            normalizedMessage.contains('deleted') ||
+            normalizedMessage.contains('does not exist');
+
+        if (isMissingUser) {
           // Clear local session and pending signup so app behaves like fresh install
           await authRepository.clearCachedSession();
           await authRepository.clearPendingSignupSession();
           await TokenStorage.clearTokens();
           _pendingSignupUser = null;
           _activeAuthFlowCorrelationId = null;
-          emit(const AuthReset());
+          emit(
+            const AuthReset(
+              'This account no longer exists. The app will restart so you can sign in again.',
+            ),
+          );
+          return;
+        }
+
+        if (normalizedMessage.contains('invalid otp') ||
+            normalizedMessage.contains('invalid code') ||
+            normalizedMessage.contains('expired')) {
+          emit(
+            const AuthError(
+              'The verification code is invalid or expired. Please request a new code and try again.',
+            ),
+          );
           return;
         }
 

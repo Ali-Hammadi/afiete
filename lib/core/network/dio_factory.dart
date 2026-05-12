@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:afiete/core/network/api_endpoints.dart';
+import 'package:afiete/core/reset/nuclear_reset_helper.dart';
+import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/network/token_storage.dart';
 
 abstract class DioFactory {
@@ -31,6 +33,7 @@ abstract class DioFactory {
           final unauthorized = err.response?.statusCode == 401;
           final alreadyRetried =
               err.requestOptions.headers['x-no-retry'] == true;
+          var shouldNuclearReset = false;
 
           if (unauthorized && !alreadyRetried) {
             final refreshed = await _tryRefreshToken(dio);
@@ -48,8 +51,19 @@ abstract class DioFactory {
                 return handler.resolve(retryResponse);
               } catch (_) {
                 // Fallback to default mapped error below.
+                shouldNuclearReset = true;
               }
+            } else {
+              shouldNuclearReset = true;
             }
+          } else if (unauthorized && alreadyRetried) {
+            shouldNuclearReset = true;
+          }
+
+          if (shouldNuclearReset) {
+            await NuclearResetHelper.performResetAndGoToSplash(
+              MyRoutes.splashScreen,
+            );
           }
 
           final cleanMessage = _mapDioErrorToMessage(err);
@@ -148,6 +162,14 @@ abstract class DioFactory {
     final responseMessage = _toUserFriendlyMessage(
       _extractResponseMessage(data),
     );
+
+    if (_isMissingUserResponse(statusCode, data)) {
+      return 'No account was found for this email. If the account was deleted, please sign in again or start a new registration.';
+    }
+
+    if (_isInvalidOtpResponse(statusCode, data)) {
+      return 'The verification code is invalid or expired. Please request a new code and try again.';
+    }
 
     if (statusCode == 400) {
       return responseMessage ??
@@ -264,6 +286,29 @@ abstract class DioFactory {
     }
 
     return null;
+  }
+
+  static bool _isMissingUserResponse(int? statusCode, dynamic data) {
+    if (statusCode != 404) {
+      return false;
+    }
+
+    final message = _extractResponseMessage(data)?.toLowerCase() ?? '';
+    return message.contains('no user matches the given query') ||
+        message.contains('no user') ||
+        message.contains('not found') ||
+        message.contains('deleted');
+  }
+
+  static bool _isInvalidOtpResponse(int? statusCode, dynamic data) {
+    if (statusCode != 400) {
+      return false;
+    }
+
+    final message = _extractResponseMessage(data)?.toLowerCase() ?? '';
+    return message.contains('invalid otp') ||
+        message.contains('invalid code') ||
+        message.contains('expired');
   }
 
   static bool _isGenericBackendMessage(String message) {

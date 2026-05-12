@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/di/injection_container.dart';
 import 'core/routes/app_route.dart';
+import 'core/reset/nuclear_reset_helper.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/language_cubit.dart';
 import 'core/theme/theme_cubit.dart';
@@ -20,6 +21,9 @@ import 'feature/settings/presentation/cubits/settings_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await init();
+
+  NuclearResetHelper.configure(getIt: sl, setupDependencies: init);
+
   final themeCubit = await ThemeCubit.create();
   final languageCubit = await LanguageCubit.create();
   runApp(MyApp(themeCubit: themeCubit, languageCubit: languageCubit));
@@ -65,6 +69,7 @@ class MyApp extends StatelessWidget {
             return BlocBuilder<LanguageCubit, Locale>(
               builder: (context, locale) {
                 return MaterialApp(
+                  navigatorKey: NuclearResetHelper.navigatorKey,
                   debugShowCheckedModeBanner: false,
                   title: 'Afiete',
                   theme: AppTheme.lightTheme,

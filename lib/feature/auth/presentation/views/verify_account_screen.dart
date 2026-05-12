@@ -88,7 +88,9 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
             final msg = (state.message != null && state.message!.isNotEmpty)
                 ? state.message!
                 : 'Your account or session was removed. The app will restart.';
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(msg)),
+            );
             Navigator.pushNamedAndRemoveUntil(
               context,
               MyRoutes.splashScreen,
