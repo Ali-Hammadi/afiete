@@ -528,7 +528,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final response = await _dio.delete<Map<String, dynamic>>(
         ApiEndpoints.deleteAccount,
-        data: {'password': password},
       );
       _log.info(
         'deleteAccount:success',

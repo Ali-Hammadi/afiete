@@ -65,7 +65,7 @@ class AuthCubit extends Cubit<AuthState> {
       ),
     );
     result.fold(
-      (failure) {
+      (failure) async {
         _log.error(
           'login:error',
           data: {'cid': correlationId, 'message': failure.errorMessage},
@@ -126,7 +126,7 @@ class AuthCubit extends Cubit<AuthState> {
       ),
     );
     result.fold(
-      (failure) {
+      (failure) async {
         _log.error(
           'signup:error',
           data: {'cid': correlationId, 'message': failure.errorMessage},
@@ -145,6 +145,10 @@ class AuthCubit extends Cubit<AuthState> {
             password: password,
             isVerified: false,
           );
+          await authRepository.cachePendingSignupSession(
+            _pendingSignupUser!,
+            correlationId: correlationId,
+          );
           // OTP already sent by backend; wait for user input
           emit(
             OtpSent(
@@ -156,7 +160,7 @@ class AuthCubit extends Cubit<AuthState> {
           emit(AuthError(failure.errorMessage));
         }
       },
-      (otpEntity) {
+      (otpEntity) async {
         _log.info(
           'signup:otp_sent',
           data: {
@@ -172,6 +176,10 @@ class AuthCubit extends Cubit<AuthState> {
           email: email,
           password: password,
           isVerified: false,
+        );
+        await authRepository.cachePendingSignupSession(
+          _pendingSignupUser!,
+          correlationId: correlationId,
         );
         // PHASE 1: OTP sent by backend; navigate to verification screen
         emit(
@@ -200,6 +208,7 @@ class AuthCubit extends Cubit<AuthState> {
       (_) async {
         _log.info('logout:success', data: {'cid': correlationId});
         await authRepository.clearCachedSession();
+        await authRepository.clearPendingSignupSession();
         _pendingSignupUser = null;
         _activeAuthFlowCorrelationId = null;
         emit(const AuthInitial());
@@ -230,6 +239,7 @@ class AuthCubit extends Cubit<AuthState> {
       (_) async {
         _log.info('delete_account:success', data: {'cid': correlationId});
         await authRepository.clearCachedSession();
+        await authRepository.clearPendingSignupSession();
         _pendingSignupUser = null;
         _activeAuthFlowCorrelationId = null;
         emit(const AuthInitial());
@@ -797,6 +807,18 @@ class AuthCubit extends Cubit<AuthState> {
     return true;
   }
 
+  Future<UserAuthEntity?> restorePendingSignupSession() async {
+    final cachedSignup = _pendingSignupUser ??
+        await authRepository.getCachedPendingSignupSession();
+    if (cachedSignup == null) {
+      return null;
+    }
+
+    _pendingSignupUser = cachedSignup;
+    emit(OtpSent(email: cachedSignup.email, expiresInSeconds: 600));
+    return cachedSignup;
+  }
+
   Future<bool> refreshProfileFromBackend({String? correlationId}) async {
     final cid = correlationId ?? _newCorrelationId(context: 'refresh_profile');
     final currentState = state;
@@ -948,7 +970,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError(failure.errorMessage));
         return false;
       },
-      (otpEntity) {
+      (otpEntity) async {
         _log.info('reset_password:otp_sent', data: {'cid': correlationId});
         return true;
       },
@@ -1064,6 +1086,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     await authRepository.cacheSession(user, correlationId: correlationId);
+    await authRepository.clearPendingSignupSession();
     if (asProfileUpdated) {
       emit(AuthProfileUpdated(user));
     } else {

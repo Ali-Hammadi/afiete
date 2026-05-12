@@ -19,14 +19,28 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnimation;
 
   Future<void> _navigateAfterSplash() async {
+    final authCubit = context.read<AuthCubit>();
+
+    final pendingSignup = await authCubit.restorePendingSignupSession();
+    if (!mounted) return;
+
+    if (pendingSignup != null) {
+      Navigator.pushReplacementNamed(
+        context,
+        MyRoutes.verifyAccountScreen,
+        arguments: pendingSignup.email,
+      );
+      return;
+    }
+
     final token = await TokenStorage.getAccessToken();
     if (!mounted) return;
 
     if (token != null && token.isNotEmpty) {
-      final restored = await context.read<AuthCubit>().restoreSession();
+      final restored = await authCubit.restoreSession();
       if (!mounted) return;
 
-      if (restored && context.read<AuthCubit>().state is AuthLoaded) {
+      if (restored && authCubit.state is AuthLoaded) {
         Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
         return;
       }

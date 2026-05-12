@@ -126,6 +126,19 @@ abstract class AuthRepository {
   /// Clear cached session locally.
   Future<void> clearCachedSession();
 
+  /// Cache pending signup flow data locally so OTP verification can resume
+  /// after app restart or hot restart.
+  Future<void> cachePendingSignupSession(
+    UserAuthEntity user, {
+    String? correlationId,
+  });
+
+  /// Retrieve cached pending signup flow data if available.
+  Future<UserAuthEntity?> getCachedPendingSignupSession();
+
+  /// Clear cached pending signup flow data locally.
+  Future<void> clearPendingSignupSession();
+
   // ===== ADDITIONAL UTILS REFERENCED BY PRESENTATION =====
 
   /// Verify generic/authentication OTP (login via OTP flow).

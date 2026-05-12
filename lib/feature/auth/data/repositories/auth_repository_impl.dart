@@ -397,10 +397,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     _log.info('deleteAccount:start', data: {'cid': correlationId});
     try {
-      await _remoteDataSource.deleteAccount(
-        password,
-        correlationId: correlationId,
-      );
+      await _remoteDataSource.deleteAccount('', correlationId: correlationId);
       _log.info('deleteAccount:success', data: {'cid': correlationId});
       return const Right(null);
     } on DioException catch (e, st) {
@@ -521,6 +518,7 @@ class AuthRepositoryImpl implements AuthRepository {
   // ==================== LOCAL CACHE HELPERS ====================
 
   static const String _cachedUserKey = 'auth_cached_user';
+  static const String _cachedPendingSignupKey = 'auth_pending_signup_user';
 
   @override
   Future<void> cacheSession(
@@ -588,6 +586,41 @@ class AuthRepositoryImpl implements AuthRepository {
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_cachedUserKey);
     await TokenStorage.clearTokens();
+  }
+
+  @override
+  Future<void> cachePendingSignupSession(
+    UserAuthEntity user, {
+    String? correlationId,
+  }) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(
+      _cachedPendingSignupKey,
+      jsonEncode(_encodeUser(user)),
+    );
+    _log.info(
+      'cachePendingSignupSession:saved',
+      data: {'cid': correlationId, 'email': user.email},
+    );
+  }
+
+  @override
+  Future<UserAuthEntity?> getCachedPendingSignupSession() async {
+    final preferences = await SharedPreferences.getInstance();
+    final cached = preferences.getString(_cachedPendingSignupKey);
+    if (cached == null || cached.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(cached) as Map<String, dynamic>;
+      return _decodeUser(decoded);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> clearPendingSignupSession() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_cachedPendingSignupKey);
   }
 
   Map<String, dynamic> _encodeUser(UserAuthEntity user) {
