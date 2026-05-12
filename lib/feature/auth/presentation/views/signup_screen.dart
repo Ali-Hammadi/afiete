@@ -6,6 +6,7 @@ import 'package:afiete/feature/auth/presentation/widgets/auth_google_button.dart
 import 'package:afiete/feature/auth/presentation/widgets/auth_header.dart';
 import 'package:afiete/feature/auth/presentation/widgets/auth_switch_prompt.dart';
 import 'package:afiete/feature/auth/presentation/widgets/custom_text_form_field.dart';
+import 'package:afiete/feature/auth/presentation/widgets/password_strength_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/auth_cubit.dart';
@@ -23,6 +24,15 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool obsecureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen to password changes to update strength indicator
+    passwordController.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +162,11 @@ class _SignupScreenState extends State<SignupScreen> {
                               }
                               return null;
                             },
+                          ),
+                          const SizedBox(height: 16),
+                          PasswordStrengthIndicator(
+                            password: passwordController.text,
+                            showRequirements: true,
                           ),
                           const SizedBox(height: 20),
                         ],

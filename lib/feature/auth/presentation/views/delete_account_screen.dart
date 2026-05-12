@@ -18,16 +18,16 @@ class DeleteAccountScreen extends StatefulWidget {
 
 class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _confirmController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmController = TextEditingController();
   bool _isLoading = false;
   bool _showPassword = false;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _confirmController.dispose();
     _passwordController.dispose();
+    _confirmController.dispose();
     super.dispose();
   }
 
@@ -271,7 +271,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     });
 
     try {
-      final success = await authCubit.deleteAccount(_passwordController.text);
+      final success = await authCubit.deleteAccount(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
       if (!mounted) return;
       setState(() {
@@ -294,12 +297,24 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           (route) => false,
         );
       } else {
+        // Backend did not delete the account. Still clear local state
+        // and restart the app so the user is signed out and app resets.
+        await _resetAppToFirstInstallState();
+
+        if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Could not delete account. Please check your details.',
+              'Account not deleted on server. Local session cleared.',
             ),
           ),
+        );
+
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          MyRoutes.splashScreen,
+          (route) => false,
         );
       }
     } catch (e) {
@@ -307,8 +322,19 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       setState(() {
         _isLoading = false;
       });
+
+      // On exception while trying to delete, still clear local state
+      // to ensure the app returns to a fresh install state.
+      await _resetAppToFirstInstallState();
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
+      );
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        MyRoutes.splashScreen,
+        (route) => false,
       );
     }
   }

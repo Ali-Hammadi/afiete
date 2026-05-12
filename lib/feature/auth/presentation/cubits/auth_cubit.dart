@@ -8,6 +8,7 @@ import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:afiete/core/network/token_storage.dart';
 import 'package:equatable/equatable.dart';
 import '../../domain/usecase/login_usecase.dart';
 import '../../domain/usecase/signup_usecase.dart';
@@ -217,15 +218,19 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<bool> deleteAccount(String password) async {
+  Future<bool> deleteAccount(String email, String password) async {
     final correlationId = _newCorrelationId(context: 'delete_account');
     _log.warn(
       'delete_account:start',
-      data: {'cid': correlationId, 'passwordLength': password.length},
+      data: {'cid': correlationId, 'email': email},
     );
     emit(AuthLoading());
     final result = await deleteAccountUseCase(
-      DeleteAccountParams(password: password, correlationId: correlationId),
+      DeleteAccountParams(
+        email: email,
+        password: password,
+        correlationId: correlationId,
+      ),
     );
     return result.fold(
       (failure) {
@@ -419,11 +424,7 @@ class AuthCubit extends Cubit<AuthState> {
           'value': sanitizedGender,
         },
       );
-      emit(
-        const AuthError(
-          'Gender must be male or female before continuing.',
-        ),
-      );
+      emit(const AuthError('Gender must be male or female before continuing.'));
       return false;
     }
 
@@ -443,10 +444,9 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     final payloadPhone = sanitizedPhone ?? existingUser.phoneNumber ?? '';
-    final payloadNickname =
-        (nickname?.trim().isNotEmpty == true)
-            ? nickname!.trim()
-            : (existingUser.nickname ?? '').trim();
+    final payloadNickname = (nickname?.trim().isNotEmpty == true)
+        ? nickname!.trim()
+        : (existingUser.nickname ?? '').trim();
     final payloadPsychologicalHistory = psychologicalHistory ?? '';
 
     _log.info(
@@ -457,8 +457,9 @@ class AuthCubit extends Cubit<AuthState> {
         'gender': sanitizedGender,
         'phoneLength': payloadPhone.length,
         'nickname': payloadNickname,
-        'hasPsychologicalHistory':
-            payloadPsychologicalHistory.trim().isNotEmpty,
+        'hasPsychologicalHistory': payloadPsychologicalHistory
+            .trim()
+            .isNotEmpty,
       },
     );
 
@@ -488,8 +489,9 @@ class AuthCubit extends Cubit<AuthState> {
             'gender': sanitizedGender,
             'phoneLength': payloadPhone.length,
             'nickname': payloadNickname,
-            'hasPsychologicalHistory':
-                payloadPsychologicalHistory.trim().isNotEmpty,
+            'hasPsychologicalHistory': payloadPsychologicalHistory
+                .trim()
+                .isNotEmpty,
           },
         );
         emit(AuthError(normalizedMessage));
@@ -595,11 +597,29 @@ class AuthCubit extends Cubit<AuthState> {
           );
 
     await result.fold(
-      (failure) {
+      (failure) async {
         _log.error(
           'verify_otp:error',
           data: {'cid': correlationId, 'message': failure.errorMessage},
         );
+
+        // Detect if backend indicates the user does not exist / was deleted.
+        final msg = failure.errorMessage.toLowerCase();
+        if (msg.contains('not found') ||
+            msg.contains('does not exist') ||
+            msg.contains('no user') ||
+            msg.contains('deleted') ||
+            msg.contains('user not found')) {
+          // Clear local session and pending signup so app behaves like fresh install
+          await authRepository.clearCachedSession();
+          await authRepository.clearPendingSignupSession();
+          await TokenStorage.clearTokens();
+          _pendingSignupUser = null;
+          _activeAuthFlowCorrelationId = null;
+          emit(const AuthReset());
+          return;
+        }
+
         emit(AuthError(failure.errorMessage));
       },
       (user) async {
@@ -808,7 +828,8 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<UserAuthEntity?> restorePendingSignupSession() async {
-    final cachedSignup = _pendingSignupUser ??
+    final cachedSignup =
+        _pendingSignupUser ??
         await authRepository.getCachedPendingSignupSession();
     if (cachedSignup == null) {
       return null;

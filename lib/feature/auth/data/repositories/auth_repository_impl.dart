@@ -392,12 +392,20 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> deleteAccount({
+    required String email,
     required String password,
     String? correlationId,
   }) async {
-    _log.info('deleteAccount:start', data: {'cid': correlationId});
+    _log.info(
+      'deleteAccount:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
-      await _remoteDataSource.deleteAccount('', correlationId: correlationId);
+      await _remoteDataSource.deleteAccount(
+        email: email,
+        password: password,
+        correlationId: correlationId,
+      );
       _log.info('deleteAccount:success', data: {'cid': correlationId});
       return const Right(null);
     } on DioException catch (e, st) {

@@ -42,6 +42,16 @@ class AuthError extends AuthState {
   List<Object> get props => [message];
 }
 
+/// App state when a user account was removed or the local session must be reset.
+class AuthReset extends AuthState {
+  final String? message;
+
+  const AuthReset([this.message]);
+
+  @override
+  List<Object> get props => [message ?? ''];
+}
+
 class WaitingForOtpVerification extends AuthState {
   final String email;
   final int? expiresInSeconds;

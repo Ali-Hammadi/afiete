@@ -7,6 +7,7 @@ import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/widget/custom_button.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:afiete/feature/auth/presentation/widgets/auth_verification_pin_input.dart';
+import 'package:afiete/feature/auth/presentation/widgets/countdown_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,11 +23,41 @@ class VerifyAccountScreen extends StatefulWidget {
 
 class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
   late final TextEditingController _pinPutController = TextEditingController();
+  bool _showCountdown = true;
+  bool _isResending = false;
 
   bool get isFormValid => _pinPutController.text.length == 4;
 
   void _verifyOTP(String otp) {
     context.read<AuthCubit>().verifyOtp(widget.email, otp);
+  }
+
+  Future<void> _handleResendOtp() async {
+    setState(() {
+      _isResending = true;
+    });
+    try {
+      _pinPutController.clear();
+      await context.read<AuthCubit>().sendVerificationOtp(widget.email);
+      if (mounted) {
+        setState(() {
+          _showCountdown = true;
+          _isResending = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(SettingsStrings.codeResentToEmail)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isResending = false;
+        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to resend code: $e')));
+      }
+    }
   }
 
   @override
@@ -51,6 +82,17 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               context,
               MyRoutes.authInfoScreens,
               arguments: state.user,
+            );
+          } else if (state is AuthReset) {
+            // Account deleted or session reset: clear UI and restart app flow
+            final msg = (state.message != null && state.message!.isNotEmpty)
+                ? state.message!
+                : 'Your account or session was removed. The app will restart.';
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              MyRoutes.splashScreen,
+              (route) => false,
             );
           } else if (state is AuthLoaded) {
             // OTP verified in login/password reset flow
@@ -150,26 +192,58 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           ? () => _verifyOTP(_pinPutController.text)
                           : null,
                     ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () {
-                        _pinPutController.clear();
-                        context.read<AuthCubit>().sendVerificationOtp(
-                          widget.email,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(SettingsStrings.codeResentToEmail),
+                    const SizedBox(height: 30),
+                    // Countdown timer with resend button
+                    if (_showCountdown)
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Resend code in ',
+                                style: AppStyles.bodyMedium,
+                              ),
+                              CountdownTimer(
+                                initialSeconds: 600, // 10 minutes
+                                onCountdownComplete: () {
+                                  setState(() {
+                                    _showCountdown = false;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                      child: Text(
-                        SettingsStrings.didntReceiveCodeResend,
-                        style: AppStyles.bodyMedium.copyWith(
-                          color: colorScheme.primary,
-                          decoration: TextDecoration.underline,
-                        ),
+                          const SizedBox(height: 16),
+                        ],
                       ),
+                    // Resend button
+                    TextButton(
+                      onPressed: !_showCountdown && !_isResending
+                          ? _handleResendOtp
+                          : null,
+                      child: _isResending
+                          ? SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  colorScheme.primary,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              _showCountdown
+                                  ? SettingsStrings.didntReceiveCodeResend
+                                  : 'Resend Code',
+                              style: AppStyles.bodyMedium.copyWith(
+                                color: !_showCountdown && !_isResending
+                                    ? colorScheme.primary
+                                    : colorScheme.outlineVariant,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
                     ),
                   ],
                 ),

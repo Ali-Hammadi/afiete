@@ -84,10 +84,11 @@ abstract class AuthRepository {
   Future<Either<Failure, void>> logout({String? correlationId});
 
   /// Delete user account permanently.
-  /// Requires email + password verification for security.
+  /// Requires email and password verification for security.
   /// Hard delete from database; cannot be recovered.
   /// Backend should clear all associated data.
   Future<Either<Failure, void>> deleteAccount({
+    required String email,
     required String password,
     String? correlationId,
   });

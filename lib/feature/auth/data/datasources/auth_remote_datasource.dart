@@ -91,8 +91,12 @@ abstract class AuthRemoteDataSource {
   Future<void> logout({String? correlationId});
 
   /// Delete account permanently (hard delete with verification).
-  /// Requires: access_token (via interceptor) + password in body
-  Future<void> deleteAccount(String password, {String? correlationId});
+  /// Requires: access_token (via interceptor) + email and password in body
+  Future<void> deleteAccount({
+    required String email,
+    required String password,
+    String? correlationId,
+  });
 
   /// Verify OTP for authentication/login purposes (OTP login flow).
   Future<UserModel> verifyOtp(
@@ -423,10 +427,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.forgotPasswordVerifyOtp,
-        data: {
-          'email': email,
-          'code': otpCode,
-        },
+        data: {'email': email, 'code': otpCode},
       );
       _log.info(
         'verifyForgotPasswordOtp:success',
@@ -523,11 +524,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> deleteAccount(String password, {String? correlationId}) async {
-    _log.info('deleteAccount:start', data: {'cid': correlationId});
+  Future<void> deleteAccount({
+    required String email,
+    required String password,
+    String? correlationId,
+  }) async {
+    _log.info(
+      'deleteAccount:start',
+      data: {'cid': correlationId, 'email': email},
+    );
     try {
       final response = await _dio.delete<Map<String, dynamic>>(
         ApiEndpoints.deleteAccount,
+        data: {'email': email, 'password': password},
       );
       _log.info(
         'deleteAccount:success',
