@@ -86,7 +86,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
         widget.textStyle ??
         theme.textTheme.bodyMedium?.copyWith(
           color: _remainingSeconds <= 10
-              ? theme.colorScheme.error
+              ? theme.colorScheme.primary
               : theme.colorScheme.onSurface,
           fontWeight: FontWeight.w600,
         );

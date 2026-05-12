@@ -166,7 +166,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           const SizedBox(height: 16),
                           PasswordStrengthIndicator(
                             password: passwordController.text,
-                            showRequirements: true,
+                            showRequirements: false,
                           ),
                           const SizedBox(height: 20),
                         ],

@@ -207,7 +207,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                                 style: AppStyles.bodyMedium,
                               ),
                               CountdownTimer(
-                                initialSeconds: 600, // 10 minutes
+                                initialSeconds: 60, // 1 minute
                                 onCountdownComplete: () {
                                   setState(() {
                                     _showCountdown = false;

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 /// Represents the strength level of a password
 enum PasswordStrength {
+  /// No password entered yet
+  empty,
+
   /// Password doesn't meet minimum requirements
   weak,
 
@@ -11,11 +14,12 @@ enum PasswordStrength {
   /// Password meets most requirements
   good,
 
-  /// Password meets all requirements
+  /// Password meets all requirements including special characters
   strong;
 
   /// Get display label for strength level
   String get label => switch (this) {
+    PasswordStrength.empty => '',
     PasswordStrength.weak => 'Weak',
     PasswordStrength.fair => 'Fair',
     PasswordStrength.good => 'Good',
@@ -26,6 +30,7 @@ enum PasswordStrength {
   Color getColor(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return switch (this) {
+      PasswordStrength.empty => colorScheme.outlineVariant,
       PasswordStrength.weak => colorScheme.error,
       PasswordStrength.fair => const Color(0xFFFFA500), // Orange
       PasswordStrength.good => const Color(0xFF4CAF50), // Green (lighter)
@@ -109,7 +114,7 @@ class _PasswordStrengthIndicatorState extends State<PasswordStrengthIndicator> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Strength bar (4 segments)
+        // Strength bar (5 segments)
         _StrengthBar(
           strength: _strength,
           height: widget.barHeight,
@@ -117,20 +122,21 @@ class _PasswordStrengthIndicatorState extends State<PasswordStrengthIndicator> {
         ),
         SizedBox(height: widget.spacing),
 
-        // Strength label
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Password Strength', style: theme.textTheme.bodySmall),
-            Text(
-              _strength.label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: _strength.getColor(context),
-                fontWeight: FontWeight.bold,
+        // Strength label - only show after user starts typing
+        if (_strength != PasswordStrength.empty)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Password Strength', style: theme.textTheme.bodySmall),
+              Text(
+                _strength.label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: _strength.getColor(context),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
 
         // Requirements checklist
         if (widget.showRequirements) ...[
@@ -163,7 +169,7 @@ class _DefaultPasswordValidator implements PasswordStrengthValidator {
   @override
   PasswordStrength evaluateStrength(String password) {
     if (password.isEmpty) {
-      return PasswordStrength.weak;
+      return PasswordStrength.empty;
     }
 
     final requirements = getRequirements(password);
@@ -173,6 +179,7 @@ class _DefaultPasswordValidator implements PasswordStrengthValidator {
       0 || 1 => PasswordStrength.weak,
       2 => PasswordStrength.fair,
       3 => PasswordStrength.good,
+      4 || 5 => PasswordStrength.strong,
       _ => PasswordStrength.strong,
     };
   }
@@ -195,6 +202,10 @@ class _DefaultPasswordValidator implements PasswordStrengthValidator {
       PasswordRequirement(
         label: 'Contains numbers (0-9)',
         isMet: password.contains(RegExp(r'[0-9]')),
+      ),
+      PasswordRequirement(
+        label: 'Contains special characters (!@#\$%^&*)',
+        isMet: password.contains(RegExp('[^a-zA-Z0-9 ]')),
       ),
     ];
   }
@@ -226,21 +237,22 @@ class _StrengthBar extends StatelessWidget {
     final strengthColor = strength.getColor(context);
     final disabledColor = colorScheme.surfaceContainerHighest;
 
-    // Calculate filled segments (1-4)
+    // Calculate filled segments (0-5)
     final filledSegments = switch (strength) {
+      PasswordStrength.empty => 0,
       PasswordStrength.weak => 1,
       PasswordStrength.fair => 2,
       PasswordStrength.good => 3,
-      PasswordStrength.strong => 4,
+      PasswordStrength.strong => 5,
     };
 
     return Row(
       children: List.generate(
-        4,
+        5,
         (index) => Expanded(
           child: Container(
             height: height,
-            margin: EdgeInsets.only(right: index < 3 ? 4 : 0),
+            margin: EdgeInsets.only(right: index < 4 ? 4 : 0),
             decoration: BoxDecoration(
               color: index < filledSegments ? strengthColor : disabledColor,
               borderRadius: BorderRadius.circular(borderRadius),
