@@ -29,6 +29,9 @@ abstract class AuthRemoteDataSource {
     String? correlationId,
   });
 
+  /// Resend signup verification OTP.
+  Future<OtpModel> resendSignupOtp(String email, {String? correlationId});
+
   // Login (1 endpoint)
   /// Login with email and password.
   /// Returns UserModel with access+refresh tokens.
@@ -91,12 +94,8 @@ abstract class AuthRemoteDataSource {
   Future<void> logout({String? correlationId});
 
   /// Delete account permanently (hard delete with verification).
-  /// Requires: access_token (via interceptor) + email and password in body
-  Future<void> deleteAccount({
-    required String email,
-    required String password,
-    String? correlationId,
-  });
+  /// Requires: access_token (via interceptor)
+  Future<void> deleteAccount({String? correlationId});
 
   /// Verify OTP for authentication/login purposes (OTP login flow).
   Future<UserModel> verifyOtp(
@@ -215,6 +214,44 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on DioException catch (e, st) {
       _log.error(
         'verifySignupOtp:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<OtpModel> resendSignupOtp(
+    String email, {
+    String? correlationId,
+  }) async {
+    _log.info(
+      'resendSignupOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.otpResend,
+        data: {'email': email},
+      );
+      _log.info(
+        'resendSignupOtp:success',
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
+      );
+
+      final payload = <String, dynamic>{'email': email};
+      payload.addAll(response.data ?? <String, dynamic>{});
+      return OtpModel.fromJson(payload);
+    } on DioException catch (e, st) {
+      _log.error(
+        'resendSignupOtp:error',
         data: {
           'cid': correlationId,
           'message': e.message,
@@ -524,19 +561,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> deleteAccount({
-    required String email,
-    required String password,
-    String? correlationId,
-  }) async {
-    _log.info(
-      'deleteAccount:start',
-      data: {'cid': correlationId, 'email': email},
-    );
+  Future<void> deleteAccount({String? correlationId}) async {
+    _log.info('deleteAccount:start', data: {'cid': correlationId});
     try {
       final response = await _dio.delete<Map<String, dynamic>>(
         ApiEndpoints.deleteAccount,
-        data: {'email': email, 'password': password},
       );
       _log.info(
         'deleteAccount:success',

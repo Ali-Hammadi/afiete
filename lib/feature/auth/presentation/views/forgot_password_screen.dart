@@ -274,9 +274,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       final email = _emailController.text.trim();
       final newPassword = _newPasswordController.text;
 
-      final success = await authCubit.resetPassword(
+      final otpVerified = await authCubit.verifyForgotPasswordOtp(
         email: email,
         otp: _otpController.text.trim(),
+        newPassword: newPassword,
+        confirmPassword: _confirmPasswordController.text,
+      );
+
+      if (!mounted) return;
+
+      if (!otpVerified) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        final state = authCubit.state;
+        final message = state is AuthError
+            ? state.message
+            : SettingsStrings.errorWith('Unable to verify the code.');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+        return;
+      }
+
+      final success = await authCubit.resetPassword(
+        email: email,
         newPassword: newPassword,
         confirmPassword: _confirmPasswordController.text,
       );
@@ -302,12 +325,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       if (!mounted) return;
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      final state = authCubit.state;
-      if (state is AuthLoaded || state is AuthProfileUpdated) {
+      final refreshedState = authCubit.state;
+      if (refreshedState is AuthLoaded ||
+          refreshedState is AuthProfileUpdated) {
         Navigator.pushNamedAndRemoveUntil(
           context,
           MyRoutes.homeScreen,
@@ -316,10 +336,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         return;
       }
 
-      if (state is AuthError) {
+      if (refreshedState is AuthError) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(state.message)));
+        ).showSnackBar(SnackBar(content: Text(refreshedState.message)));
       }
     } catch (e) {
       if (!mounted) return;

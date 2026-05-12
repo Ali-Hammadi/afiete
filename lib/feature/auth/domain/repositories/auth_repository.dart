@@ -27,6 +27,13 @@ abstract class AuthRepository {
     String? correlationId,
   });
 
+  /// Resend signup OTP to the same email.
+  /// Uses dedicated endpoint: /api/users/otp/resend
+  Future<Either<Failure, OtpEntity>> resendSignupOtp({
+    required String email,
+    String? correlationId,
+  });
+
   // ===== LOGIN FLOW =====
 
   /// Login with email and password.
@@ -84,14 +91,10 @@ abstract class AuthRepository {
   Future<Either<Failure, void>> logout({String? correlationId});
 
   /// Delete user account permanently.
-  /// Requires email and password verification for security.
+  /// Uses authenticated session token.
   /// Hard delete from database; cannot be recovered.
   /// Backend should clear all associated data.
-  Future<Either<Failure, void>> deleteAccount({
-    required String email,
-    required String password,
-    String? correlationId,
-  });
+  Future<Either<Failure, void>> deleteAccount({String? correlationId});
 
   // ===== GOOGLE SIGN-IN =====
 
@@ -154,7 +157,6 @@ abstract class AuthRepository {
   /// Change password using a reset flow (server-side reset).
   Future<Either<Failure, OtpEntity>> resetPassword({
     required String email,
-    required String otpCode,
     required String newPassword,
     required String confirmPassword,
     String? correlationId,

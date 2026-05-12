@@ -6,6 +6,7 @@ import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
 
 import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/verify_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:afiete/core/network/token_storage.dart';
@@ -36,6 +37,7 @@ class AuthCubit extends Cubit<AuthState> {
   final UpdateProfileInfoUseCase updateProfileInfoUseCase;
 
   final RequestForgotPasswordOtpUseCase requestForgotPasswordOtpUseCase;
+  final VerifyForgotPasswordOtpUseCase verifyForgotPasswordOtpUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
 
   final AuthRepository authRepository;
@@ -50,6 +52,7 @@ class AuthCubit extends Cubit<AuthState> {
     this.updateProfileInfoUseCase,
 
     this.requestForgotPasswordOtpUseCase,
+    this.verifyForgotPasswordOtpUseCase,
     this.verifyOtpUseCase,
 
     this.authRepository,
@@ -191,9 +194,9 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<bool> logout(String email, String password) async {
+  Future<bool> logout() async {
     final correlationId = _newCorrelationId(context: 'logout');
-    _log.info('logout:start', data: {'cid': correlationId, 'email': email});
+    _log.info('logout:start', data: {'cid': correlationId});
     emit(AuthLoading());
     final result = await logoutUseCase(
       LogoutParams(correlationId: correlationId),
@@ -219,19 +222,12 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<bool> deleteAccount(String email, String password) async {
+  Future<bool> deleteAccount() async {
     final correlationId = _newCorrelationId(context: 'delete_account');
-    _log.warn(
-      'delete_account:start',
-      data: {'cid': correlationId, 'email': email},
-    );
+    _log.warn('delete_account:start', data: {'cid': correlationId});
     emit(AuthLoading());
     final result = await deleteAccountUseCase(
-      DeleteAccountParams(
-        email: email,
-        password: password,
-        correlationId: correlationId,
-      ),
+      DeleteAccountParams(correlationId: correlationId),
     );
     return result.fold(
       (failure) {
@@ -533,7 +529,7 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<void> sendVerificationOtp(
+  Future<bool> sendVerificationOtp(
     String email, {
     VerifyOtpParams? params,
     UserAuthEntity? userAuthEntity,
@@ -546,18 +542,61 @@ class AuthCubit extends Cubit<AuthState> {
       data: {'cid': correlationId, 'email': email},
     );
     emit(AuthLoading());
-    // Request to resend OTP for signup verification
+
+    // If there's a pending signup session, use the dedicated signup OTP resend
+    // endpoint. Otherwise, fall back to the forgot-password OTP flow.
+    if (_pendingSignupUser != null) {
+      _log.info(
+        'sendVerificationOtp:using_signup_resend_endpoint',
+        data: {'cid': correlationId, 'email': email},
+      );
+
+      final result = await authRepository.resendSignupOtp(
+        email: email,
+        correlationId: correlationId,
+      );
+
+      final success = await result.fold<Future<bool>>(
+        (failure) async {
+          _log.error(
+            'sendVerificationOtp:error_signup_resend',
+            data: {'cid': correlationId, 'message': failure.errorMessage},
+          );
+          emit(AuthError(failure.errorMessage));
+          return false;
+        },
+        (otpEntity) async {
+          _log.info(
+            'sendVerificationOtp:success_signup_resend',
+            data: {
+              'cid': correlationId,
+              'email': email,
+              'expiresIn': otpEntity.expiresInSeconds,
+            },
+          );
+          emit(
+            OtpSent(email: email, expiresInSeconds: otpEntity.expiresInSeconds),
+          );
+          return true;
+        },
+      );
+
+      return success;
+    }
+
+    // No pending signup -> assume forgot-password flow
     final result = await requestForgotPasswordOtpUseCase(
       ForgotPasswordParams(email: email, correlationId: correlationId),
     );
 
-    await result.fold(
+    final success = await result.fold<Future<bool>>(
       (failure) async {
         _log.error(
           'sendVerificationOtp:error',
           data: {'cid': correlationId, 'message': failure.errorMessage},
         );
         emit(AuthError(failure.errorMessage));
+        return false;
       },
       (otpEntity) async {
         _log.info(
@@ -572,8 +611,11 @@ class AuthCubit extends Cubit<AuthState> {
         emit(
           OtpSent(email: email, expiresInSeconds: otpEntity.expiresInSeconds),
         );
+        return true;
       },
     );
+
+    return success;
   }
 
   Future<void> verifyOtp(String email, String otp) async {
@@ -606,29 +648,12 @@ class AuthCubit extends Cubit<AuthState> {
           data: {'cid': correlationId, 'message': failure.errorMessage},
         );
 
-        // Detect if backend indicates the account no longer exists.
-        final normalizedMessage = failure.errorMessage.toLowerCase();
-        final isMissingUser =
-            normalizedMessage.contains('no user matches the given query') ||
-            normalizedMessage.contains('no user') ||
-            normalizedMessage.contains('not found') ||
-            normalizedMessage.contains('deleted') ||
-            normalizedMessage.contains('does not exist');
-
-        if (isMissingUser) {
-          // Clear local session and pending signup so app behaves like fresh install
-          await authRepository.clearCachedSession();
-          await authRepository.clearPendingSignupSession();
-          await TokenStorage.clearTokens();
-          _pendingSignupUser = null;
-          _activeAuthFlowCorrelationId = null;
-          emit(
-            const AuthReset(
-              'This account no longer exists. The app will restart so you can sign in again.',
-            ),
-          );
+        if (_isMissingUserError(failure.errorMessage)) {
+          await _resetAuthStateAfterMissingUser(correlationId: correlationId);
           return;
         }
+
+        final normalizedMessage = failure.errorMessage.toLowerCase();
 
         if (normalizedMessage.contains('invalid otp') ||
             normalizedMessage.contains('invalid code') ||
@@ -885,15 +910,21 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await fetchProfileUseCase(
       FetchProfileParams(correlationId: cid),
     );
-    return result.fold(
-      (failure) {
+    return result.fold<Future<bool>>(
+      (failure) async {
         _log.error(
           'refresh_profile:error',
           data: {'cid': cid, 'message': failure.errorMessage},
         );
+
+        if (_isMissingUserError(failure.errorMessage)) {
+          await _resetAuthStateAfterMissingUser(correlationId: cid);
+          return false;
+        }
+
         return false;
       },
-      (remoteUser) {
+      (remoteUser) async {
         _log.info('refresh_profile:success', data: {'cid': cid});
         final mergedUser = _mergeWithCurrentUser(currentState, remoteUser);
         return _cacheAndEmitUser(
@@ -983,9 +1014,55 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<bool> resetPassword({
+  Future<bool> verifyForgotPasswordOtp({
     required String email,
     required String otp,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    final correlationId = _newCorrelationId(
+      context: 'verify_forgot_password_otp',
+    );
+    _log.info(
+      'verify_forgot_password_otp:start',
+      data: {'cid': correlationId, 'email': email, 'otpLength': otp.length},
+    );
+
+    final result = await verifyForgotPasswordOtpUseCase(
+      VerifyForgotPasswordOtpParams(
+        email: email,
+        otpCode: otp,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
+        correlationId: correlationId,
+      ),
+    );
+
+    return result.fold(
+      (failure) {
+        _log.error(
+          'verify_forgot_password_otp:error',
+          data: {'cid': correlationId, 'message': failure.errorMessage},
+        );
+        emit(AuthError(failure.errorMessage));
+        return false;
+      },
+      (otpEntity) {
+        _log.info(
+          'verify_forgot_password_otp:success',
+          data: {
+            'cid': correlationId,
+            'email': email,
+            'message': otpEntity.message,
+          },
+        );
+        return true;
+      },
+    );
+  }
+
+  Future<bool> resetPassword({
+    required String email,
     required String newPassword,
     required String confirmPassword,
   }) async {
@@ -997,7 +1074,6 @@ class AuthCubit extends Cubit<AuthState> {
 
     final result = await authRepository.resetPassword(
       email: email,
-      otpCode: otp,
       newPassword: newPassword,
       confirmPassword: confirmPassword,
       correlationId: correlationId,
@@ -1034,6 +1110,15 @@ class AuthCubit extends Cubit<AuthState> {
     final normalized = errorMessage.toLowerCase();
     return normalized.contains('already verified') ||
         normalized.contains('user is already verified');
+  }
+
+  bool _isMissingUserError(String errorMessage) {
+    final normalized = errorMessage.toLowerCase();
+    return normalized.contains('no user matches the given query') ||
+        normalized.contains('no user') ||
+        normalized.contains('not found') ||
+        normalized.contains('deleted') ||
+        normalized.contains('does not exist');
   }
 
   bool _isInactiveAccountError(String errorMessage) {
@@ -1102,6 +1187,22 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     return message;
+  }
+
+  Future<void> _resetAuthStateAfterMissingUser({
+    required String correlationId,
+  }) async {
+    _log.warn('auth:missing_user_reset', data: {'cid': correlationId});
+    await authRepository.clearCachedSession();
+    await authRepository.clearPendingSignupSession();
+    await TokenStorage.clearTokens();
+    _pendingSignupUser = null;
+    _activeAuthFlowCorrelationId = null;
+    emit(
+      const AuthReset(
+        'This account no longer exists. The app will restart so you can sign in again.',
+      ),
+    );
   }
 
   Future<bool> _cacheAndEmitUser(

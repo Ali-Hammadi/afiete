@@ -1,37 +1,27 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:afiete/core/theme/language_cubit.dart';
-import 'package:afiete/core/theme/theme_cubit.dart';
-import 'package:flutter/material.dart';
+import 'package:afiete/feature/auth/data/models/otp_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:afiete/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(
-      MyApp(
-        themeCubit: await ThemeCubit.create(),
-        languageCubit: await LanguageCubit.create(),
-      ),
-    );
+  test('OtpModel parses backend payload with default expiry', () {
+    final model = OtpModel.fromJson({
+      'email': 'user@example.com',
+      'message': 'OTP sent',
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(model.email, 'user@example.com');
+    expect(model.expiresInSeconds, 600);
+    expect(model.message, 'OTP sent');
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test('OtpModel parses alternate expiry key', () {
+    final model = OtpModel.fromJson({
+      'email': 'user@example.com',
+      'expiresInSeconds': 240,
+      'message': 'Try again later',
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(model.email, 'user@example.com');
+    expect(model.expiresInSeconds, 240);
+    expect(model.message, 'Try again later');
   });
 }

@@ -333,16 +333,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (confirmed != true || !context.mounted) return;
 
-    final user = authState is AuthLoaded
-        ? authState.user
-        : authState is AuthProfileUpdated
-        ? authState.user
-        : null;
-
-    final loggedOut = await context.read<AuthCubit>().logout(
-      user?.email ?? '',
-      user?.password ?? '',
-    );
+    final loggedOut = await context.read<AuthCubit>().logout();
 
     if (!context.mounted || !loggedOut) return;
 

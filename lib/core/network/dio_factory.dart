@@ -30,12 +30,25 @@ abstract class DioFactory {
           handler.next(options);
         },
         onError: (err, handler) async {
+          final missingUser = _isMissingUserResponse(
+            err.response?.statusCode,
+            err.response?.data,
+          );
+
+          if (missingUser) {
+            await NuclearResetHelper.performResetAndGoToSplash(
+              MyRoutes.splashScreen,
+            );
+          }
+
           final unauthorized = err.response?.statusCode == 401;
           final alreadyRetried =
               err.requestOptions.headers['x-no-retry'] == true;
           var shouldNuclearReset = false;
 
-          if (unauthorized && !alreadyRetried) {
+          if (missingUser) {
+            shouldNuclearReset = false;
+          } else if (unauthorized && !alreadyRetried) {
             final refreshed = await _tryRefreshToken(dio);
             if (refreshed) {
               final retryOptions = err.requestOptions;

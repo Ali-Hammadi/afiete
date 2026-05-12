@@ -29,7 +29,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
   bool get isFormValid => _pinPutController.text.length == 4;
 
   void _verifyOTP(String otp) {
-    context.read<AuthCubit>().verifyOtp(widget.email, otp);
+    context.read<AuthCubit>().verifyOtp(widget.email, otp.trim());
   }
 
   Future<void> _handleResendOtp() async {
@@ -38,15 +38,18 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
     });
     try {
       _pinPutController.clear();
-      await context.read<AuthCubit>().sendVerificationOtp(widget.email);
+      final success = await context.read<AuthCubit>().sendVerificationOtp(widget.email);
       if (mounted) {
         setState(() {
-          _showCountdown = true;
+          _showCountdown = success;
           _isResending = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(SettingsStrings.codeResentToEmail)),
-        );
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(SettingsStrings.codeResentToEmail)),
+          );
+        }
+        // If not success, cubit's listener will show the error message.
       }
     } catch (e) {
       if (mounted) {

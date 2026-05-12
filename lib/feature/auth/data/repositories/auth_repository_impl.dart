@@ -109,6 +109,46 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, OtpEntity>> resendSignupOtp({
+    required String email,
+    String? correlationId,
+  }) async {
+    _log.info(
+      'resendSignupOtp:start',
+      data: {'cid': correlationId, 'email': email},
+    );
+    try {
+      final model = await _remoteDataSource.resendSignupOtp(
+        email,
+        correlationId: correlationId,
+      );
+      _log.info('resendSignupOtp:success', data: {'cid': correlationId});
+      return Right(model.toEntity());
+    } on DioException catch (e, st) {
+      _log.error(
+        'resendSignupOtp:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e, st) {
+      _log.error(
+        'resendSignupOtp:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
   // ==================== LOGIN ====================
 
   @override
@@ -391,21 +431,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteAccount({
-    required String email,
-    required String password,
-    String? correlationId,
-  }) async {
-    _log.info(
-      'deleteAccount:start',
-      data: {'cid': correlationId, 'email': email},
-    );
+  Future<Either<Failure, void>> deleteAccount({String? correlationId}) async {
+    _log.info('deleteAccount:start', data: {'cid': correlationId});
     try {
-      await _remoteDataSource.deleteAccount(
-        email: email,
-        password: password,
-        correlationId: correlationId,
-      );
+      await _remoteDataSource.deleteAccount(correlationId: correlationId);
       _log.info('deleteAccount:success', data: {'cid': correlationId});
       return const Right(null);
     } on DioException catch (e, st) {
@@ -474,7 +503,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, OtpEntity>> resetPassword({
     required String email,
-    required String otpCode,
     required String newPassword,
     required String confirmPassword,
     String? correlationId,
@@ -484,13 +512,6 @@ class AuthRepositoryImpl implements AuthRepository {
       data: {'cid': correlationId, 'email': email},
     );
     try {
-      await _remoteDataSource.verifyForgotPasswordOtp(
-        email,
-        otpCode,
-        newPassword,
-        confirmPassword,
-        correlationId: correlationId,
-      );
       final model = await _remoteDataSource.resetPassword(
         email,
         newPassword,

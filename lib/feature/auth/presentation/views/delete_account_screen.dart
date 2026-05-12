@@ -221,25 +221,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   }
 
   Future<void> _handleDeleteAccount() async {
-    final emailInput = _emailController.text.trim();
-    if (emailInput.isEmpty || !emailInput.contains('@')) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(SettingsStrings.invalidEmailError)),
-        );
-      }
-      return;
-    }
-
-    if (_passwordController.text.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(SettingsStrings.pleaseEnterPassword)),
-        );
-      }
-      return;
-    }
-
     final authCubit = context.read<AuthCubit>();
     final errorColor = Theme.of(context).colorScheme.error;
 
@@ -271,10 +252,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     });
 
     try {
-      final success = await authCubit.deleteAccount(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      final success = await authCubit.deleteAccount();
 
       if (!mounted) return;
       setState(() {
