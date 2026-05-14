@@ -25,8 +25,15 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
   late final TextEditingController _pinPutController = TextEditingController();
   bool _showCountdown = true;
   bool _isResending = false;
+  int _countdownSeconds = 600;
 
   bool get isFormValid => _pinPutController.text.length == 4;
+
+  void _syncCountdownSecondsFromState(AuthState state) {
+    if (state is OtpSent && state.expiresInSeconds > 0) {
+      _countdownSeconds = state.expiresInSeconds;
+    }
+  }
 
   void _verifyOTP(String otp) {
     context.read<AuthCubit>().verifyOtp(widget.email, otp.trim());
@@ -40,6 +47,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
       _pinPutController.clear();
       final success = await context.read<AuthCubit>().sendVerificationOtp(widget.email);
       if (mounted) {
+        final currentState = context.read<AuthCubit>().state;
+        _syncCountdownSecondsFromState(currentState);
         setState(() {
           _showCountdown = success;
           _isResending = false;
@@ -79,6 +88,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
       appBar: null,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
+          _syncCountdownSecondsFromState(state);
+
           if (state is SignupOtpVerified) {
             // PHASE 2 → PHASE 3: OTP verified in signup flow, navigate to profile completion
             Navigator.pushReplacementNamed(
@@ -210,7 +221,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                                 style: AppStyles.bodyMedium,
                               ),
                               CountdownTimer(
-                                initialSeconds: 60, // 1 minute
+                                key: ValueKey(_countdownSeconds),
+                                initialSeconds: _countdownSeconds,
                                 onCountdownComplete: () {
                                   setState(() {
                                     _showCountdown = false;

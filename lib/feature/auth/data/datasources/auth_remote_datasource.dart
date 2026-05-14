@@ -243,11 +243,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       _log.info(
         'resendSignupOtp:success',
-        data: {'cid': correlationId, 'statusCode': response.statusCode},
+        data: {
+          'cid': correlationId,
+          'statusCode': response.statusCode,
+          'responseDataKeys': (response.data ?? {}).keys.toList(),
+          'responseData': response.data,
+        },
       );
 
       final payload = <String, dynamic>{'email': email};
       payload.addAll(response.data ?? <String, dynamic>{});
+      _log.info(
+        'resendSignupOtp:response_payload',
+        data: {'cid': correlationId, 'payload': payload},
+      );
       return OtpModel.fromJson(payload);
     } on DioException catch (e, st) {
       _log.error(

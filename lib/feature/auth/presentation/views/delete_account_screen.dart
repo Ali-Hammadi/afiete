@@ -222,6 +222,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   Future<void> _handleDeleteAccount() async {
     final authCubit = context.read<AuthCubit>();
+    final themeCubit = context.read<ThemeCubit>();
+    final languageCubit = context.read<LanguageCubit>();
     final errorColor = Theme.of(context).colorScheme.error;
 
     final confirmed = await showDialog<bool>(
@@ -260,7 +262,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       });
 
       if (success) {
-        await _resetAppToFirstInstallState();
+        await _resetAppToFirstInstallState(themeCubit, languageCubit);
 
         if (!mounted) return;
 
@@ -277,7 +279,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       } else {
         // Backend did not delete the account. Still clear local state
         // and restart the app so the user is signed out and app resets.
-        await _resetAppToFirstInstallState();
+        await _resetAppToFirstInstallState(themeCubit, languageCubit);
 
         if (!mounted) return;
 
@@ -303,8 +305,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
       // On exception while trying to delete, still clear local state
       // to ensure the app returns to a fresh install state.
-      await _resetAppToFirstInstallState();
+      await _resetAppToFirstInstallState(themeCubit, languageCubit);
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
       );
@@ -317,10 +320,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     }
   }
 
-  Future<void> _resetAppToFirstInstallState() async {
-    final themeCubit = context.read<ThemeCubit>();
-    final languageCubit = context.read<LanguageCubit>();
-
+  Future<void> _resetAppToFirstInstallState(
+    ThemeCubit themeCubit,
+    LanguageCubit languageCubit,
+  ) async {
     await TokenStorage.clearTokens();
 
     final prefs = await SharedPreferences.getInstance();

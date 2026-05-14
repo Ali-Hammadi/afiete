@@ -58,15 +58,19 @@ class UserModel extends Equatable {
         payload['access_token'] ??
         payload['accessToken'] ??
         payload['access'] ??
+      payload['token'] ??
         rootPayload['access_token'] ??
         rootPayload['accessToken'] ??
         rootPayload['access'] ??
+      rootPayload['token'] ??
         json['access_token'] ??
         json['accessToken'] ??
         json['access'] ??
+      json['token'] ??
         tokens['access_token'] ??
         tokens['accessToken'] ??
-        tokens['access'];
+      tokens['access'] ??
+      tokens['token'];
 
     final refreshToken =
         payload['refresh_token'] ??

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:afiete/core/network/api_endpoints.dart';
-import 'package:afiete/core/reset/nuclear_reset_helper.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/network/token_storage.dart';
+import 'package:afiete/core/utils/logger.dart';
+import 'package:afiete/core/reset/nuclear_reset_helper.dart';
 
 abstract class DioFactory {
   static const String baseUrl = 'https://workserveys.pythonanywhere.com';
@@ -19,6 +21,24 @@ abstract class DioFactory {
         headers: {'Content-Type': 'application/json'},
       ),
     );
+
+    // During development, enable detailed request/response logging to help
+    // diagnose network issues (payloads, headers, bodies). Enabled only
+    // when running in debug mode so production logs stay clean.
+    if (kDebugMode) {
+      final log = loggerFor('DioFactory');
+      dio.interceptors.add(
+        LogInterceptor(
+          request: true,
+          requestHeader: true,
+          requestBody: true,
+          responseHeader: true,
+          responseBody: true,
+          error: true,
+          logPrint: (obj) => log.info('$obj'),
+        ),
+      );
+    }
 
     dio.interceptors.add(
       InterceptorsWrapper(
@@ -36,9 +56,12 @@ abstract class DioFactory {
           );
 
           if (missingUser) {
-            await NuclearResetHelper.performResetAndGoToSplash(
-              MyRoutes.splashScreen,
-            );
+            await TokenStorage.clearTokens();
+            NuclearResetHelper.navigatorKey.currentState
+                ?.pushNamedAndRemoveUntil(
+                  MyRoutes.splashScreen,
+                  (route) => false,
+                );
           }
 
           final unauthorized = err.response?.statusCode == 401;
@@ -74,9 +97,12 @@ abstract class DioFactory {
           }
 
           if (shouldNuclearReset) {
-            await NuclearResetHelper.performResetAndGoToSplash(
-              MyRoutes.splashScreen,
-            );
+            await TokenStorage.clearTokens();
+            NuclearResetHelper.navigatorKey.currentState
+                ?.pushNamedAndRemoveUntil(
+                  MyRoutes.splashScreen,
+                  (route) => false,
+                );
           }
 
           final cleanMessage = _mapDioErrorToMessage(err);

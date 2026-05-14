@@ -216,6 +216,10 @@ class AuthCubit extends Cubit<AuthState> {
         await authRepository.clearPendingSignupSession();
         _pendingSignupUser = null;
         _activeAuthFlowCorrelationId = null;
+
+        // Complete app reset on explicit logout
+        await NuclearResetHelper.performNuclearReset();
+
         emit(const AuthInitial());
         return true;
       },
@@ -542,6 +546,7 @@ class AuthCubit extends Cubit<AuthState> {
       data: {'cid': correlationId, 'email': email},
     );
     emit(AuthLoading());
+    await _restorePendingSignupSessionIfNeeded();
 
     // If there's a pending signup session, use the dedicated signup OTP resend
     // endpoint. Otherwise, fall back to the forgot-password OTP flow.
@@ -625,12 +630,13 @@ class AuthCubit extends Cubit<AuthState> {
       data: {'cid': correlationId, 'email': email, 'otpLength': otp.length},
     );
     emit(AuthLoading());
-    final isSignupFlow = _pendingSignupUser != null;
+    final pendingSignupUser = await _restorePendingSignupSessionIfNeeded();
+    final isSignupFlow = pendingSignupUser != null;
     final result = isSignupFlow
         ? await authRepository.verifySignupOtp(
             email: email,
             otpCode: otp,
-            password: _pendingSignupUser?.password,
+            password: pendingSignupUser.password,
             correlationId: correlationId,
           )
         : await verifyOtpUseCase(
@@ -720,29 +726,29 @@ class AuthCubit extends Cubit<AuthState> {
         }
 
         // PHASE 2: OTP verified successfully - CRITICAL token caching point
-        // Cache tokens immediately after OTP verification
-        await _cacheAndEmitUser(sessionUser, correlationId: correlationId);
-
-        // Determine next step based on flow and profile completion status
+        // Signup flow must always continue to profile completion after OTP.
         if (isSignupFlow) {
-          // PHASE 2.5: Check if profile is complete
-          final isProfileComplete = _isUserProfileComplete(sessionUser);
+          await authRepository.cacheSession(
+            sessionUser,
+            correlationId: correlationId,
+          );
+          await authRepository.clearPendingSignupSession();
 
-          if (!isProfileComplete) {
-            // Profile incomplete: emit special state to navigate to profile completion screen
-            _log.info(
-              'verify_otp:signup_requires_profile_completion',
-              data: {
-                'cid': correlationId,
-                'email': email,
-                'hasAccessToken': sessionUser.accessToken?.isNotEmpty == true,
-              },
-            );
-            // Emit SignupOtpVerified to trigger navigation to CompleteProfileScreen
-            emit(SignupOtpVerified(sessionUser));
-          }
-          // If profile IS complete, AuthLoaded was already emitted above via _cacheAndEmitUser
+          _log.info(
+            'verify_otp:signup_route_profile_completion',
+            data: {
+              'cid': correlationId,
+              'email': email,
+              'hasAccessToken': sessionUser.accessToken?.isNotEmpty == true,
+            },
+          );
+
+          emit(SignupOtpVerified(sessionUser));
+          return;
         }
+
+        // Non-signup flows (login/forgot password) continue as authenticated session.
+        await _cacheAndEmitUser(sessionUser, correlationId: correlationId);
       },
     );
   }
@@ -1238,6 +1244,23 @@ class AuthCubit extends Cubit<AuthState> {
     return true;
   }
 
+  Future<UserAuthEntity?> _restorePendingSignupSessionIfNeeded() async {
+    if (_pendingSignupUser != null) {
+      return _pendingSignupUser;
+    }
+
+    final cachedSignup = await authRepository.getCachedPendingSignupSession();
+    if (cachedSignup != null) {
+      _pendingSignupUser = cachedSignup;
+      _log.info(
+        'signup_session:restored_from_cache',
+        data: {'email': cachedSignup.email},
+      );
+    }
+
+    return _pendingSignupUser;
+  }
+
   String _ensureAuthFlowCorrelationId({required String context}) {
     if (_activeAuthFlowCorrelationId != null &&
         _activeAuthFlowCorrelationId!.isNotEmpty) {
@@ -1303,16 +1326,5 @@ class AuthCubit extends Cubit<AuthState> {
       phoneNumber: updatedUser.phoneNumber ?? currentUser.phoneNumber,
       isVerified: updatedUser.isVerified || currentUser.isVerified,
     );
-  }
-
-  /// Check if user profile is complete for signup flow
-  /// Profile is considered complete when: birthDate, gender, and phoneNumber are all non-empty
-  bool _isUserProfileComplete(UserAuthEntity user) {
-    final hasBirthDate = user.birthDate != null;
-    final hasGender = user.gender != null && user.gender!.trim().isNotEmpty;
-    final hasPhoneNumber =
-        user.phoneNumber != null && user.phoneNumber!.trim().isNotEmpty;
-
-    return hasBirthDate && hasGender && hasPhoneNumber;
   }
 }
