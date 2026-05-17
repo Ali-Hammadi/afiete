@@ -158,7 +158,7 @@ class AuthCubit extends Cubit<AuthState> {
           emit(
             OtpSent(
               email: email,
-              expiresInSeconds: 600, // 10 minutes default
+              expiresInSeconds: 60,
             ),
           );
         } else {
@@ -888,7 +888,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
 
     _pendingSignupUser = cachedSignup;
-    emit(OtpSent(email: cachedSignup.email, expiresInSeconds: 600));
+    emit(OtpSent(email: cachedSignup.email, expiresInSeconds: 60));
     return cachedSignup;
   }
 

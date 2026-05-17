@@ -25,9 +25,17 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
   late final TextEditingController _pinPutController = TextEditingController();
   bool _showCountdown = true;
   bool _isResending = false;
-  int _countdownSeconds = 600;
+  int _countdownSeconds = 60;
 
   bool get isFormValid => _pinPutController.text.length == 4;
+
+  @override
+  void initState() {
+    super.initState();
+    final authState = context.read<AuthCubit>().state;
+    _syncCountdownSecondsFromState(authState);
+    _showCountdown = authState is OtpSent;
+  }
 
   void _syncCountdownSecondsFromState(AuthState state) {
     if (state is OtpSent && state.expiresInSeconds > 0) {
