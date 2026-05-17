@@ -44,7 +44,7 @@ User creates account, receives OTP via email, verifies OTP, completes profile in
     "email": "user@example.com",
     "is_verified": false
   },
-  "otp_expires_in": 600
+  "otp_expires_in": 60
 }
 ```
 
@@ -73,7 +73,7 @@ User creates account, receives OTP via email, verifies OTP, completes profile in
 ```json
 {
   "message": "OTP sent successfully",
-  "otp_expires_in": 600
+  "otp_expires_in": 60
 }
 ```
 
@@ -341,7 +341,7 @@ User forgot password, requests OTP via email, verifies OTP, sets new password.
 ```json
 {
   "message": "OTP sent to email",
-  "otp_expires_in": 600
+  "otp_expires_in": 60
 }
 ```
 

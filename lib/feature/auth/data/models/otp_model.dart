@@ -18,7 +18,7 @@ class OtpModel extends Equatable {
   factory OtpModel.fromJson(Map<String, dynamic> json) {
     return OtpModel(
       email: json['email'] ?? '',
-      expiresInSeconds: json['expires_in'] ?? json['expiresInSeconds'] ?? 600,
+      expiresInSeconds: json['expires_in'] ?? json['expiresInSeconds'] ?? 60,
       message: json['message'],
     );
   }

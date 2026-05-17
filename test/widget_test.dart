@@ -9,7 +9,7 @@ void main() {
     });
 
     expect(model.email, 'user@example.com');
-    expect(model.expiresInSeconds, 600);
+    expect(model.expiresInSeconds, 60);
     expect(model.message, 'OTP sent');
   });
 
