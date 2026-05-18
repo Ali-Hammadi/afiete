@@ -9,6 +9,8 @@ import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_u
 import 'package:afiete/feature/auth/domain/usecase/verify_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+// BuildContext is not used inside the cubit methods to avoid passing
+// contexts across async gaps. The reset helper uses navigatorKey instead.
 import 'package:afiete/core/network/token_storage.dart';
 import 'package:afiete/core/reset/nuclear_reset_helper.dart';
 import 'package:equatable/equatable.dart';
@@ -155,12 +157,7 @@ class AuthCubit extends Cubit<AuthState> {
             correlationId: correlationId,
           );
           // OTP already sent by backend; wait for user input
-          emit(
-            OtpSent(
-              email: email,
-              expiresInSeconds: 60,
-            ),
-          );
+          emit(OtpSent(email: email, expiresInSeconds: 60));
         } else {
           emit(AuthError(failure.errorMessage));
         }
@@ -198,62 +195,78 @@ class AuthCubit extends Cubit<AuthState> {
     final correlationId = _newCorrelationId(context: 'logout');
     _log.info('logout:start', data: {'cid': correlationId});
     emit(AuthLoading());
-    final result = await logoutUseCase(
-      LogoutParams(correlationId: correlationId),
-    );
-    return result.fold(
-      (failure) {
-        _log.error(
-          'logout:error',
-          data: {'cid': correlationId, 'message': failure.errorMessage},
-        );
-        emit(AuthError(failure.errorMessage));
-        return false;
-      },
-      (_) async {
-        _log.info('logout:success', data: {'cid': correlationId});
-        await authRepository.clearCachedSession();
-        await authRepository.clearPendingSignupSession();
-        _pendingSignupUser = null;
-        _activeAuthFlowCorrelationId = null;
 
-        // Complete app reset on explicit logout
-        await NuclearResetHelper.performNuclearReset();
+    try {
+      final result = await logoutUseCase(
+        LogoutParams(correlationId: correlationId),
+      );
 
-        emit(const AuthInitial());
-        return true;
-      },
-    );
+      return await result.fold(
+        (failure) {
+          _log.error(
+            'logout:error',
+            data: {'cid': correlationId, 'message': failure.errorMessage},
+          );
+          emit(AuthError(failure.errorMessage));
+          return Future.value(false);
+        },
+        (_) async {
+          _log.info('logout:success', data: {'cid': correlationId});
+          await authRepository.clearCachedSession();
+          await authRepository.clearPendingSignupSession();
+          _pendingSignupUser = null;
+          _activeAuthFlowCorrelationId = null;
+
+          emit(const AuthInitial());
+          return true;
+        },
+      );
+    } finally {
+      // Ensure the app is wiped regardless of network success/failure.
+      try {
+        await NuclearResetHelper.wipeEverything();
+      } catch (_) {
+        // Swallow wipe errors.
+      }
+    }
   }
 
   Future<bool> deleteAccount() async {
     final correlationId = _newCorrelationId(context: 'delete_account');
     _log.warn('delete_account:start', data: {'cid': correlationId});
     emit(AuthLoading());
-    final result = await deleteAccountUseCase(
-      DeleteAccountParams(correlationId: correlationId),
-    );
-    return result.fold(
-      (failure) {
-        _log.error(
-          'delete_account:error',
-          data: {'cid': correlationId, 'message': failure.errorMessage},
-        );
-        emit(AuthError(failure.errorMessage));
-        return false;
-      },
-      (_) async {
-        _log.info('delete_account:success', data: {'cid': correlationId});
 
-        // Proactive reset path after account deletion.
-        await NuclearResetHelper.performNuclearReset();
+    try {
+      final result = await deleteAccountUseCase(
+        DeleteAccountParams(correlationId: correlationId),
+      );
 
-        _pendingSignupUser = null;
-        _activeAuthFlowCorrelationId = null;
-        emit(const AuthReset('Account deleted successfully.'));
-        return true;
-      },
-    );
+      return await result.fold(
+        (failure) {
+          _log.error(
+            'delete_account:error',
+            data: {'cid': correlationId, 'message': failure.errorMessage},
+          );
+          emit(AuthError(failure.errorMessage));
+          return Future.value(false);
+        },
+        (_) async {
+          _log.info('delete_account:success', data: {'cid': correlationId});
+
+          _pendingSignupUser = null;
+          _activeAuthFlowCorrelationId = null;
+          emit(const AuthReset('Account deleted successfully.'));
+          return true;
+        },
+      );
+    } finally {
+      // Ensure local state is wiped regardless of backend response.
+      try {
+        await NuclearResetHelper.wipeEverything();
+      } catch (_) {
+        // Swallow wipe errors.
+      }
+    }
   }
 
   Future<void> googleSignIn() async {
@@ -1325,6 +1338,8 @@ class AuthCubit extends Cubit<AuthState> {
       gender: updatedUser.gender ?? currentUser.gender,
       phoneNumber: updatedUser.phoneNumber ?? currentUser.phoneNumber,
       isVerified: updatedUser.isVerified || currentUser.isVerified,
+      accessToken: updatedUser.accessToken ?? currentUser.accessToken,
+      refreshToken: updatedUser.refreshToken ?? currentUser.refreshToken,
     );
   }
 }

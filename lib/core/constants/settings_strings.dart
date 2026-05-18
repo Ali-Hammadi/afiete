@@ -638,6 +638,7 @@ abstract class SettingsStrings {
   static String get phoneTitleProfile => _t('Phone Number', 'رقم الهاتف');
   static String get birthDateTitle => _t('Birth Date', 'تاريخ الميلاد');
   static String get genderTitle => _t('Gender', 'الجنس');
+  static String get ageTitle => _t('Age', 'العمر');
   static String get passwordTitle => _t('Password', 'كلمة المرور');
   static String get saveProfileChanges => _t('Save Changes', 'حفظ التغييرات');
   static String get changeEmailTitle =>

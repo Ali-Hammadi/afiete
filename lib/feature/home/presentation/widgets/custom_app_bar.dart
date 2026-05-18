@@ -15,7 +15,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final authState = context.watch<AuthCubit>().state;
 
-    String userName = '';
+    String userName = "";
     if (authState is AuthLoaded) {
       userName = authState.user.nickname ?? '';
     } else if (authState is AuthProfileUpdated) {

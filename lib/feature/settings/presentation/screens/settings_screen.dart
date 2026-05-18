@@ -1,19 +1,16 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
-import 'package:afiete/core/network/token_storage.dart';
 import 'package:afiete/core/routes/app_route.dart';
 import 'package:afiete/core/theme/language_cubit.dart';
 import 'package:afiete/core/theme/theme_cubit.dart';
 import 'package:afiete/core/utils/age_utils.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
-import 'package:afiete/feature/settings/domin/entity/setting_entity.dart';
 import 'package:afiete/feature/settings/presentation/widgets/language_option.dart';
 import 'package:afiete/feature/settings/presentation/widgets/setting_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -163,9 +160,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildHeader(BuildContext context, AuthState authState) {
-    final profile = _resolveProfile(authState);
     final authUser = _resolveAuthUser(authState);
     final colorScheme = Theme.of(context).colorScheme;
+    final displayName = _displayUserValue(
+      authUser?.nickname?.trim(),
+      fallback: authUser?.username.trim() ?? '—',
+    );
+    final username = _displayUserValue(authUser?.username.trim());
+    final email = _displayUserValue(authUser?.email.trim());
+    final phoneNumber = _displayUserValue(authUser?.phoneNumber?.trim());
+    final gender = _displayGender(authUser?.gender);
+    final age = authUser?.age ?? calculateAge(authUser?.birthDate) ?? 0;
+    final birthDate = _displayBirthDate(authUser?.birthDate);
 
     return InkWell(
       onTap: () {
@@ -176,61 +182,202 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       },
       borderRadius: BorderRadius.circular(AppStyles.borderRadius),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 38,
-            backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
-            child: Icon(Icons.person, size: 44, color: colorScheme.primary),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.22),
+          borderRadius: BorderRadius.circular(AppStyles.borderRadius),
+          border: Border.all(
+            color: colorScheme.outline.withValues(alpha: 0.22),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(profile.nickName, style: AppStyles.headingSmall),
-                const SizedBox(height: 4),
-                Text(
-                  SettingsStrings.usernameLabel,
-                  style: AppStyles.bodySmall.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.65),
+                CircleAvatar(
+                  radius: 38,
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
+                  child: Icon(
+                    Icons.person,
+                    size: 44,
+                    color: colorScheme.primary,
                   ),
                 ),
-                const SizedBox(height: 2),
-                InkWell(
-                  onTap: () => _copyUsername(context, profile.userId),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(profile.userId, style: AppStyles.bodyMedium),
-                        const SizedBox(width: 8),
-                        Icon(
-                          Icons.copy_outlined,
-                          size: 18,
-                          color: colorScheme.primary,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(displayName, style: AppStyles.headingSmall),
+                      const SizedBox(height: 4),
+                      Text(
+                        SettingsStrings.updateProfileHint,
+                        style: AppStyles.bodySmall.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.65),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            _buildProfileLine(
+              context,
+              label: SettingsStrings.usernameLabel,
+              value: username,
+              onCopy: username == '—'
+                  ? null
+                  : () => _copyToClipboard(
+                      context,
+                      username,
+                      SettingsStrings.usernameLabel,
+                    ),
+            ),
+            const SizedBox(height: 8),
+            _buildProfileLine(
+              context,
+              label: SettingsStrings.emailTitleProfile,
+              value: email,
+              onCopy: email == '—'
+                  ? null
+                  : () => _copyToClipboard(
+                      context,
+                      email,
+                      SettingsStrings.emailTitleProfile,
+                    ),
+            ),
+            const SizedBox(height: 8),
+            _buildProfileLine(
+              context,
+              label: SettingsStrings.phoneTitleProfile,
+              value: phoneNumber,
+              onCopy: phoneNumber == '—'
+                  ? null
+                  : () => _copyToClipboard(
+                      context,
+                      phoneNumber,
+                      SettingsStrings.phoneTitleProfile,
+                    ),
+            ),
+            const SizedBox(height: 8),
+            _buildProfileLine(
+              context,
+              label: SettingsStrings.genderTitle,
+              value: gender,
+            ),
+            const SizedBox(height: 8),
+            _buildProfileLine(
+              context,
+              label: SettingsStrings.birthDateTitle,
+              value: birthDate,
+            ),
+            const SizedBox(height: 8),
+            _buildProfileLine(
+              context,
+              label: SettingsStrings.ageTitle,
+              value: age > 0 ? age.toString() : '—',
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Future<void> _copyUsername(BuildContext context, String username) async {
-    if (username.isEmpty) return;
-    await Clipboard.setData(ClipboardData(text: username));
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${SettingsStrings.usernameLabel} copied')),
+  Widget _buildProfileLine(
+    BuildContext context, {
+    required String label,
+    required String value,
+    VoidCallback? onCopy,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 118,
+          child: Text(
+            label,
+            style: AppStyles.bodySmall.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.68),
+            ),
+          ),
+        ),
+        Expanded(
+          child: InkWell(
+            onTap: onCopy,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      value,
+                      style: AppStyles.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (onCopy != null) ...[
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.copy_outlined,
+                      size: 18,
+                      color: colorScheme.primary,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  String _displayUserValue(String? value, {String fallback = '—'}) {
+    final trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty) return fallback;
+    return trimmed;
+  }
+
+  String _displayGender(String? raw) {
+    final value = (raw ?? '').trim().toLowerCase();
+    if (value.isEmpty) return '—';
+    if (value == 'female' ||
+        value == 'f' ||
+        value == 'أنثى' ||
+        value == 'انثى') {
+      return SettingsStrings.female;
+    }
+    if (value == 'male' || value == 'm' || value == 'ذكر') {
+      return SettingsStrings.male;
+    }
+    return raw!.trim();
+  }
+
+  String _displayBirthDate(DateTime? birthDate) {
+    if (birthDate == null) return '—';
+    return birthDate.toLocal().toString().split(' ').first;
+  }
+
+  Future<void> _copyToClipboard(
+    BuildContext context,
+    String value,
+    String label,
+  ) async {
+    if (value.isEmpty || value == '—') return;
+    await Clipboard.setData(ClipboardData(text: value));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('$label copied')));
   }
 
   void _showLanguageSheet(BuildContext context) {
@@ -340,66 +487,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final loggedOut = await context.read<AuthCubit>().logout();
 
+    // The logout flow triggers a full app wipe and restart; don't perform
+    // duplicate local clearing or navigation here.
     if (!context.mounted || !loggedOut) return;
-
-    await _resetAppToFirstInstallState();
-    if (!context.mounted) return;
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(SettingsStrings.logoutSuccess)));
-
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      MyRoutes.splashScreen,
-      (route) => false,
-    );
-  }
-
-  Future<void> _resetAppToFirstInstallState() async {
-    final themeCubit = context.read<ThemeCubit>();
-    final languageCubit = context.read<LanguageCubit>();
-
-    await TokenStorage.clearTokens();
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    await prefs.reload();
-
-    if (!mounted) return;
-
-    await themeCubit.resetToDefault();
-    await languageCubit.resetToDefault();
-  }
-
-  UserSettingsProfileEntity _resolveProfile(AuthState authState) {
-    UserAuthEntity? user;
-
-    if (authState is AuthLoaded) {
-      user = authState.user;
-    } else if (authState is AuthProfileUpdated) {
-      user = authState.user;
-    }
-
-    if (user == null) {
-      return const UserSettingsProfileEntity(
-        nickName: '',
-        userId: '',
-        email: '',
-        phoneNumber: '',
-        gender: '',
-        age: 0,
-      );
-    }
-
-    return UserSettingsProfileEntity(
-      nickName: user.nickname ?? '',
-      userId: user.username,
-      email: user.email,
-      phoneNumber: user.phoneNumber ?? '',
-      gender: user.gender ?? '',
-      age: user.age ?? calculateAge(user.birthDate) ?? 0,
-    );
   }
 
   UserAuthEntity? _resolveAuthUser(AuthState authState) {

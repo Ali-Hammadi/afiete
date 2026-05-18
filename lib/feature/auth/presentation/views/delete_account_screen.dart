@@ -1,12 +1,7 @@
 import 'package:afiete/core/constants/styles.dart';
 import 'package:afiete/core/constants/settings_strings.dart';
-import 'package:afiete/core/network/token_storage.dart';
-import 'package:afiete/core/routes/app_route.dart';
-import 'package:afiete/core/theme/language_cubit.dart';
-import 'package:afiete/core/theme/theme_cubit.dart';
 import 'package:afiete/feature/auth/presentation/cubits/auth_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DeleteAccountScreen extends StatefulWidget {
@@ -222,8 +217,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   Future<void> _handleDeleteAccount() async {
     final authCubit = context.read<AuthCubit>();
-    final themeCubit = context.read<ThemeCubit>();
-    final languageCubit = context.read<LanguageCubit>();
     final errorColor = Theme.of(context).colorScheme.error;
 
     final confirmed = await showDialog<bool>(
@@ -261,78 +254,18 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         _isLoading = false;
       });
 
-      if (success) {
-        await _resetAppToFirstInstallState(themeCubit, languageCubit);
-
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(SettingsStrings.accountDeletedSuccess)),
-        );
-
-        // Clear navigation stack and restart from splash.
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          MyRoutes.splashScreen,
-          (route) => false,
-        );
-      } else {
-        // Backend did not delete the account. Still clear local state
-        // and restart the app so the user is signed out and app resets.
-        await _resetAppToFirstInstallState(themeCubit, languageCubit);
-
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Account not deleted on server. Local session cleared.',
-            ),
-          ),
-        );
-
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          MyRoutes.splashScreen,
-          (route) => false,
-        );
-      }
+      // The deleteAccount flow triggers a full wipe and restart. No further
+      // UI handling is required here.
+      if (success) return;
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-
-      // On exception while trying to delete, still clear local state
-      // to ensure the app returns to a fresh install state.
-      await _resetAppToFirstInstallState(themeCubit, languageCubit);
-
-      if (!mounted) return;
+      // Show error to user; the cubit will perform wipe+restart.
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(SettingsStrings.errorWith(e.toString()))),
       );
-
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        MyRoutes.splashScreen,
-        (route) => false,
-      );
     }
-  }
-
-  Future<void> _resetAppToFirstInstallState(
-    ThemeCubit themeCubit,
-    LanguageCubit languageCubit,
-  ) async {
-    await TokenStorage.clearTokens();
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    await prefs.reload();
-
-    if (!mounted) return;
-
-    await themeCubit.resetToDefault();
-    await languageCubit.resetToDefault();
   }
 }
