@@ -820,17 +820,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenVerify'
           description: ''
-  /api/users/account/delete/:
+  /api/users/activate:
     post:
-      operationId: users_account_delete_create
+      operationId: users_activate_create
       tags:
       - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ActivateUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ActivateUser'
+        required: true
       security:
       - cookieAuth: []
       - jwtAuth: []
+      - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivateUser'
+          description: ''
   /api/users/auth/forgot-password/:
     post:
       operationId: users_auth_forgot_password_create
@@ -915,6 +932,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/ForgetPasswordVerifyOtp'
           description: ''
+  /api/users/deactivate:
+    delete:
+      operationId: users_deactivate_destroy
+      tags:
+      - users
+      security:
+      - cookieAuth: []
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/users/email/reset:
     put:
       operationId: users_email_reset_update
@@ -1116,6 +1144,17 @@ paths:
           description: ''
 components:
   schemas:
+    ActivateUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email
+      - password
     AnswerOption:
       type: object
       properties:
@@ -1834,7 +1873,6 @@ components:
         email:
           type: string
           format: email
-          maxLength: 254
         password:
           type: string
           writeOnly: true
@@ -1858,7 +1896,6 @@ components:
         email:
           type: string
           format: email
-          maxLength: 254
         password:
           type: string
           writeOnly: true

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:afiete/core/utils/age_utils.dart';
 import 'package:afiete/core/utils/logger.dart';
 import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
@@ -27,6 +28,8 @@ class AuthCubit extends Cubit<AuthState> {
   final _log = loggerFor('AuthCubit');
   UserAuthEntity? _pendingSignupUser;
   String? _activeAuthFlowCorrelationId;
+  bool _isLoggingOut = false;
+  bool _isDeletingAccount = false;
 
   String? get activeAuthFlowCorrelationId => _activeAuthFlowCorrelationId;
 
@@ -192,79 +195,217 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<bool> logout() async {
+    if (_isLoggingOut) {
+      debugPrint(
+        '[AuthCubit] logout() called but _isLoggingOut is already true, returning false',
+      );
+      _log.warn('logout:already_in_progress');
+      return false;
+    }
+    _isLoggingOut = true;
+
     final correlationId = _newCorrelationId(context: 'logout');
-    _log.info('logout:start', data: {'cid': correlationId});
+    debugPrint(
+      '[AuthCubit] logout() started with correlationId: $correlationId',
+    );
+    _log.info(
+      'logout:start',
+      data: {
+        'cid': correlationId,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
     emit(AuthLoading());
 
     try {
+      // Call logout backend API but don't let its failure/success affect the UI reset.
+      debugPrint(
+        '[AuthCubit] Calling logoutUseCase with correlationId: $correlationId',
+      );
+      _log.info('logout:calling_usecase', data: {'cid': correlationId});
       final result = await logoutUseCase(
         LogoutParams(correlationId: correlationId),
       );
+      debugPrint(
+        '[AuthCubit] logoutUseCase completed with result: ${result.runtimeType}',
+      );
 
-      return await result.fold(
+      // Log the result but proceed with wipe regardless
+      result.fold(
         (failure) {
-          _log.error(
-            'logout:error',
-            data: {'cid': correlationId, 'message': failure.errorMessage},
+          debugPrint(
+            '[AuthCubit] Logout backend failed: ${failure.errorMessage}',
           );
-          emit(AuthError(failure.errorMessage));
-          return Future.value(false);
+          _log.error(
+            'logout:backend_error',
+            data: {
+              'cid': correlationId,
+              'message': failure.errorMessage,
+              'failureType': failure.runtimeType.toString(),
+            },
+          );
         },
-        (_) async {
-          _log.info('logout:success', data: {'cid': correlationId});
-          await authRepository.clearCachedSession();
-          await authRepository.clearPendingSignupSession();
-          _pendingSignupUser = null;
-          _activeAuthFlowCorrelationId = null;
-
-          emit(const AuthInitial());
-          return true;
+        (_) {
+          debugPrint('[AuthCubit] Logout backend succeeded');
+          _log.info('logout:backend_success', data: {'cid': correlationId});
         },
       );
+
+      // Clear session cache immediately (don't emit state yet)
+      debugPrint('[AuthCubit] Clearing cached session...');
+      _log.info('logout:clearing_cache', data: {'cid': correlationId});
+      await authRepository.clearCachedSession();
+      debugPrint('[AuthCubit] Cached session cleared');
+
+      debugPrint('[AuthCubit] Clearing pending signup session...');
+      await authRepository.clearPendingSignupSession();
+      debugPrint('[AuthCubit] Pending signup session cleared');
+
+      _pendingSignupUser = null;
+      _activeAuthFlowCorrelationId = null;
+      debugPrint('[AuthCubit] Local state cleared');
+      _log.info('logout:local_cache_cleared', data: {'cid': correlationId});
+
+      return true;
+    } catch (e, st) {
+      debugPrint('[AuthCubit] logout() exception: $e');
+      _log.error(
+        'logout:exception',
+        data: {
+          'cid': correlationId,
+          'error': e.toString(),
+          'stackTrace': st.toString(),
+        },
+        error: e,
+        stackTrace: st,
+      );
+      rethrow;
     } finally {
-      // Ensure the app is wiped regardless of network success/failure.
+      // Wipe everything BEFORE state emission to prevent listener-triggered loops.
+      debugPrint('[AuthCubit] Starting nuclear reset...');
+      _log.info('logout:wipe_start', data: {'cid': correlationId});
       try {
         await NuclearResetHelper.wipeEverything();
-      } catch (_) {
-        // Swallow wipe errors.
+        debugPrint('[AuthCubit] Nuclear reset completed successfully');
+        _log.info('logout:wipe_success', data: {'cid': correlationId});
+      } catch (e) {
+        debugPrint('[AuthCubit] Nuclear reset failed: $e');
+        _log.error(
+          'logout:wipe_error',
+          data: {'cid': correlationId, 'error': e.toString()},
+        );
+      } finally {
+        _isLoggingOut = false;
+        debugPrint('[AuthCubit] logout() finally block complete');
+        _log.info('logout:finally_complete', data: {'cid': correlationId});
       }
     }
   }
 
   Future<bool> deleteAccount() async {
+    if (_isDeletingAccount) {
+      debugPrint(
+        '[AuthCubit] deleteAccount() called but _isDeletingAccount is already true, returning false',
+      );
+      _log.warn('delete_account:already_in_progress');
+      return false;
+    }
+    _isDeletingAccount = true;
+
     final correlationId = _newCorrelationId(context: 'delete_account');
-    _log.warn('delete_account:start', data: {'cid': correlationId});
+    debugPrint(
+      '[AuthCubit] deleteAccount() started with correlationId: $correlationId',
+    );
+    _log.warn(
+      'delete_account:start',
+      data: {
+        'cid': correlationId,
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
     emit(AuthLoading());
 
     try {
+      debugPrint(
+        '[AuthCubit] Calling deleteAccountUseCase with correlationId: $correlationId',
+      );
+      _log.warn('delete_account:calling_usecase', data: {'cid': correlationId});
       final result = await deleteAccountUseCase(
         DeleteAccountParams(correlationId: correlationId),
       );
+      debugPrint(
+        '[AuthCubit] deleteAccountUseCase completed with result: ${result.runtimeType}',
+      );
 
-      return await result.fold(
+      // Log the result but proceed with wipe regardless
+      result.fold(
         (failure) {
-          _log.error(
-            'delete_account:error',
-            data: {'cid': correlationId, 'message': failure.errorMessage},
+          debugPrint(
+            '[AuthCubit] Delete account backend failed: ${failure.errorMessage}',
           );
-          emit(AuthError(failure.errorMessage));
-          return Future.value(false);
+          _log.error(
+            'delete_account:backend_error',
+            data: {
+              'cid': correlationId,
+              'message': failure.errorMessage,
+              'failureType': failure.runtimeType.toString(),
+            },
+          );
         },
-        (_) async {
-          _log.info('delete_account:success', data: {'cid': correlationId});
-
-          _pendingSignupUser = null;
-          _activeAuthFlowCorrelationId = null;
-          emit(const AuthReset('Account deleted successfully.'));
-          return true;
+        (_) {
+          debugPrint('[AuthCubit] Delete account backend succeeded');
+          _log.info(
+            'delete_account:backend_success',
+            data: {'cid': correlationId},
+          );
         },
       );
+
+      // Clear pending state (don't emit state yet)
+      debugPrint('[AuthCubit] Clearing pending signup user...');
+      _pendingSignupUser = null;
+      _activeAuthFlowCorrelationId = null;
+      debugPrint('[AuthCubit] Local state cleared');
+      _log.info(
+        'delete_account:local_state_cleared',
+        data: {'cid': correlationId},
+      );
+
+      return true;
+    } catch (e, st) {
+      debugPrint('[AuthCubit] deleteAccount() exception: $e');
+      _log.error(
+        'delete_account:exception',
+        data: {
+          'cid': correlationId,
+          'error': e.toString(),
+          'stackTrace': st.toString(),
+        },
+        error: e,
+        stackTrace: st,
+      );
+      rethrow;
     } finally {
-      // Ensure local state is wiped regardless of backend response.
+      // Wipe everything BEFORE state emission to prevent listener-triggered loops.
+      debugPrint('[AuthCubit] Starting nuclear reset...');
+      _log.info('delete_account:wipe_start', data: {'cid': correlationId});
       try {
         await NuclearResetHelper.wipeEverything();
-      } catch (_) {
-        // Swallow wipe errors.
+        debugPrint('[AuthCubit] Nuclear reset completed successfully');
+        _log.info('delete_account:wipe_success', data: {'cid': correlationId});
+      } catch (e) {
+        debugPrint('[AuthCubit] Nuclear reset failed: $e');
+        _log.error(
+          'delete_account:wipe_error',
+          data: {'cid': correlationId, 'error': e.toString()},
+        );
+      } finally {
+        _isDeletingAccount = false;
+        debugPrint('[AuthCubit] deleteAccount() finally block complete');
+        _log.info(
+          'delete_account:finally_complete',
+          data: {'cid': correlationId},
+        );
       }
     }
   }

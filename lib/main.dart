@@ -30,7 +30,6 @@ void main() async {
     getIt: sl,
     setupDependencies: init,
     clearSecureStorage: () async => await TokenStorage.clearTokens(),
-    restartApp: (BuildContext context) => MyApp.restartApp(context),
   );
 
   runApp(MyApp(themeCubit: themeCubit, languageCubit: languageCubit));
@@ -46,8 +45,18 @@ class MyApp extends StatefulWidget {
   });
 
   static void restartApp(BuildContext context) {
+    debugPrint('[MyApp.restartApp] Called with context: $context');
     final _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
-    state?._restart();
+    debugPrint('[MyApp.restartApp] Found _MyAppState: $state');
+    if (state != null) {
+      debugPrint('[MyApp.restartApp] Calling _restart()');
+      state._restart();
+      debugPrint('[MyApp.restartApp] _restart() completed');
+    } else {
+      debugPrint(
+        '[MyApp.restartApp] ERROR: Could not find _MyAppState ancestor',
+      );
+    }
   }
 
   @override
@@ -57,7 +66,15 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Key _rootKey = UniqueKey();
 
-  void _restart() => setState(() => _rootKey = UniqueKey());
+  void _restart() {
+    debugPrint('[_MyAppState._restart] Called');
+    setState(() {
+      _rootKey = UniqueKey();
+      debugPrint(
+        '[_MyAppState._restart] setState completed, new rootKey: $_rootKey',
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
