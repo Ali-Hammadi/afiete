@@ -7,6 +7,7 @@ import 'package:afiete/feature/auth/presentation/views/delete_account_screen.dar
 
 import 'package:afiete/feature/auth/presentation/views/forgot_password_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/password_change_screen.dart';
+import 'package:afiete/feature/auth/presentation/views/reactivate_account_screen.dart';
 import 'package:afiete/feature/auth/presentation/views/verify_account_screen.dart';
 import 'package:afiete/feature/auth/domain/entities/auth_user_entity.dart';
 import 'package:afiete/feature/booking_assiments/presentation/screens/appointments_screen.dart';
@@ -66,6 +67,18 @@ class AppRouter {
             : '';
         return MaterialPageRoute(
           builder: (_) => VerifyAccountScreen(email: email),
+        );
+      case MyRoutes.reactivateAccountScreen:
+        final args = settings.arguments;
+        final reactivation = args is AccountReactivationRequired
+            ? args
+            : null;
+        return MaterialPageRoute(
+          builder: (_) => ReactivateAccountScreen(
+            email: reactivation?.email ?? '',
+            password: reactivation?.password ?? '',
+            message: reactivation?.message ?? '',
+          ),
         );
       case MyRoutes.authInfoScreens:
         return MaterialPageRoute(builder: (_) => const AuthInfoScreen());
@@ -300,6 +313,7 @@ class MyRoutes {
   static const String login = "/login";
   static const String welcomeScreens = "/welcomeScreens";
   static const String verifyAccountScreen = "/verifyAccountScreen";
+  static const String reactivateAccountScreen = "/reactivateAccountScreen";
   static const String authInfoScreens = "/authInfoScreens";
 
   static const String passwordChangeScreen = "/passwordChangeScreen";

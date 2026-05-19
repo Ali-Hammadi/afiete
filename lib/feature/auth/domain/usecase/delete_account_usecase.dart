@@ -6,9 +6,10 @@ import 'package:afiete/core/utils/logger.dart';
 import 'package:afiete/feature/auth/domain/repositories/auth_repository.dart';
 
 class DeleteAccountParams {
+  final String password;
   final String? correlationId;
 
-  const DeleteAccountParams({this.correlationId});
+  const DeleteAccountParams({required this.password, this.correlationId});
 }
 
 class DeleteAccountUseCase implements UseCase<void, DeleteAccountParams> {
@@ -32,6 +33,7 @@ class DeleteAccountUseCase implements UseCase<void, DeleteAccountParams> {
       });
 
       final result = await repository.deleteAccount(
+        password: params.password,
         correlationId: params.correlationId,
       );
 

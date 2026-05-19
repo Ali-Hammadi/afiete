@@ -94,7 +94,17 @@ abstract class AuthRepository {
   /// Uses authenticated session token.
   /// Hard delete from database; cannot be recovered.
   /// Backend should clear all associated data.
-  Future<Either<Failure, void>> deleteAccount({String? correlationId});
+  Future<Either<Failure, void>> deleteAccount({
+    required String password,
+    String? correlationId,
+  });
+
+  /// Reactivate an inactive account with email and password.
+  Future<Either<Failure, void>> reactivateAccount({
+    required String email,
+    required String password,
+    String? correlationId,
+  });
 
   // ===== GOOGLE SIGN-IN =====
 

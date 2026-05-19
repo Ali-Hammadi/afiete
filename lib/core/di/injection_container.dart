@@ -11,6 +11,7 @@ import 'package:afiete/feature/auth/domain/usecase/delete_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/fetch_profile_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/google_signin_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/logout_usecase.dart';
+import 'package:afiete/feature/auth/domain/usecase/reactivate_account_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/request_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_forgot_password_otp_usecase.dart';
 import 'package:afiete/feature/auth/domain/usecase/verify_otp_usecase.dart';
@@ -140,6 +141,9 @@ Future<void> init() async {
   sl.registerLazySingleton<DeleteAccountUseCase>(
     () => DeleteAccountUseCase(sl<AuthRepository>()),
   );
+  sl.registerLazySingleton<ReactivateAccountUseCase>(
+    () => ReactivateAccountUseCase(sl<AuthRepository>()),
+  );
   sl.registerLazySingleton<LogoutUseCase>(
     () => LogoutUseCase(sl<AuthRepository>()),
   );
@@ -170,6 +174,7 @@ Future<void> init() async {
       sl<SignupUseCase>(),
       sl<LogoutUseCase>(),
       sl<DeleteAccountUseCase>(),
+      sl<ReactivateAccountUseCase>(),
       sl<GoogleSignInUseCase>(),
       sl<FetchProfileUseCase>(),
       sl<UpdateProfileInfoUseCase>(),

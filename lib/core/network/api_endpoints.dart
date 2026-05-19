@@ -22,7 +22,9 @@ abstract class ApiEndpoints {
   static const String login = '$users/login/';
   static const String signup = '$patients/register/';
   static const String logout = '$users/logout/';
-  static const String deleteAccount = '$users/account/delete/';
+  static const String deactivateAccount = '$users/deactivate';
+  static const String deleteAccount = deactivateAccount;
+  static const String activateAccount = '$users/activate';
   static const String googleLogin = '$patients/google/auth/';
 
   // === User Profile ===

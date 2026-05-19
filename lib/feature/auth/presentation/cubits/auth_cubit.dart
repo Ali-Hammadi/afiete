@@ -18,6 +18,7 @@ import 'package:equatable/equatable.dart';
 import '../../domain/usecase/login_usecase.dart';
 import '../../domain/usecase/signup_usecase.dart';
 import '../../domain/usecase/google_signin_usecase.dart';
+import '../../domain/usecase/reactivate_account_usecase.dart';
 import '../../domain/usecase/update_profile_info_usecase.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/entities/auth_user_entity.dart';
@@ -37,6 +38,7 @@ class AuthCubit extends Cubit<AuthState> {
   final SignupUseCase signupUseCase;
   final LogoutUseCase logoutUseCase;
   final DeleteAccountUseCase deleteAccountUseCase;
+  final ReactivateAccountUseCase reactivateAccountUseCase;
   final GoogleSignInUseCase googleSignInUseCase;
   final FetchProfileUseCase fetchProfileUseCase;
   final UpdateProfileInfoUseCase updateProfileInfoUseCase;
@@ -52,6 +54,7 @@ class AuthCubit extends Cubit<AuthState> {
     this.signupUseCase,
     this.logoutUseCase,
     this.deleteAccountUseCase,
+    this.reactivateAccountUseCase,
     this.googleSignInUseCase,
     this.fetchProfileUseCase,
     this.updateProfileInfoUseCase,
@@ -88,8 +91,11 @@ class AuthCubit extends Cubit<AuthState> {
             data: {'cid': correlationId, 'email': email},
           );
           emit(
-            const AuthError(
-              'This account is inactive or restricted on the server, so sign-in is currently unavailable. Please contact support if you believe this is an error.',
+            AccountReactivationRequired(
+              email: email,
+              password: password,
+              message:
+                  'This account is inactive. You can reactivate it now and verify a new code to sign in again.',
             ),
           );
           return Future.value();
@@ -302,7 +308,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<bool> deleteAccount() async {
+  Future<bool> deleteAccount(String password) async {
     if (_isDeletingAccount) {
       debugPrint(
         '[AuthCubit] deleteAccount() called but _isDeletingAccount is already true, returning false',
@@ -331,7 +337,10 @@ class AuthCubit extends Cubit<AuthState> {
       );
       _log.warn('delete_account:calling_usecase', data: {'cid': correlationId});
       final result = await deleteAccountUseCase(
-        DeleteAccountParams(correlationId: correlationId),
+        DeleteAccountParams(
+          password: password,
+          correlationId: correlationId,
+        ),
       );
       debugPrint(
         '[AuthCubit] deleteAccountUseCase completed with result: ${result.runtimeType}',
@@ -408,6 +417,39 @@ class AuthCubit extends Cubit<AuthState> {
         );
       }
     }
+  }
+
+  Future<bool> reactivateAccount(String email, String password) async {
+    final correlationId = _newCorrelationId(context: 'reactivate_account');
+    _log.info(
+      'reactivate_account:start',
+      data: {'cid': correlationId, 'email': email},
+    );
+    emit(AuthLoading());
+
+    final result = await reactivateAccountUseCase(
+      ReactivateAccountParams(
+        email: email,
+        password: password,
+        correlationId: correlationId,
+      ),
+    );
+
+    return result.fold(
+      (failure) {
+        _log.error(
+          'reactivate_account:error',
+          data: {'cid': correlationId, 'message': failure.errorMessage},
+        );
+        emit(AuthError(failure.errorMessage));
+        return false;
+      },
+      (_) {
+        _log.info('reactivate_account:success', data: {'cid': correlationId});
+        emit(OtpSent(email: email, expiresInSeconds: 60));
+        return true;
+      },
+    );
   }
 
   Future<void> googleSignIn() async {

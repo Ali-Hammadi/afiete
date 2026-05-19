@@ -95,7 +95,17 @@ abstract class AuthRemoteDataSource {
 
   /// Delete account permanently (hard delete with verification).
   /// Requires: access_token (via interceptor)
-  Future<void> deleteAccount({String? correlationId});
+  Future<void> deleteAccount({
+    required String password,
+    String? correlationId,
+  });
+
+  /// Reactivate an inactive account using email and password.
+  Future<void> reactivateAccount(
+    String email,
+    String password, {
+    String? correlationId,
+  });
 
   /// Verify OTP for authentication/login purposes (OTP login flow).
   Future<UserModel> verifyOtp(
@@ -570,11 +580,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> deleteAccount({String? correlationId}) async {
+  Future<void> deleteAccount({
+    required String password,
+    String? correlationId,
+  }) async {
     _log.info('deleteAccount:start', data: {'cid': correlationId});
     try {
       final response = await _dio.delete<Map<String, dynamic>>(
         ApiEndpoints.deleteAccount,
+        data: {'password': password},
       );
       _log.info(
         'deleteAccount:success',
@@ -583,6 +597,41 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on DioException catch (e, st) {
       _log.error(
         'deleteAccount:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> reactivateAccount(
+    String email,
+    String password, {
+    String? correlationId,
+  }) async {
+    _log.info(
+      'reactivateAccount:start',
+      data: {'cid': correlationId, 'email': email},
+    );
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.activateAccount,
+        data: {'email': email, 'password': password},
+      );
+      _log.info(
+        'reactivateAccount:success',
+        data: {'cid': correlationId, 'statusCode': response.statusCode},
+      );
+    } on DioException catch (e, st) {
+      _log.error(
+        'reactivateAccount:error',
         data: {
           'cid': correlationId,
           'message': e.message,

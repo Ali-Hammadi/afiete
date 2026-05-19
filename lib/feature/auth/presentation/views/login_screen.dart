@@ -35,6 +35,12 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           if (state is AuthLoaded) {
             Navigator.pushReplacementNamed(context, MyRoutes.homeScreen);
+          } else if (state is AccountReactivationRequired) {
+            Navigator.pushNamed(
+              context,
+              MyRoutes.reactivateAccountScreen,
+              arguments: state,
+            );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(
               context,

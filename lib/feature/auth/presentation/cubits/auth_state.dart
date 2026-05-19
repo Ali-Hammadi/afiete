@@ -42,6 +42,22 @@ class AuthError extends AuthState {
   List<Object> get props => [message];
 }
 
+/// The account is inactive and can be reactivated from a dedicated flow.
+class AccountReactivationRequired extends AuthState {
+  final String email;
+  final String password;
+  final String message;
+
+  const AccountReactivationRequired({
+    required this.email,
+    required this.password,
+    required this.message,
+  });
+
+  @override
+  List<Object> get props => [email, password, message];
+}
+
 /// App state when a user account was removed or the local session must be reset.
 class AuthReset extends AuthState {
   final String? message;

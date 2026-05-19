@@ -431,10 +431,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteAccount({String? correlationId}) async {
+  Future<Either<Failure, void>> deleteAccount({
+    required String password,
+    String? correlationId,
+  }) async {
     _log.info('deleteAccount:start', data: {'cid': correlationId});
     try {
-      await _remoteDataSource.deleteAccount(correlationId: correlationId);
+      await _remoteDataSource.deleteAccount(
+        password: password,
+        correlationId: correlationId,
+      );
       _log.info('deleteAccount:success', data: {'cid': correlationId});
       return const Right(null);
     } on DioException catch (e, st) {
@@ -453,6 +459,48 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e, st) {
       _log.error(
         'deleteAccount:exception',
+        data: {'cid': correlationId, 'error': e.toString()},
+        error: e,
+        stackTrace: st,
+      );
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> reactivateAccount({
+    required String email,
+    required String password,
+    String? correlationId,
+  }) async {
+    _log.info(
+      'reactivateAccount:start',
+      data: {'cid': correlationId, 'email': email},
+    );
+    try {
+      await _remoteDataSource.reactivateAccount(
+        email,
+        password,
+        correlationId: correlationId,
+      );
+      _log.info('reactivateAccount:success', data: {'cid': correlationId});
+      return const Right(null);
+    } on DioException catch (e, st) {
+      _log.error(
+        'reactivateAccount:error',
+        data: {
+          'cid': correlationId,
+          'message': e.message,
+          'statusCode': e.response?.statusCode,
+          'response': e.response?.data,
+        },
+        error: e,
+        stackTrace: st,
+      );
+      return Left(ServerFailure.fromDioError(e));
+    } catch (e, st) {
+      _log.error(
+        'reactivateAccount:exception',
         data: {'cid': correlationId, 'error': e.toString()},
         error: e,
         stackTrace: st,
