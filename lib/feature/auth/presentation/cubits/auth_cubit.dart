@@ -147,6 +147,23 @@ class AuthCubit extends Cubit<AuthState> {
           'signup:error',
           data: {'cid': correlationId, 'message': failure.errorMessage},
         );
+
+        if (_isInactiveAccountError(failure.errorMessage)) {
+          _log.warn(
+            'signup:account_inactive',
+            data: {'cid': correlationId, 'email': email},
+          );
+          emit(
+            AccountReactivationRequired(
+              email: email,
+              password: password,
+              message:
+                  'This account is inactive. Reactivate it to request a new verification code.',
+            ),
+          );
+          return;
+        }
+
         // If email already exists (unverified), ask for OTP verification
         if (_isNotVerifiedError(failure.errorMessage) ||
             _isEmailAlreadyExistsError(failure.errorMessage)) {
@@ -294,6 +311,7 @@ class AuthCubit extends Cubit<AuthState> {
         await NuclearResetHelper.wipeEverything();
         debugPrint('[AuthCubit] Nuclear reset completed successfully');
         _log.info('logout:wipe_success', data: {'cid': correlationId});
+        emit(const AuthReset('Session cleared.'));
       } catch (e) {
         debugPrint('[AuthCubit] Nuclear reset failed: $e');
         _log.error(
@@ -402,6 +420,7 @@ class AuthCubit extends Cubit<AuthState> {
         await NuclearResetHelper.wipeEverything();
         debugPrint('[AuthCubit] Nuclear reset completed successfully');
         _log.info('delete_account:wipe_success', data: {'cid': correlationId});
+        emit(const AuthReset('Account deactivated.'));
       } catch (e) {
         debugPrint('[AuthCubit] Nuclear reset failed: $e');
         _log.error(

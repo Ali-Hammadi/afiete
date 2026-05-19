@@ -54,6 +54,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 arguments: state.user.email,
               );
             }
+          } else if (state is AccountReactivationRequired) {
+            Navigator.pushNamed(
+              context,
+              MyRoutes.reactivateAccountScreen,
+              arguments: state,
+            );
           } else if (state is OtpSent) {
             // PHASE 1 → PHASE 2: Navigate to OTP verification screen
             Navigator.pushNamed(
